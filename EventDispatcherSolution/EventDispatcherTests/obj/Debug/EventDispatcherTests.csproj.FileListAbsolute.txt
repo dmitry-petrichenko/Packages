@@ -1,0 +1,13 @@
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherTests\bin\Debug\EventDispatcherTests.dll
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherTests\bin\Debug\EventDispatcherTests.pdb
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherTests\bin\Debug\xunit.abstractions.dll
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherTests\bin\Debug\xunit.assert.dll
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherTests\bin\Debug\xunit.core.dll
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherTests\bin\Debug\xunit.execution.desktop.dll
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherTests\obj\Debug\EventDispatcherTests.csprojAssemblyReference.cache
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherTests\obj\Debug\EventDispatcherTests.csproj.CoreCompileInputs.cache
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherTests\obj\Debug\EventDispatcherTests.csproj.CopyComplete
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherTests\obj\Debug\EventDispatcherTests.dll
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherTests\obj\Debug\EventDispatcherTests.pdb
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherTests\bin\Debug\EventDispatcher.dll
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherTests\bin\Debug\EventDispatcher.pdb

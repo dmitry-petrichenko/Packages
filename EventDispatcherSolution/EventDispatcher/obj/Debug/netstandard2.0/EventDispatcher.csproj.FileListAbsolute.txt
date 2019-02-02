@@ -1,0 +1,9 @@
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcher\bin\Debug\netstandard2.0\EventDispatcher.deps.json
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcher\bin\Debug\netstandard2.0\EventDispatcher.dll
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcher\bin\Debug\netstandard2.0\EventDispatcher.pdb
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcher\obj\Debug\netstandard2.0\EventDispatcher.csprojAssemblyReference.cache
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcher\obj\Debug\netstandard2.0\EventDispatcher.csproj.CoreCompileInputs.cache
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcher\obj\Debug\netstandard2.0\EventDispatcher.AssemblyInfoInputs.cache
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcher\obj\Debug\netstandard2.0\EventDispatcher.AssemblyInfo.cs
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcher\obj\Debug\netstandard2.0\EventDispatcher.dll
+D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcher\obj\Debug\netstandard2.0\EventDispatcher.pdb

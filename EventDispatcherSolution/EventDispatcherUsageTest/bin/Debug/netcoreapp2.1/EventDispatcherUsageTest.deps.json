@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v2.1",
+    "signature": "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v2.1": {
+      "EventDispatcherUsageTest/1.0.0": {
+        "dependencies": {
+          "ID5D6AAC.Common.EventDispatcher": "1.0.0"
+        },
+        "runtime": {
+          "EventDispatcherUsageTest.dll": {}
+        }
+      },
+      "ID5D6AAC.Common.EventDispatcher/1.0.0": {
+        "runtime": {
+          "EventDispatcher.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "EventDispatcherUsageTest/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "ID5D6AAC.Common.EventDispatcher/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

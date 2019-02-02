@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>ID5D6AAC.Common.EventDispatcher</id>
+    <version>1.0.0</version>
+    <authors>Dmitry Petrichenko</authors>
+    <owners>Dmitry Petrichenko</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Package Description</description>
+    <dependencies>
+      <group targetFramework=".NETCoreApp2.1" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcher\bin\Debug\netcoreapp2.1\EventDispatcher.dll" target="lib\netcoreapp2.1\EventDispatcher.dll" />
+  </files>
+</package>
