@@ -1,6 +1,7 @@
 {
   "version": 3,
   "targets": {
+    ".NETFramework,Version=v4.0": {},
     ".NETStandard,Version=v1.0": {
       "Microsoft.NETCore.Platforms/1.1.0": {
         "type": "package",
@@ -1912,6 +1913,7 @@
     }
   },
   "projectFileDependencyGroups": {
+    ".NETFramework,Version=v4.0": [],
     ".NETStandard,Version=v1.0": [
       "NETStandard.Library >= 1.6.1"
     ]
@@ -1921,7 +1923,7 @@
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
-    "version": "1.1.0",
+    "version": "1.2.0",
     "restore": {
       "projectUniqueName": "D:\\Projects_Home\\Unity\\Packages\\EventDispatcherSolution\\EventDispatcher\\EventDispatcher.csproj",
       "projectName": "ID5D6AAC.Common.EventDispatcher",
@@ -1929,6 +1931,7 @@
       "packagesPath": "C:\\Users\\dimap\\.nuget\\packages\\",
       "outputPath": "D:\\Projects_Home\\Unity\\Packages\\EventDispatcherSolution\\EventDispatcher\\obj\\",
       "projectStyle": "PackageReference",
+      "crossTargeting": true,
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
@@ -1937,13 +1940,18 @@
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
+        "net40",
         "netstandard1.0"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "D:\\Local.Server": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
+        "net40": {
+          "projectReferences": {}
+        },
         "netstandard1.0": {
           "projectReferences": {}
         }
@@ -1955,6 +1963,7 @@
       }
     },
     "frameworks": {
+      "net40": {},
       "netstandard1.0": {
         "dependencies": {
           "NETStandard.Library": {

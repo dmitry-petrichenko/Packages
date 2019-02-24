@@ -1,18 +1,23 @@
 ﻿{
-  "version": "1.1.0",
+  "version": "1.2.0",
   "restore": {
     "projectUniqueName": "D:\\Projects_Home\\Unity\\Packages\\EventDispatcherSolution\\EventDispatcher\\EventDispatcher.csproj",
     "projectName": "ID5D6AAC.Common.EventDispatcher",
     "projectPath": "D:\\Projects_Home\\Unity\\Packages\\EventDispatcherSolution\\EventDispatcher\\EventDispatcher.csproj",
     "outputPath": "D:\\Projects_Home\\Unity\\Packages\\EventDispatcherSolution\\EventDispatcher\\obj\\",
     "projectStyle": "PackageReference",
+    "crossTargeting": true,
     "fallbackFolders": [
       "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
     ],
     "originalTargetFrameworks": [
+      "net40",
       "netstandard1.0"
     ],
     "frameworks": {
+      "net40": {
+        "projectReferences": {}
+      },
       "netstandard1.0": {
         "projectReferences": {}
       }
@@ -24,6 +29,7 @@
     }
   },
   "frameworks": {
+    "net40": {},
     "netstandard1.0": {
       "dependencies": {
         "NETStandard.Library": {
