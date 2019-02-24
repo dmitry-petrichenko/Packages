@@ -1,9 +1,0 @@
-D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherSolution\obj\Debug\netcoreapp2.1\EventDispatcherSolution.csprojAssemblyReference.cache
-D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherSolution\obj\Debug\netcoreapp2.1\EventDispatcherSolution.csproj.CoreCompileInputs.cache
-D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherSolution\obj\Debug\netcoreapp2.1\EventDispatcherSolution.AssemblyInfoInputs.cache
-D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherSolution\obj\Debug\netcoreapp2.1\EventDispatcherSolution.AssemblyInfo.cs
-D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherSolution\bin\Debug\netcoreapp2.1\EventDispatcherSolution.deps.json
-D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherSolution\bin\Debug\netcoreapp2.1\EventDispatcherSolution.dll
-D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherSolution\bin\Debug\netcoreapp2.1\EventDispatcherSolution.pdb
-D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherSolution\obj\Debug\netcoreapp2.1\EventDispatcherSolution.dll
-D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcherSolution\obj\Debug\netcoreapp2.1\EventDispatcherSolution.pdb

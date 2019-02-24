@@ -1,8 +1,0 @@
-D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcher\bin\Debug\net40\EventDispatcher.dll
-D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcher\bin\Debug\net40\EventDispatcher.pdb
-D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcher\obj\Debug\net40\EventDispatcher.csprojAssemblyReference.cache
-D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcher\obj\Debug\net40\EventDispatcher.csproj.CoreCompileInputs.cache
-D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcher\obj\Debug\net40\EventDispatcher.AssemblyInfoInputs.cache
-D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcher\obj\Debug\net40\EventDispatcher.AssemblyInfo.cs
-D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcher\obj\Debug\net40\EventDispatcher.dll
-D:\Projects_Home\Unity\Packages\EventDispatcherSolution\EventDispatcher\obj\Debug\net40\EventDispatcher.pdb
