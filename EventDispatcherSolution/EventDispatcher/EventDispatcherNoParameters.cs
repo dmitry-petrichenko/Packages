@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ID5D6AAC.Common.EventDispatcher
 {
-    internal class EventDispatcherNoParameters
+    internal class EventDispatcherNoParameters : IDisposable
     {
         private Dictionary<string, HashSet<Action>> _subscriptionsNoParameters;
 
@@ -39,6 +39,12 @@ namespace ID5D6AAC.Common.EventDispatcher
                     _subscriptionsNoParameters[eventType].Remove(handler);
                 }
             }
+        }
+
+        public void Dispose()
+        {
+            _subscriptionsNoParameters.Clear();
+            _subscriptionsNoParameters = null;
         }
     }
 }

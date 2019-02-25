@@ -2,7 +2,7 @@ using System;
 
 namespace ID5D6AAC.Common.EventDispatcher
 {
-    public interface IEventDispatcher
+    public interface IEventDispatcher : IDisposable
     {
         void AddEventListener(string eventType, Action handler);
         void AddEventListener<TData>(string eventType, Action<TData> handler);

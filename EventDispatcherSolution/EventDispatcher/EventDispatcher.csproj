@@ -2,7 +2,7 @@
 
     <PropertyGroup>
 		<PackageId>ID5D6AAC.Common.EventDispatcher</PackageId>
-		<Version>1.2.0</Version>
+		<Version>1.3.0</Version>
 		<Authors>Dmitry Petrichenko</Authors>
 		<Company>ID5D6AAC</Company>
         <RootNamespace>EventDispatcherSolution</RootNamespace>

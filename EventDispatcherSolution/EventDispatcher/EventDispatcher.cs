@@ -40,7 +40,13 @@ namespace ID5D6AAC.Common.EventDispatcher
             Action action = handler as Action;
             _eventDispatcherNoParameters.RemoveEventListener(eventType, action);
         }
+
+        public void Dispose()
+        {
+            _eventDispatcherNoParameters.Dispose();
+            _eventDispatcherNoParameters = null;
+            _eventDispatcherWithParameters.Dispose();
+            _eventDispatcherWithParameters = null;
+        }
     }
-
-
 }

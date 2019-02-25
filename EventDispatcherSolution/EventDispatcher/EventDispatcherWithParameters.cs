@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ID5D6AAC.Common.EventDispatcher
 {
-    internal class EventDispatcherWithParameters
+    internal class EventDispatcherWithParameters : IDisposable
     {
         private Dictionary<string, Dictionary<Delegate, IEventhandlerWithParameter>> _subscriptionsWithParameters;
         
@@ -72,6 +72,12 @@ namespace ID5D6AAC.Common.EventDispatcher
         private interface IEventhandlerWithParameter
         {
             void Invoke();
+        }
+
+        public void Dispose()
+        {
+            _subscriptionsWithParameters.Clear();
+            _subscriptionsWithParameters = null;
         }
     }
     

@@ -2,8 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventDispatcher", "EventDispatcher\EventDispatcher.csproj", "{B62B6BCD-22B2-4B93-8A0C-98ED0A1D6ADC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventDispatcherUsageTest", "EventDispatcherUsageTest\EventDispatcherUsageTest.csproj", "{9963824F-3750-44A7-8EA3-76958C63ADEC}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventDispatcherTests", "EventDispatcherTests\EventDispatcherTests.csproj", "{7BF0D033-F959-40F6-91E0-BD2450BACC14}"
 EndProject
 Global
@@ -16,10 +14,6 @@ Global
 		{B62B6BCD-22B2-4B93-8A0C-98ED0A1D6ADC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B62B6BCD-22B2-4B93-8A0C-98ED0A1D6ADC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B62B6BCD-22B2-4B93-8A0C-98ED0A1D6ADC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9963824F-3750-44A7-8EA3-76958C63ADEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9963824F-3750-44A7-8EA3-76958C63ADEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9963824F-3750-44A7-8EA3-76958C63ADEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9963824F-3750-44A7-8EA3-76958C63ADEC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7BF0D033-F959-40F6-91E0-BD2450BACC14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7BF0D033-F959-40F6-91E0-BD2450BACC14}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BF0D033-F959-40F6-91E0-BD2450BACC14}.Release|Any CPU.ActiveCfg = Release|Any CPU
