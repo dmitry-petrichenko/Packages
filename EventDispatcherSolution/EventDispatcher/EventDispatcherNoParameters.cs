@@ -5,18 +5,18 @@ namespace ID5D6AAC.Common.EventDispatcher
 {
     internal class EventDispatcherNoParameters : IDisposable
     {
-        private Dictionary<string, HashSet<Action>> _subscriptionsNoParameters;
+        private Dictionary<string, List<Action>> _subscriptionsNoParameters;
 
         internal EventDispatcherNoParameters()
         {
-            _subscriptionsNoParameters = new Dictionary<string, HashSet<Action>>();
+            _subscriptionsNoParameters = new Dictionary<string, List<Action>>();
         }
 
         internal void AddEventListener(string eventType, Action handler)
         {
             if (!_subscriptionsNoParameters.ContainsKey(eventType))
             {
-                _subscriptionsNoParameters[eventType] = new HashSet<Action>();
+                _subscriptionsNoParameters[eventType] = new List<Action>();
             }
 
             _subscriptionsNoParameters[eventType].Add(handler);
@@ -26,7 +26,11 @@ namespace ID5D6AAC.Common.EventDispatcher
         {
             if (_subscriptionsNoParameters.ContainsKey(eventType))
             {
-                foreach( var action in _subscriptionsNoParameters[eventType] ) { action.Invoke(); }
+                List<Action> actions = _subscriptionsNoParameters[eventType];
+                for (int i = 0; i < actions.Count; i++)
+                {
+                    actions[i].Invoke();
+                }
             }
         }
         
