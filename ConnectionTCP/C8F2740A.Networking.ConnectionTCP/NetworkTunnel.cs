@@ -81,8 +81,8 @@ namespace C8F2740A.Networking.ConnectionTCP
                 
                 if (bytes == 0) 
                     break;
-                    
-                Received?.Invoke(data.Take(bytes).ToArray());
+                
+                Task.Run(() => Received?.Invoke(data.Take(bytes).ToArray()));
             }
 
             CloseInternal();
