@@ -18,7 +18,7 @@ namespace C8F2740A.Networking.ConnectionTCP
         private readonly Func<ISocket, INetworkTunnel> _networkTunnelFactory;
         private readonly IRecorder _recorder;
 
-        private bool _isOpenned;
+        private bool _isOpened;
 
         public event Action<INetworkTunnel> Accepted;
         
@@ -39,7 +39,7 @@ namespace C8F2740A.Networking.ConnectionTCP
         {
             SafeExecution.TryCatchAsync(OpenInternal(), exception =>
             {
-                Console.WriteLine(exception.Message);
+                _recorder.RecordError(nameof(NetworkPoint), exception.Message);
             });
         }
 
@@ -51,28 +51,21 @@ namespace C8F2740A.Networking.ConnectionTCP
 
         private async Task OpenInternal()
         {
-            _isOpenned = true;
-            _recorder.RecordInfo(nameof(NetworkPoint), $"NetworkPoint openned {(_sListener.LocalEndPoint).Address}:{(_sListener.LocalEndPoint).Port}");
-
-            try
+            _isOpened = true;
+            _recorder.RecordInfo(nameof(NetworkPoint), $"NetworkPoint opened {(_sListener.LocalEndPoint).Address}:{(_sListener.LocalEndPoint).Port}");
+            
+            while (_isOpened)
             {
-                while (_isOpenned)
-                {
-                    _sListener.Listen(10);
-                    ISocket socket = await _sListener.AcceptAsync();
+                _sListener.Listen(10);
+                ISocket socket = await _sListener.AcceptAsync();
 
-                    ConnectionAcceptedHandler(socket);
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
+                ConnectionAcceptedHandler(socket);
             }
         }
 
         private void Close()
         {
-            _isOpenned = false;
+            _isOpened = false;
         }
 
         private void ConnectionAcceptedHandler(ISocket socket)

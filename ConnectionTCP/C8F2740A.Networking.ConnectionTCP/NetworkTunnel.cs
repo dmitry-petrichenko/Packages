@@ -30,13 +30,13 @@ namespace C8F2740A.Networking.ConnectionTCP
             _recorder = recorder;
             _socket = socket;
             
-            RecordInfo("Tunnel openned");
+            RecordInfo("Tunnel opened");
             Listen();
         }
 
         public void Send(byte[] data)
         {
-            _socket.Send(data);
+            SafeExecution.TryCatch(() => _socket.Send(data), ExceptionHandler);
         }
 
         public event Action<byte[]> Received;
@@ -48,7 +48,8 @@ namespace C8F2740A.Networking.ConnectionTCP
             {
                 return;
             }
-            
+
+            _isDisposed = true;
             CloseInternal();
         }
 
@@ -56,10 +57,34 @@ namespace C8F2740A.Networking.ConnectionTCP
         {
             SafeExecution.TryCatchAsync(Task.Run(ListenInternal), ExceptionHandler);
         }
+        
+        private void ListenInternal()
+        {
+            byte[] data = new byte[1024];
 
+            while (_socket.Connected)
+            {
+                var bytes = _socket.Receive(data);
+                
+                if (bytes == 0) 
+                    break;
+                
+                Received?.Invoke(data.Take(bytes).ToArray());
+            }
+
+            Dispose();
+        }
+        
         private void ExceptionHandler(Exception exception)
         {
             SocketException socketException = exception as SocketException;
+
+            if (socketException == null)
+            {
+                RecordError(exception.Message);
+                return;
+            }
+
             if (socketException.ErrorCode == 10054)
             {
                 CloseInternal();
@@ -70,27 +95,8 @@ namespace C8F2740A.Networking.ConnectionTCP
             }
         }
 
-        private void ListenInternal()
-        {
-            int bytes = 0;
-            byte[] data = new byte[1024];
-
-            while (_socket.Connected)
-            {
-                bytes = _socket.Receive(data);
-                
-                if (bytes == 0) 
-                    break;
-                
-                Task.Run(() => Received?.Invoke(data.Take(bytes).ToArray()));
-            }
-
-            CloseInternal();
-        }
-
         private void CloseInternal()
         {
-            _isDisposed = true;
             RecordInfo("Tunnel closed");
             Closed?.Invoke();
             _socket.Close();

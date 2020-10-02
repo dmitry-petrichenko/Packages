@@ -59,5 +59,20 @@ namespace C8F2740A.Common.ExecutionStrategies
 
             return result;
         }
+        
+        public static T TryCatchWithResult<T>(Func<T> action, Action<Exception> exceptionHandler)
+        {
+            T result = default;
+            try
+            {
+                result = action();
+            }
+            catch (Exception exception)
+            {
+                exceptionHandler(exception);
+            }
+
+            return result;
+        }
     }
 }

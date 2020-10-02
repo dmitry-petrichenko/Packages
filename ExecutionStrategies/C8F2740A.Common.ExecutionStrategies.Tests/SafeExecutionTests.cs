@@ -35,5 +35,20 @@ namespace C8F2740A.Common.ExecutionStrategies.Tests
             Assert.False(wasCatched);
             Assert.True(task.Result);
         }
+        
+        [Fact]
+        public void TryCatchWithResult_OnSuccess_ShouldReturnResult()
+        {
+            var wasCatched = false;
+            bool TestMethod()
+            {
+                return true;
+            }
+
+            var result = SafeExecution.TryCatchWithResult(TestMethod, exception => wasCatched = true);
+            
+            Assert.False(wasCatched);
+            Assert.True(result);
+        }
     }
 }
