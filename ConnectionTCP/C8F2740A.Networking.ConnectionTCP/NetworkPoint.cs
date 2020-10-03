@@ -37,10 +37,7 @@ namespace C8F2740A.Networking.ConnectionTCP
         
         private void Open()
         {
-            SafeExecution.TryCatchAsync(OpenInternal(), exception =>
-            {
-                _recorder.RecordError(nameof(NetworkPoint), exception.Message);
-            });
+            SafeExecution.TryCatchAsync(OpenInternal(), ExceptionHandler);
         }
 
         public void Dispose()
@@ -59,8 +56,13 @@ namespace C8F2740A.Networking.ConnectionTCP
                 _sListener.Listen(10);
                 ISocket socket = await _sListener.AcceptAsync();
 
-                ConnectionAcceptedHandler(socket);
+                SafeExecution.TryCatch(() => ConnectionAcceptedHandler(socket), ExceptionHandler);
             }
+        }
+
+        private void ExceptionHandler(Exception exception)
+        {
+            _recorder.RecordError(nameof(NetworkPoint), exception.Message);
         }
 
         private void Close()
