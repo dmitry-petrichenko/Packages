@@ -11,6 +11,7 @@ namespace C8F2740A.Networking.ConnectionTCP
 {
     public interface INetworkTunnel : IDisposable
     {
+        Task Listen();
         void Send(byte[] data);
 
         event Action<byte[]> Received;
@@ -31,11 +32,11 @@ namespace C8F2740A.Networking.ConnectionTCP
             _socket = socket;
             
             RecordInfo("Tunnel opened");
-            Listen();
         }
 
         public void Send(byte[] data)
         {
+            RecordInfo($"Tunnel.Send {data.Length}");
             SafeExecution.TryCatch(() => _socket.Send(data), ExceptionHandler);
         }
 
@@ -53,7 +54,7 @@ namespace C8F2740A.Networking.ConnectionTCP
             CloseInternal();
         }
 
-        private async Task Listen()
+        public async Task Listen()
         {
             SafeExecution.TryCatchAsync(Task.Run(ListenInternal), ExceptionHandler);
         }
@@ -65,7 +66,7 @@ namespace C8F2740A.Networking.ConnectionTCP
             while (_socket.Connected)
             {
                 var bytes = _socket.Receive(data);
-                
+                RecordInfo($"Tunnel bytes received {bytes}");
                 if (bytes == 0) 
                     break;
                 

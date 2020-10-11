@@ -2,7 +2,7 @@
 
     <PropertyGroup>
 		<PackageId>C8F2740A.Networking.ConnectionTCP</PackageId>
-		<Version>1.4.0</Version>
+		<Version>1.5.0</Version>
 		<Authors>Dmitry Petrichenko</Authors>
 		<Company>C8F2740A</Company>
         <RootNamespace>C8F2740A.Networking.ConnectionTCP</RootNamespace>
@@ -10,8 +10,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="C8F2740A.Common.ExecutionStrategies" Version="1.2.0" />
-      <PackageReference Include="C8F2740A.Common.Records" Version="1.0.0" />
+      <ProjectReference Include="..\..\ExecutionStrategies\C8F2740A_Common_ExecutionStrategies\C8F2740A.Common.ExecutionStrategies.csproj" />
+      <ProjectReference Include="..\..\Records\C8F2740A.Common.Records\C8F2740A.Common.Records.csproj" />
     </ItemGroup>
 
 </Project>
