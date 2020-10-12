@@ -1,10 +1,8 @@
-﻿using System;
-
-namespace C8F2740A.Common.Records
+﻿namespace C8F2740A.Common.Records
 {
     public interface IRecorder
     {
-        string GetHexCodeByHesh(int heshCode);
+        string GetHexCodeByHesh(int hashCode); 
         void RecordInfo(string tag, string message);
         void RecordError(string tag, string message);
 

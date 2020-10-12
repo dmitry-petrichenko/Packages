@@ -7,6 +7,7 @@
 		<Company>C8F2740A</Company>
         <RootNamespace>C8F2740A.Common.Records</RootNamespace>
         <TargetFramework>netstandard1.3</TargetFramework>
+        <LangVersion>8</LangVersion>
     </PropertyGroup>
 
 </Project>

@@ -13,7 +13,7 @@ namespace C8F2740A.Common.Records
             return heshCode.ToString("X");
         }
 
-        public void RecordInfo(string tag, string message)
+        public virtual void RecordInfo(string tag, string message)
         {
             if (ShowInfo)
             {
@@ -23,7 +23,7 @@ namespace C8F2740A.Common.Records
             }
         }
 
-        public void RecordError(string tag, string message)
+        public virtual void RecordError(string tag, string message)
         {
             if (ShowErrors)
             {
