@@ -2,7 +2,7 @@
 
     <PropertyGroup>
 		<PackageId>C8F2740A.Networking.ConnectionTCP</PackageId>
-		<Version>1.5.0</Version>
+		<Version>1.7.0</Version>
 		<Authors>Dmitry Petrichenko</Authors>
 		<Company>C8F2740A</Company>
         <RootNamespace>C8F2740A.Networking.ConnectionTCP</RootNamespace>

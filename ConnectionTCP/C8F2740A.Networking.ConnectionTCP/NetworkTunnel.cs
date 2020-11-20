@@ -88,7 +88,7 @@ namespace C8F2740A.Networking.ConnectionTCP
 
             if (socketException.ErrorCode == 10054)
             {
-                CloseInternal();
+                Dispose();
             }
             else
             {

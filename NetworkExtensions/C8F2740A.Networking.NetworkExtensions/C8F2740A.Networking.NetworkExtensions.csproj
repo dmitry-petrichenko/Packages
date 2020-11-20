@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    
+	<PropertyGroup>
+		<PackageId>C8F2740A.Networking.NetworkExtensions</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>Dmitry Petrichenko</Authors>
+		<Company>C8F2740A</Company>
+        <RootNamespace>C8F2740A.Networking.NetworkExtensions</RootNamespace>
+        <TargetFramework>netstandard1.0</TargetFramework>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <TargetFramework>netstandard1.0</TargetFramework>
+    </PropertyGroup>
+
+</Project>
