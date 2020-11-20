@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <RootNamespace>RemoteApi</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\ConnectionTCP\C8F2740A.Networking.ConnectionTCP\C8F2740A.Networking.ConnectionTCP.csproj" />
+      <ProjectReference Include="..\..\ExecutionStrategies\C8F2740A.Common.ExecutionStrategies\C8F2740A.Common.ExecutionStrategies.csproj" />
+      <ProjectReference Include="..\..\NetworkExtensions\C8F2740A.Networking.NetworkExtensions\C8F2740A.Networking.NetworkExtensions.csproj" />
+      <ProjectReference Include="..\..\NodeCommands\C8F2740A.NetworkNode.Commands.csproj" />
+      <ProjectReference Include="..\..\Records\C8F2740A.Common.Records\C8F2740A.Common.Records.csproj" />
+      <ProjectReference Include="..\..\SessionProtocol\C8F2740A.NetworkNode.SessionProtocol\C8F2740A.NetworkNode.SessionProtocol.csproj" />
+      <ProjectReference Include="..\C8F2740A.NetworkNode.RemoteApiCommands\C8F2740A.NetworkNode.RemoteApiCommands.csproj" />
+    </ItemGroup>
+
+</Project>

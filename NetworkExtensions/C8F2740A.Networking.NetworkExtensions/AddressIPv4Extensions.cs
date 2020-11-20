@@ -1,6 +1,6 @@
-﻿﻿using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
-namespace C8F2740A.Networking.Extensions
+namespace C8F2740A.Networking.NetworkExtensions
 {
     public static class AddressIPv4Extensions
     {

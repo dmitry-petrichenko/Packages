@@ -1,6 +1,6 @@
-﻿﻿using System.Text;
+﻿using System.Text;
 
-namespace C8F2740A.Networking.Extensions
+namespace C8F2740A.Networking.NetworkExtensions
 {
     public static class StringDataExtensions
     {

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+		<PackageId>C8F2740A.NetworkNode.Commands</PackageId>
+		<Version>1.1.0</Version>
+		<Authors>Dmitry Petrichenko</Authors>
+		<Company>C8F2740A</Company>
+        <RootNamespace>C8F2740A.NetworkNode.Commands</RootNamespace>
+        <TargetFramework>netstandard2.1</TargetFramework>
+    </PropertyGroup>
+
+</Project>
