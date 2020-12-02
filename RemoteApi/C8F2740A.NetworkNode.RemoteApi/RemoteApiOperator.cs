@@ -10,8 +10,10 @@ namespace RemoteApi
 {
     public interface IRemoteApiOperator
     {
-        void Start();
-        void Stop();
+        Task<(bool, IEnumerable<byte>)> ExecuteCommand(string command);
+        
+        event Action<string> ConnectedSuccess;
+        event Action<string> Error;
     }
     
     public class RemoteApiOperator : IRemoteApiOperator
@@ -19,7 +21,6 @@ namespace RemoteApi
         private readonly IInstructionsSenderFactory _instructionsSenderFactory;
         
         private Dictionary<string, Func<IEnumerable<string>, Task>> _commandsMap;
-        private IConsolePromptChat _consolePromptChat;
         private IInstructionsSender _currentInstructionSender;
 
         public RemoteApiOperator(IInstructionsSenderFactory instructionsSenderFactory)
@@ -31,34 +32,26 @@ namespace RemoteApi
                 {"connect", ConnectHandler}, 
                 {"disconnect", DisconnectHandler}
             };
-            
-            _consolePromptChat = new ConsolePromptChat();
-            _consolePromptChat.CommandReceived += CommandReceivedHandler;
         }
-
-        private async Task CommandReceivedHandler(string command)
+        
+        public async Task<(bool, IEnumerable<byte>)> ExecuteCommand(string command)
         {
             var textCommand = new TextCommand(command);
             
-            if(_commandsMap.TryGetValue(textCommand.Command, out Func<IEnumerable<string>, Task> handler))
+            if (_commandsMap.TryGetValue(textCommand.Command, out Func<IEnumerable<string>, Task> handler))
             {
                 await handler.Invoke(textCommand.Parameters);
+                return (true, Enumerable.Empty<byte>());
             }
-            else
+
+            if (_currentInstructionSender != default)
             {
-                if (_currentInstructionSender != default)
-                {
-                    var result = await _currentInstructionSender.TrySendInstruction(command.ToBytesArray());
-                    if (result.Item1)
-                    {
-                        Console.WriteLine(result.Item2.ToText());
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("wrong command");
-                }
+                var result = await _currentInstructionSender.TrySendInstruction(command.ToBytesArray());
+                return (result.Item1, result.Item2);
             }
+            
+            Error?.Invoke("wrong command");
+            return (true, Enumerable.Empty<byte>());
         }
 
         private async Task ConnectHandler(IEnumerable<string> parameters)
@@ -66,7 +59,7 @@ namespace RemoteApi
             var parametersArr = parameters.ToArray();
             if (parametersArr.Length != 1 || !parametersArr.First().IsCorrectIPv4Address())
             {
-                Console.WriteLine("wrong remote address");
+                Error?.Invoke("wrong remote address");
                 return;
             }
             
@@ -74,7 +67,7 @@ namespace RemoteApi
             var result =  await instructionsSender.TrySendInstruction(((byte)Commands.PING).ToBytesArray());
             if (result.Item1)
             {
-                _consolePromptChat.Prompt = parametersArr.First();
+                ConnectedSuccess?.Invoke(parametersArr.First());
                 _currentInstructionSender = instructionsSender;
             }
         }
@@ -84,14 +77,7 @@ namespace RemoteApi
             throw new NotImplementedException();
         }
 
-        public void Start()
-        {
-            _consolePromptChat.ReadFromInput();
-        }
-
-        public void Stop()
-        {
-            throw new NotImplementedException();
-        }
+        public event Action<string> ConnectedSuccess;
+        public event Action<string> Error;
     }
 }

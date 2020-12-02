@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <RootNamespace>C8F2740A.NetworkNode.SessionProtocol</RootNamespace>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+		<LangVersion>9</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\ConnectionTCP\C8F2740A.Networking.ConnectionTCP\C8F2740A.Networking.ConnectionTCP.csproj" />
+    </ItemGroup>
+
+</Project>
