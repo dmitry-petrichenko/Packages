@@ -17,17 +17,27 @@ namespace C8F2740A.NetworkNode.SessionProtocol
         
         public static byte ExtractDataPrefix(this IEnumerable<byte> rawData)
         {
-            return ExtractBytePrefiInternal(rawData.First());;
+            return ExtractBytePrefixInternal(rawData.First());;
+        }
+        
+        public static byte ExtractDataIndex(this IEnumerable<byte> rawData)
+        {
+            var firstByteVector = new BitVector32(rawData.First());
+            
+            var firstBytePrefix = BitConverter.GetBytes(firstByteVector[FirstByteSections.INDEX]).First();
+            
+            return firstBytePrefix;
         }
         
         public static byte ExtractBytePrefix(this byte value)
         {
-            return ExtractBytePrefiInternal(value);
+            return ExtractBytePrefixInternal(value);
         }
 
-        private static byte ExtractBytePrefiInternal(byte firstByte)
+        private static byte ExtractBytePrefixInternal(byte firstByte)
         {
             var firstByteVector = new BitVector32(firstByte);
+            
             var firstBytePrefix = BitConverter.GetBytes(firstByteVector[FirstByteSections.PREFIX]).First();
             
             return firstBytePrefix;

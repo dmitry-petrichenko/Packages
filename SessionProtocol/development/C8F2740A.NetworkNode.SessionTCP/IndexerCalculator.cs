@@ -10,7 +10,14 @@ namespace C8F2740A.NetworkNode.SessionProtocol
         
         public IndexerCalculator(bool isResponseBehaviour)
         {
-            _currentIndex = 0;
+            _isResponseBehaviour = isResponseBehaviour;
+
+            _currentIndex = _isResponseBehaviour ? 1 : 0;
+        }
+        
+        internal IndexerCalculator(bool isResponseBehaviour, int currentIndex)
+        {
+            _currentIndex = currentIndex;
             _isResponseBehaviour = isResponseBehaviour;
         }
 
@@ -20,19 +27,19 @@ namespace C8F2740A.NetworkNode.SessionProtocol
             return _currentIndex.Equals(index);
         }
 
-        public byte GenerateIndexToSend(byte prexix)
+        public byte GenerateIndexToSend(byte prefix)
         {
             var result = default(byte);
             
             if (_isResponseBehaviour)
             {
-                result = GenerateFirstByteWithIndex(_currentIndex, prexix);
+                result = GenerateFirstByteWithIndex(_currentIndex, prefix);
                 _currentIndex++;
             }
             else
             {
                 _currentIndex++;
-                result = GenerateFirstByteWithIndex(_currentIndex, prexix);
+                result = GenerateFirstByteWithIndex(_currentIndex, prefix);
             }
             
             ResetCurrentIndexIfNeeded();

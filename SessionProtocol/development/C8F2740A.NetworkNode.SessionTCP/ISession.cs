@@ -23,13 +23,13 @@ namespace C8F2740A.NetworkNode.SessionProtocol
         private readonly IRecorder _recorder;
         private readonly byte _requestBytePrefix, _responseBytePrefix;
 
-        private const byte REQUEST = 0b1100_0000;
-        private const byte RESPONSE = 0b0011_0000;
+        internal static readonly byte REQUEST = 0b1100_0000;
+        internal static readonly byte RESPONSE = 0b0011_0000;
 
         private IndexerCalculator _requestCalculator, _responseCalculator;
-        private Dictionary<byte, Action<IEnumerable<byte>>> _responceEventMap;
-        private bool _innerCallIsSent;
-        private bool _outerCallIsSent;
+        private Dictionary<byte, Action<IEnumerable<byte>, byte>> _responceEventMap;
+        private bool _requestFromRemoteReceived;
+        private bool _requestToRemoteSent;
         
         public event Action<IEnumerable<byte>> Received;
         public event Action<IEnumerable<byte>> Responded;
@@ -45,7 +45,7 @@ namespace C8F2740A.NetworkNode.SessionProtocol
             _requestBytePrefix = REQUEST.ExtractBytePrefix();
             _responseBytePrefix = RESPONSE.ExtractBytePrefix();
 
-            _responceEventMap = new Dictionary<byte, Action<IEnumerable<byte>>>
+            _responceEventMap = new Dictionary<byte, Action<IEnumerable<byte>, byte>>
             {
                 { _requestBytePrefix, BytesReceivedHandler },
                 { _responseBytePrefix, BytesRespondedHandler },
@@ -55,6 +55,9 @@ namespace C8F2740A.NetworkNode.SessionProtocol
             _networkTunnel.Listen();
             _networkTunnel.Received += ReceivedHandler;
             _networkTunnel.Closed += CloseHandler;
+
+            _requestFromRemoteReceived = false;
+            _requestToRemoteSent = false;
         }
 
         public void Dispose()
@@ -78,29 +81,12 @@ namespace C8F2740A.NetworkNode.SessionProtocol
             SafeExecution.TryCatch(() => ReceivedHandlerInternal(receivedBytes), ExceptionHandler);
         }
 
-        // RESPONSE (INNER CALL)
-        private void ResponseInternal(IEnumerable<byte> data)
-        {
-            if (_innerCallIsSent)
-            {
-                _recorder.RecordError(this.GetType().Name, 
-                    "Trying to send response without inner call");
-                return;
-            }
-            
-            _innerCallIsSent = true;
-            
-            var nextPrefix = _responseCalculator.GenerateIndexToSend(RESPONSE);
-            data.WrapDataWithFirstByte(nextPrefix);
-            
-            _networkTunnel?.Send(data.ToArray());
-        }
-
         private void ReceivedHandlerInternal(byte[] receivedBytes)
         {
+            var receivedIndex = receivedBytes.ExtractDataIndex();
             var receivedPrefix = receivedBytes.ExtractDataPrefix();
             var usefulData = receivedBytes.Skip(1).ToArray();
-            _responceEventMap[ResolveDataType(receivedPrefix)](usefulData);
+            _responceEventMap[ResolveDataType(receivedPrefix)](usefulData, receivedIndex);
         }
 
         private byte ResolveDataType(byte firstByte)
@@ -118,37 +104,69 @@ namespace C8F2740A.NetworkNode.SessionProtocol
             return 0;
         }
         
-        // REQUEST (INNER CALL)
-        private void BytesReceivedHandler(IEnumerable<byte> data)
+        // RESPONSE (INNER CALL)
+        private void ResponseInternal(IEnumerable<byte> data)
         {
-            if (!_innerCallIsSent)
+            if (!_requestFromRemoteReceived)
+            {
+                _recorder.RecordError(this.GetType().Name, 
+                    "Trying to send response without inner call");
+                return;
+            }
+            
+            _requestFromRemoteReceived = false;
+            
+            var nextPrefix = _responseCalculator.GenerateIndexToSend(RESPONSE);
+            var dataWithPrefix = data.WrapDataWithFirstByte(nextPrefix);
+            
+            _networkTunnel?.Send(dataWithPrefix.ToArray());
+        }
+        
+        // REQUEST (INNER CALL)
+        private void BytesReceivedHandler(IEnumerable<byte> data, byte index)
+        {
+            if (_requestFromRemoteReceived)
             {
                 _recorder.RecordError(this.GetType().Name, 
                     "Trying to receive request without inner call");
                 return;
             }
 
-            _innerCallIsSent = false;
+            if (!_responseCalculator.ValidateCurrentIndex(index))
+            {
+                _recorder.RecordError(this.GetType().Name, 
+                    "Received request with wrong index");
+                return;
+            }
+            
+            _requestFromRemoteReceived = true;
             
             Received?.Invoke(data);
         }
         
-        // RESPONCE (OUTER CALL)
-        private void BytesRespondedHandler(IEnumerable<byte> data)
+        // RESPONSE (OUTER CALL)
+        private void BytesRespondedHandler(IEnumerable<byte> data, byte prefix)
         {
-            if (!_outerCallIsSent)
+            if (!_requestToRemoteSent)
             {
                 _recorder.RecordError(this.GetType().Name, 
                     "Trying to receive responce without outer call");
                 return;
             }
+            
+            if (!_responseCalculator.ValidateCurrentIndex(prefix))
+            {
+                _recorder.RecordError(this.GetType().Name, 
+                    "Received response with wrong index");
+                return;
+            }
 
-            _outerCallIsSent = false;
+            _requestToRemoteSent = false;
             
             Responded?.Invoke(data);
         }
         
-        private void BytesUnknownHandler(IEnumerable<byte> data)
+        private void BytesUnknownHandler(IEnumerable<byte> data, byte prefix)
         {
             _recorder.RecordError(this.GetType().Name, "Wrong received data");
         }
@@ -156,18 +174,18 @@ namespace C8F2740A.NetworkNode.SessionProtocol
         // REQUEST (OUTER CALL)
         private void SendInternal(IEnumerable<byte> data)
         {
-            if (_outerCallIsSent)
+            if (_requestToRemoteSent)
             {
                 _recorder.RecordError(this.GetType().Name, "");
                 return;
             }
             
-            _outerCallIsSent = true;
+            _requestToRemoteSent = true;
             
-            var nextPrefix = _requestCalculator.GenerateIndexToSend(REQUEST);
-            data.WrapDataWithFirstByte(nextPrefix);
+            var nextPrefix = _responseCalculator.GenerateIndexToSend(REQUEST);
+            var dataWithPrefix = data.WrapDataWithFirstByte(nextPrefix);
             
-            _networkTunnel?.Send(data.ToArray());
+            _networkTunnel?.Send(dataWithPrefix.ToArray());
         }
         
         private void ExceptionHandler(Exception exception)
