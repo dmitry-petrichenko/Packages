@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
 
-namespace C8F2740A.NetworkNode.SessionProtocol
+namespace C8F2740A.NetworkNode.SessionTCP
 {
     internal class IndexerCalculator
     {

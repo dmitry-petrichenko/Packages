@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 
-namespace C8F2740A.NetworkNode.SessionProtocol
+namespace C8F2740A.NetworkNode.SessionTCP
 {
     internal static class ByteArrayExtensions
     {
