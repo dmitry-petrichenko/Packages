@@ -180,7 +180,7 @@ namespace C8F2740A.NetworkNode.SessionTCP
         
         private void ExceptionHandler(Exception exception)
         {
-            _recorder.RecordError(this.GetType().Name, exception.Message);
+            _recorder.RecordError(GetType().Name, exception.Message);
         }
 
         private void CloseHandler() => Closed?.Invoke();

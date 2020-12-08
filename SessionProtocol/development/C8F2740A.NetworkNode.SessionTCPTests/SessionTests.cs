@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using C8F2740A.Common.Records;
 using C8F2740A.Networking.ConnectionTCP;
-using C8F2740A.NetworkNode.SessionProtocol;
+using C8F2740A.NetworkNode.SessionTCP;
 using Telerik.JustMock;
 using Telerik.JustMock.Helpers;
 using Xunit;
@@ -22,6 +22,7 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
             _recorder = Mock.Create<IRecorder>();
         }
         
+        #region Constructor
         [Fact]
         public void Constructor_WhenCalled_ShouldStartListen()
         {
@@ -47,6 +48,7 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
             
             _networkTunnel.AssertAll();
         }
+        #endregion
         
         [Fact]
         public void Dispose_WhenCalled_ShouldSubscribeFromSubscriptions()
@@ -59,7 +61,8 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
             
             _networkTunnel.AssertAll();
         }
-        
+   
+        #region RequestInnerCall
         [Fact]
         public void RequestInnerCall_WhenCalled_ShouldReceiveData()
         {
@@ -125,6 +128,45 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
         }
         
         [Fact]
+        public void ResponseInnerCall_WhenCalledWithException_ShouldCatch()
+        {
+            var actualResponded = default(IEnumerable<byte>);
+            var data1 = BitConverter.GetBytes(0);
+            var data2 = BitConverter.GetBytes(989898);
+            var requestDataWithPrefix = GenerateDataWithPrefix(Session.REQUEST, data1);
+            _sut = new Session(_networkTunnel, _recorder);
+            Mock.Raise(() => _networkTunnel.Received += null, requestDataWithPrefix.ToArray());
+            Mock.Arrange(() => _networkTunnel.Send(Arg.IsAny<byte[]>())).Throws(new Exception());
+            
+            _sut.Response(BitConverter.GetBytes(989898));
+            
+            Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Exactly(1));
+        }
+        
+        [Theory]
+        [InlineData(13)]
+        [InlineData(3455)]
+        [InlineData(0)]
+        public void SecondResponceInnerCall_WhenCalledAfterRequest_ShouldNotReceiveData(int dataToTransfer)
+        {
+            var actualResponded = default(IEnumerable<byte>);
+            var data1 = BitConverter.GetBytes(0);
+            var data2 = BitConverter.GetBytes(dataToTransfer);
+            var requestDataWithPrefix = GenerateDataWithPrefix(Session.REQUEST, data1);
+            var responseDataWithPrefix = GenerateDataWithPrefix(Session.RESPONSE, data2, true);
+            _sut = new Session(_networkTunnel, _recorder);
+            Mock.Raise(() => _networkTunnel.Received += null, requestDataWithPrefix.ToArray());
+            Mock.Arrange(() => _networkTunnel.Send(Arg.IsAny<byte[]>())).DoInstead(
+                (byte[] args) => actualResponded = args);
+            
+            _sut.Response(BitConverter.GetBytes(dataToTransfer));
+            _sut.Response(BitConverter.GetBytes(dataToTransfer));
+            
+            Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Exactly(1));
+            Mock.Assert(() => _networkTunnel.Send(Arg.IsAny<byte[]>()), Occurs.Exactly(1));
+        }
+        
+        [Fact]
         public void ResponseInnerCall_WhenCalledBeforeRequest_ShouldNotReceiveData()
         {
             var response = 13;
@@ -139,7 +181,54 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
             Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Once());
             Assert.Equal(default, actualResponded);
         }
+        #endregion  
+        
+        #region RequestOuterCall
+        [Fact]
+        public void RequestOuterCall_WhenCalled_ShouldSendData()
+        {
+            var actualSent = default(IEnumerable<byte>);
+            var data = BitConverter.GetBytes(23443223);
+            var dataWithPrefix = GenerateDataWithPrefix(Session.REQUEST, data, true);
+            var temp = IndexerCalculatorTests.ByteToString(dataWithPrefix.First());
+            _sut = new Session(_networkTunnel, _recorder);
+            Mock.Arrange(() => _networkTunnel.Send(Arg.IsAny<byte[]>())).DoInstead(
+                (byte[] args) => actualSent = args);
+            
+            _sut.Send(data);
 
+            Assert.Equal(dataWithPrefix, actualSent);
+        }
+
+        [Fact]
+        public void SecondRequestOuterCall_WhenCalled_ShouldNotSendData()
+        {
+            var actualSent = default(IEnumerable<byte>);
+            var data = BitConverter.GetBytes(23443223);
+            _sut = new Session(_networkTunnel, _recorder);
+            Mock.Arrange(() => _networkTunnel.Send(Arg.IsAny<byte[]>())).DoInstead(
+                (byte[] args) => actualSent = args);
+            
+            _sut.Send(data);
+            _sut.Send(data);
+
+            Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Exactly(1));
+            Mock.Assert(() => _networkTunnel.Send(Arg.IsAny<byte[]>()), Occurs.Exactly(1));
+        }
+        #endregion  
+        
+        [Fact]
+        public void Close_WhenRaised_ShouldRaiseClose()
+        {
+            var calledClose = false;
+            _sut = new Session(_networkTunnel, _recorder);
+            _sut.Closed += ()=> calledClose = true;
+
+            Mock.Raise(() => _networkTunnel.Closed += null); 
+
+            Assert.True(calledClose);
+        }
+        
         private byte[] GenerateDataWithPrefix(byte prefix, byte[] data, bool responseBehaviour = false, int startIndex = int.MinValue)
         {
             var indexerCalculator = default(IndexerCalculator);
@@ -152,7 +241,7 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
                 indexerCalculator = new IndexerCalculator(responseBehaviour, startIndex);
             }
 
-            var nextPrefix = indexerCalculator.GenerateIndexToSend(prefix);;
+            var nextPrefix = indexerCalculator.GenerateIndexToSend(prefix);
             var dataWithPrefix = data.WrapDataWithFirstByte(nextPrefix);
 
             return dataWithPrefix.ToArray();

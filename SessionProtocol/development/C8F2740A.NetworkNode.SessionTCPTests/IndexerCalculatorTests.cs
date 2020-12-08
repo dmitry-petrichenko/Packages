@@ -1,5 +1,5 @@
 using System;
-using C8F2740A.NetworkNode.SessionProtocol;
+using C8F2740A.NetworkNode.SessionTCP;
 using Xunit;
 
 namespace C8F2740A.NetworkNode.SessionTCPTests

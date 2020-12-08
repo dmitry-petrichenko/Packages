@@ -1,7 +1,5 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.SessionProtocol", "..\sources\C8F2740A.NetworkNode.SessionProtocol.csproj", "{943DA237-313F-4A95-AE16-3EE34019CF39}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.SessionTCP", "C8F2740A.NetworkNode.SessionTCP\C8F2740A.NetworkNode.SessionTCP.csproj", "{14956A7F-913E-4CFF-B285-AB7D1BCA0162}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.Networking.ConnectionTCP", "..\..\ConnectionTCP\C8F2740A.Networking.ConnectionTCP\C8F2740A.Networking.ConnectionTCP.csproj", "{44294F2F-B41E-4BBB-ABC4-219262DB6381}"
@@ -20,10 +18,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{943DA237-313F-4A95-AE16-3EE34019CF39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{943DA237-313F-4A95-AE16-3EE34019CF39}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{943DA237-313F-4A95-AE16-3EE34019CF39}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{943DA237-313F-4A95-AE16-3EE34019CF39}.Release|Any CPU.Build.0 = Release|Any CPU
 		{14956A7F-913E-4CFF-B285-AB7D1BCA0162}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{14956A7F-913E-4CFF-B285-AB7D1BCA0162}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14956A7F-913E-4CFF-B285-AB7D1BCA0162}.Release|Any CPU.ActiveCfg = Release|Any CPU
