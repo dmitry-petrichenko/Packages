@@ -17,7 +17,6 @@ namespace C8F2740A.NetworkNode.SessionTCP
         
         public NodeVisitor(
             INetworkConnector networkConnector,
-            Func<string, INetworkAddress> networkAddressFactory,
             IRecorder recorder)
         {
             _networkConnector = networkConnector;

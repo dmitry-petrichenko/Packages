@@ -13,6 +13,7 @@ namespace C8F2740A.Networking.ConnectionTCP
     {
         Task Listen();
         void Send(byte[] data);
+        void Close();
 
         event Action<byte[]> Received;
         event Action Closed;
@@ -38,6 +39,11 @@ namespace C8F2740A.Networking.ConnectionTCP
         {
             RecordInfo($"Tunnel.Send {data.Length}");
             SafeExecution.TryCatch(() => _socket.Send(data), ExceptionHandler);
+        }
+
+        public void Close()
+        {
+            CloseInternal();
         }
 
         public event Action<byte[]> Received;

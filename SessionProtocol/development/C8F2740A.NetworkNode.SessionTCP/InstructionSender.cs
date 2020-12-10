@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using C8F2740A.Common.ExecutionStrategies;
 using C8F2740A.Common.Records;
@@ -22,9 +23,8 @@ namespace C8F2740A.NetworkNode.SessionTCP
         private readonly INodeVisitor _nodeVisitor;
         private readonly IRecorder _recorder;
 
-        private ISession _currentSession;
-        private TaskCompletionSource<IEnumerable<byte>> _sendInstructionTask;
-        
+        private ISessionHolder _sessionHolder;
+
         public InstructionSender(
             INodeVisitor nodeVisitor, 
             INetworkAddress remoteAddress,
@@ -33,12 +33,16 @@ namespace C8F2740A.NetworkNode.SessionTCP
             _nodeVisitor = nodeVisitor;
             _remoteAddress = remoteAddress;
             _recorder = recorder;
-            _currentSession = default;
+            _sessionHolder = new SessionHolder();
+            _sessionHolder.InstructionReceived += InstructionReceivedHandler;
         }
-        
+
         public void Dispose()
         {
-            
+            if (_sessionHolder.HasActiveSession)
+            {
+                _sessionHolder.Clear();
+            }
         }
         
         public Task<(bool, IEnumerable<byte>)> TrySendInstruction(IEnumerable<byte> instruction)
@@ -46,61 +50,31 @@ namespace C8F2740A.NetworkNode.SessionTCP
             return SafeExecution.TryCatchWithResultAsync(TrySendInstructionInternal(instruction), ExceptionHandler);
         }
 
-        private void SubscribeOnSession(ISession session)
+        private Task<(bool, IEnumerable<byte>)> TrySendInstructionInternal(IEnumerable<byte> instruction)
         {
-            session.Received += SessionReceivedHandler;
-            session.Responded += SessionRespondedHandler;
-        }
-
-        private void SessionRespondedHandler(IEnumerable<byte> value)
-        {
-            _sendInstructionTask.SetResult(value);
-        }
-
-        private void SessionReceivedHandler(IEnumerable<byte> obj)
-        {
-            
-        }
-        
-        private async Task<(bool, IEnumerable<byte>)> TrySendInstructionInternal(IEnumerable<byte> instruction)
-        {
-            ValidateSend();
-            _sendInstructionTask = new TaskCompletionSource<IEnumerable<byte>>();
-            
-            if (_currentSession != default)
+            if (_sessionHolder.HasActiveSession)
             {
-                _currentSession.Send(instruction);
-            }
-            else
-            {
-                var connectResult = _nodeVisitor.TryConnect(_remoteAddress);
-                if (connectResult.Item1)
-                {
-                    _currentSession = connectResult.Item2;
-                    _currentSession.Send(instruction);
-                }
-                else
-                {
-                    return (false, default);
-                }
+                return _sessionHolder.SendInstruction(instruction);
             }
 
-            var response =  await _sendInstructionTask.Task;
-            
-            return (true, response);
+            var connectResult = _nodeVisitor.TryConnect(_remoteAddress);
+            if (connectResult.Item1)
+            {
+                _sessionHolder.Set(connectResult.Item2);
+                return _sessionHolder.SendInstruction(instruction);
+            }
+
+            return Task.FromResult((false, Enumerable.Empty<byte>()));
         }
 
-        private void ValidateSend()
-        {
-            if (_sendInstructionTask != default && !_sendInstructionTask.Task.IsCompleted)
-            {
-                throw new Exception("Attempt to send white task is not completed");
-            }
-        }
-        
         private void ExceptionHandler(Exception exception)
         {
             _recorder.RecordError(GetType().Name, exception.Message);
+        }
+
+        private IEnumerable<byte> InstructionReceivedHandler(IEnumerable<byte> value)
+        {
+            return InstructionReceived?.Invoke(value);
         }
     }
 }

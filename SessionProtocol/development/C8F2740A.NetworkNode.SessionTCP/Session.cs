@@ -20,7 +20,17 @@ namespace C8F2740A.NetworkNode.SessionTCP
         private Dictionary<byte, Action<IEnumerable<byte>, byte>> _responceEventMap;
         private bool _requestFromRemoteReceived;
         private bool _requestToRemoteSent;
-        
+
+        public void Close()
+        {
+            if (_networkTunnel == default)
+            {
+                return;
+            }
+            
+            _networkTunnel.Close();
+        }
+
         public event Action<IEnumerable<byte>> Received;
         public event Action<IEnumerable<byte>> Responded;
         public event Action Closed;
@@ -183,6 +193,11 @@ namespace C8F2740A.NetworkNode.SessionTCP
             _recorder.RecordError(GetType().Name, exception.Message);
         }
 
-        private void CloseHandler() => Closed?.Invoke();
+        private void CloseHandler()
+        {
+            _networkTunnel.Received -= ReceivedHandler;
+            _networkTunnel.Closed -= CloseHandler;
+            Closed?.Invoke();
+        }
     }
 }
