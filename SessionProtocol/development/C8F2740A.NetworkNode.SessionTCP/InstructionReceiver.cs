@@ -23,7 +23,7 @@ namespace C8F2740A.NetworkNode.SessionTCP
         {
             _recorder = recorder;
             _nodeGateway = nodeGateway;
-            _sessionHolder = new SessionHolder();
+            _sessionHolder = new SessionHolder(_recorder);
             _sessionHolder.InstructionReceived += InstructionReceivedHandler;
 
             _nodeGateway.ConnectionReceived += ConnectionReceivedHandler;

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using C8F2740A.Common.ExecutionStrategies;
+using C8F2740A.Common.Records;
 
 namespace C8F2740A.NetworkNode.SessionTCP
 {
-    internal interface ISessionHolder
+    internal interface ISessionHolder : IDisposable
     {
         void Set(ISession session);
         void Clear();
@@ -18,12 +20,17 @@ namespace C8F2740A.NetworkNode.SessionTCP
     {
         public bool HasActiveSession { get; private set; }
         
+        public event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived;
+
+        private readonly IRecorder _recorder;
+        
         private ISession _currentSession;
         private bool _hasActiveSession;
         private TaskCompletionSource<IEnumerable<byte>> _sendInstructionTask;
 
-        public SessionHolder()
+        public SessionHolder(IRecorder recorder)
         {
+            _recorder = recorder;
             _currentSession = default;
             HasActiveSession = false;
         }
@@ -53,7 +60,13 @@ namespace C8F2740A.NetworkNode.SessionTCP
             _currentSession.Close();
         }
 
-        public async Task<(bool, IEnumerable<byte>)> SendInstruction(IEnumerable<byte> instruction)
+        public Task<(bool, IEnumerable<byte>)> SendInstruction(IEnumerable<byte> instruction)
+        {
+            return SafeExecution.TryCatchWithResultAsync(SendInstructionInternal(instruction),
+                exception => _recorder.DefaultException(this, exception));
+        }
+        
+        private async Task<(bool, IEnumerable<byte>)> SendInstructionInternal(IEnumerable<byte> instruction)
         {
             ValidateSend();
             _sendInstructionTask = new TaskCompletionSource<IEnumerable<byte>>();
@@ -64,10 +77,19 @@ namespace C8F2740A.NetworkNode.SessionTCP
             return (true, response);
         }
 
-        public event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived;
-
         private void ClosedHandler()
         {
+            ClearAndReset();
+        }
+
+        private void ClearAndReset()
+        {
+            if (_sendInstructionTask != default && !_sendInstructionTask.Task.IsCompleted)
+            {
+                _sendInstructionTask.SetCanceled();
+                _sendInstructionTask = default;
+            }
+            
             _currentSession.Received -= ReceivedHandler;
             _currentSession.Responded -= RespondedHandler;
             _currentSession.Closed -= ClosedHandler;
@@ -82,6 +104,12 @@ namespace C8F2740A.NetworkNode.SessionTCP
         }
 
         private void ReceivedHandler(IEnumerable<byte> value)
+        {
+            SafeExecution.TryCatch(() => ReceivedHandlerInternal(value),
+                exception => _recorder.DefaultException(this, exception));
+        }
+        
+        private void ReceivedHandlerInternal(IEnumerable<byte> value)
         {
             var result = InstructionReceived.Invoke(value);
             
@@ -102,6 +130,11 @@ namespace C8F2740A.NetworkNode.SessionTCP
             {
                 throw new Exception("Attempt to send when session is null");
             }
+        }
+
+        public void Dispose()
+        {
+            ClearAndReset();
         }
     }
 }

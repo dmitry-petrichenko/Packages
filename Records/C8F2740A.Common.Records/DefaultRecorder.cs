@@ -4,6 +4,9 @@ namespace C8F2740A.Common.Records
 {
     public class DefaultRecorder : IRecorder
     {
+        public bool ShowErrors { get; set; }
+        public bool ShowInfo { get; set; }
+        
         public DefaultRecorder()
         {
         }
@@ -32,8 +35,10 @@ namespace C8F2740A.Common.Records
                 Console.ResetColor();
             }
         }
-
-        public bool ShowErrors { get; set; }
-        public bool ShowInfo { get; set; }
+        
+        public void DefaultException(object source, Exception exception)
+        {
+            RecordError(source.GetType().Name, exception.Message);
+        }
     }
 }

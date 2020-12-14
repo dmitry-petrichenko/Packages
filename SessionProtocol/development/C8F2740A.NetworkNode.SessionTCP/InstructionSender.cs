@@ -33,7 +33,7 @@ namespace C8F2740A.NetworkNode.SessionTCP
             _nodeVisitor = nodeVisitor;
             _remoteAddress = remoteAddress;
             _recorder = recorder;
-            _sessionHolder = new SessionHolder();
+            _sessionHolder = new SessionHolder(_recorder);
             _sessionHolder.InstructionReceived += InstructionReceivedHandler;
         }
 

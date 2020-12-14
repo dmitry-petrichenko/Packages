@@ -42,5 +42,12 @@ namespace C8F2740A.NetworkNode.SessionTCP
             
             return firstBytePrefix;
         }
+        
+        public static IEnumerable<byte> ToEnumerable(this byte value)
+        {
+            var result = Enumerable.Repeat(value, 1);
+            
+            return result;
+        }
     }
 }

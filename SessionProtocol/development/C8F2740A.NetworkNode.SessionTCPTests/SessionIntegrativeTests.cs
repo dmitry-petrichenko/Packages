@@ -107,6 +107,11 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
                 RemoteTunnel?.Received?.Invoke(data);
             }
 
+            public void Close()
+            {
+                
+            }
+
             public NetworkTunnelMock RemoteTunnel { get; set; }
 
             public event Action<byte[]> Received;
