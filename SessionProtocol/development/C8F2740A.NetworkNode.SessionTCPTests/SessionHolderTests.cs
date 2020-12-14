@@ -52,6 +52,18 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
         {
             Assert.Throws<Exception>(() => _sut.Set(null));
         }
+        
+        [Fact]
+        public void HasActiveSession_WhenSet_ShouldBeTrue()
+        {
+            var session = Mock.Create<ISession>();
+            var before = _sut.HasActiveSession;
+            
+            _sut.Set(session);
+            
+            Assert.False(before);
+            Assert.True(_sut.HasActiveSession);
+        }
         #endregion 
         
         #region SendInstruction
@@ -190,6 +202,19 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
             Mock.Raise(() => session.Closed += null); 
             
             session.AssertAll();
+        }
+        
+        [Fact]
+        public void SessionClosed_WhenRaised_ShouldReset()
+        {
+            var session = Mock.Create<ISession>();
+            _sut.Set(session);
+            var before = _sut.HasActiveSession;
+            
+            Mock.Raise(() => session.Closed += null); 
+            
+            Assert.True(before);
+            Assert.False(_sut.HasActiveSession);
         }
         #endregion
     }

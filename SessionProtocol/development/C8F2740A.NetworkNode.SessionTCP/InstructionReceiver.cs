@@ -14,16 +14,20 @@ namespace C8F2740A.NetworkNode.SessionTCP
 
     public class InstructionReceiver : IInstructionReceiver
     {
+        public event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived;
+        
         private readonly IRecorder _recorder;
         private readonly INodeGateway _nodeGateway;
+        private readonly ISessionHolder _sessionHolder;
         
-        private ISessionHolder _sessionHolder;
-        
-        public InstructionReceiver(INodeGateway nodeGateway, IRecorder recorder)
+        public InstructionReceiver(
+            INodeGateway nodeGateway, 
+            ISessionHolder sessionHolder,
+            IRecorder recorder)
         {
             _recorder = recorder;
             _nodeGateway = nodeGateway;
-            _sessionHolder = new SessionHolder(_recorder);
+            _sessionHolder = sessionHolder;
             _sessionHolder.InstructionReceived += InstructionReceivedHandler;
 
             _nodeGateway.ConnectionReceived += ConnectionReceivedHandler;
@@ -61,7 +65,5 @@ namespace C8F2740A.NetworkNode.SessionTCP
             _recorder.RecordError(GetType().Name, "Trying to sent instruction without session");
             return Task.FromResult<(bool, IEnumerable<byte>)>((false, default));
         }
-
-        public event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived;
     }
 }

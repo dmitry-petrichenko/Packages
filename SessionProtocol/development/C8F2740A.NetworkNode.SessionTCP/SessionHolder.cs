@@ -6,7 +6,7 @@ using C8F2740A.Common.Records;
 
 namespace C8F2740A.NetworkNode.SessionTCP
 {
-    internal interface ISessionHolder : IDisposable
+    public interface ISessionHolder : IDisposable
     {
         void Set(ISession session);
         void Clear();
