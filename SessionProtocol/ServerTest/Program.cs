@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
 
 namespace ServerTest
@@ -14,7 +15,11 @@ namespace ServerTest
 
             instructionReceiver.InstructionReceived += InstructionReceivedHandler;
 
-            Console.ReadLine();
+            while (true)
+            {
+                var str = Console.ReadLine();
+                instructionReceiver.TrySendInstruction(Encoding.ASCII.GetBytes(str));
+            }
         }
 
         private static IEnumerable<byte> InstructionReceivedHandler(IEnumerable<byte> instruction)

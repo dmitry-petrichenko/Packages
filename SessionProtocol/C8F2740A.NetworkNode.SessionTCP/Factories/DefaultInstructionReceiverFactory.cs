@@ -10,9 +10,7 @@ namespace C8F2740A.NetworkNode.SessionTCP.Factories
         
         public DefaultInstructionReceiverFactory()
         {
-            _recorder = new DefaultRecorder();
-            _recorder.ShowErrors = true;
-            _recorder.ShowInfo = true;
+            _recorder = new DefaultRecorder(new RecorderSettings());
         }
 
         public IInstructionReceiver Create(string address)
@@ -47,6 +45,18 @@ namespace C8F2740A.NetworkNode.SessionTCP.Factories
         private INetworkTunnel NetworkTunnelFactory(ISocket socket)
         {
             return new NetworkTunnel(socket, _recorder);
+        }
+
+        private class RecorderSettings : IRecorderSettings
+        {
+            public RecorderSettings()
+            {
+                ShowErrors = true;
+                ShowInfo = true;
+            }
+
+            public bool ShowErrors { get; }
+            public bool ShowInfo { get; }
         }
     }
 }
