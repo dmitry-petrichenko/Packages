@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using C8F2740A.NetworkNode.SessionProtocol;
+using C8F2740A.NetworkNode.SessionTCP;
 using RemoteApiCommands;
 
 namespace RemoteApi
@@ -15,20 +15,20 @@ namespace RemoteApi
     
     public class RemoteApiMap : IRemoteApiMap
     {
-        private readonly IInstructionsReceiver _instructionsReceiver;
+        private readonly IInstructionReceiver _instructionsReceiver;
 
         private Dictionary<string, bool> _commandWithParametersMap;
         private Dictionary<string, Func<IEnumerable<string>, IEnumerable<byte>>> _commandHandlerMap;
         private Dictionary<string, string> _commandDescriptionMap;
         
-        public RemoteApiMap(IInstructionsReceiver instructionsReceiver)
+        public RemoteApiMap(IInstructionReceiver instructionsReceiver)
         {
             _commandWithParametersMap = new Dictionary<string, bool>();
             _commandHandlerMap = new Dictionary<string, Func<IEnumerable<string>, IEnumerable<byte>>>();
             _commandDescriptionMap = new Dictionary<string, string>();
             
             _instructionsReceiver = instructionsReceiver;
-            _instructionsReceiver.CommandReceived += CommandHandler;
+            _instructionsReceiver.InstructionReceived += CommandHandler;
             
             RegisterDefaultCommands();
         }

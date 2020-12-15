@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client2", "Client2\Client2.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.RemoteTerminalTracer", "C8F2740A.NetworkNode.RemoteTerminalTracer\C8F2740A.NetworkNode.RemoteTerminalTracer.csproj", "{CD82D207-F49E-4155-B190-54F2384EC4EA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.RemoteApi.Nuget", "C8F2740A.NetworkNode.RemoteApi\C8F2740A.NetworkNode.RemoteApi.Nuget.csproj", "{246A921E-08A6-4124-9C48-B24B3C51DD46}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +82,10 @@ Global
 		{CD82D207-F49E-4155-B190-54F2384EC4EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD82D207-F49E-4155-B190-54F2384EC4EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD82D207-F49E-4155-B190-54F2384EC4EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{246A921E-08A6-4124-9C48-B24B3C51DD46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{246A921E-08A6-4124-9C48-B24B3C51DD46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{246A921E-08A6-4124-9C48-B24B3C51DD46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{246A921E-08A6-4124-9C48-B24B3C51DD46}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6678655B-E8D1-4CCC-A3B1-4149ECE4FBBD} = {E356AF65-3D92-40D9-AC87-8AABEBD25D0D}

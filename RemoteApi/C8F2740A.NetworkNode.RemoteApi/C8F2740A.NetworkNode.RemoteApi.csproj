@@ -15,4 +15,8 @@
       <ProjectReference Include="..\C8F2740A.NetworkNode.RemoteApiCommands\C8F2740A.NetworkNode.RemoteApiCommands.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="C8F2740A.NetworkNode.SessionTCP" Version="1.0.0" />
+    </ItemGroup>
+
 </Project>
