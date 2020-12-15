@@ -4,11 +4,11 @@ namespace C8F2740A.Common.Records
 {
     public class DefaultRecorder : IRecorder
     {
-        public bool ShowErrors { get; set; }
-        public bool ShowInfo { get; set; }
+        private readonly IRecorderSettings _recorderSettings;
         
-        public DefaultRecorder()
+        public DefaultRecorder(IRecorderSettings recorderSettings)
         {
+            _recorderSettings = recorderSettings;
         }
 
         public string GetHexCodeByHesh(int heshCode)
@@ -18,7 +18,7 @@ namespace C8F2740A.Common.Records
 
         public virtual void RecordInfo(string tag, string message)
         {
-            if (ShowInfo)
+            if (_recorderSettings.ShowInfo)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"{tag}: {message}");
@@ -28,7 +28,7 @@ namespace C8F2740A.Common.Records
 
         public virtual void RecordError(string tag, string message)
         {
-            if (ShowErrors)
+            if (_recorderSettings.ShowErrors)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"{tag}: {message}");
