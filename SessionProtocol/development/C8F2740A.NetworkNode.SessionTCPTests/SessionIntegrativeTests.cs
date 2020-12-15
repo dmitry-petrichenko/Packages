@@ -20,9 +20,12 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
             var actualResponded = default(IEnumerable<byte>);
             
             var recorder = Mock.Create<IRecorder>();
-            var networkTunnel = new NetworkTunnelMock();
-            var session1 = CreateSession(networkTunnel, recorder);
-            var session2 = CreateSession(networkTunnel, recorder);
+            var networkTunnelSession1 = new NetworkTunnelMock();
+            var networkTunnelSession2 = new NetworkTunnelMock();
+            networkTunnelSession1.RemoteTunnel = networkTunnelSession2;
+            networkTunnelSession2.RemoteTunnel = networkTunnelSession1;
+            var session1 = CreateSession(networkTunnelSession1, recorder);
+            var session2 = CreateSession(networkTunnelSession2, recorder);
             session1.Responded += Responded;
             session2.Received += Received;
             
@@ -30,7 +33,7 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
 
             void Received(IEnumerable<byte> bytes) => actualReceivedData = bytes;
 
-                session1.Send(rawDataToSend);
+            session1.Send(rawDataToSend);
             session2.Response(rawDataToResponse);
 
             Assert.Equal(rawDataToSend, actualReceivedData);

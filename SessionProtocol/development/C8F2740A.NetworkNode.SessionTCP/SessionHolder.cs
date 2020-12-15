@@ -62,7 +62,7 @@ namespace C8F2740A.NetworkNode.SessionTCP
 
         public Task<(bool, IEnumerable<byte>)> SendInstruction(IEnumerable<byte> instruction)
         {
-            return SafeExecution.TryCatchWithResultAsync(SendInstructionInternal(instruction),
+            return SafeExecution.TryCatchWithResultAsync(() => SendInstructionInternal(instruction),
                 exception => _recorder.DefaultException(this, exception));
         }
         

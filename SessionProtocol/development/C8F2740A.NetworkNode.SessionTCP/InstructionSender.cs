@@ -28,12 +28,13 @@ namespace C8F2740A.NetworkNode.SessionTCP
         public InstructionSender(
             INodeVisitor nodeVisitor, 
             INetworkAddress remoteAddress,
+            ISessionHolder sessionHolder,
             IRecorder recorder)
         {
             _nodeVisitor = nodeVisitor;
             _remoteAddress = remoteAddress;
             _recorder = recorder;
-            _sessionHolder = new SessionHolder(_recorder);
+            _sessionHolder = sessionHolder;
             _sessionHolder.InstructionReceived += InstructionReceivedHandler;
         }
 
@@ -47,7 +48,7 @@ namespace C8F2740A.NetworkNode.SessionTCP
         
         public Task<(bool, IEnumerable<byte>)> TrySendInstruction(IEnumerable<byte> instruction)
         {
-            return SafeExecution.TryCatchWithResultAsync(TrySendInstructionInternal(instruction), ExceptionHandler);
+            return SafeExecution.TryCatchWithResultAsync(() => TrySendInstructionInternal(instruction), ExceptionHandler);
         }
 
         private Task<(bool, IEnumerable<byte>)> TrySendInstructionInternal(IEnumerable<byte> instruction)

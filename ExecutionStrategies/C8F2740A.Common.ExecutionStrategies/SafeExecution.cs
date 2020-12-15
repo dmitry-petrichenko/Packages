@@ -44,11 +44,12 @@ namespace C8F2740A.Common.ExecutionStrategies
             successHandler?.Invoke();
         }
         
-        public static async Task<T> TryCatchWithResultAsync<T>(Task<T> task, Action<Exception> exceptionHandler)
+        public static async Task<T> TryCatchWithResultAsync<T>(Func<Task<T>> action, Action<Exception> exceptionHandler)
         {
             T result = default;
             try
             {
+                var task = action();
                 result = await task;
             }
             catch (Exception exception)

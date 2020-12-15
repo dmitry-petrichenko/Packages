@@ -15,7 +15,22 @@ namespace C8F2740A.Common.ExecutionStrategies.Tests
                 throw new Exception("test exception");
             }
 
-            var task = SafeExecution.TryCatchWithResultAsync(TestMethod(), exception => wasCatched = true);
+            var task = SafeExecution.TryCatchWithResultAsync(() => TestMethod(), exception => wasCatched = true);
+            
+            Assert.True(wasCatched);
+            Assert.False(task.Result);
+        }
+        
+        [Fact]
+        public void TryCatchWithResultAsync_OnExceptionAndNotAsyncSignature_ShouldCatch()
+        {
+            var wasCatched = false;
+            Task<bool> TestMethod()
+            {
+                throw new Exception("test exception");
+            }
+
+            var task = SafeExecution.TryCatchWithResultAsync(() => TestMethod(), exception => wasCatched = true);
             
             Assert.True(wasCatched);
             Assert.False(task.Result);
@@ -30,7 +45,7 @@ namespace C8F2740A.Common.ExecutionStrategies.Tests
                 return true;
             }
 
-            var task = SafeExecution.TryCatchWithResultAsync(TestMethod(), exception => wasCatched = true);
+            var task = SafeExecution.TryCatchWithResultAsync(() => TestMethod(), exception => wasCatched = true);
             
             Assert.False(wasCatched);
             Assert.True(task.Result);

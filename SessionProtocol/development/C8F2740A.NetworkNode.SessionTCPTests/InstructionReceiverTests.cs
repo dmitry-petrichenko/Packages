@@ -68,7 +68,31 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
         }
         #endregion
         
-        #region ConnectionReceived
+        #region TrySendInstruction
+        [Theory]
+        [InlineData( 0b0100_1111 )]
+        [InlineData( 0b0100_1001 )]
+        [InlineData( 0b0100_1101 )]
+        public void TrySendInstruction_WhenCalled_ShouldSendToSessionHolder(byte data)
+        {
+            var dataToSend = data.ToEnumerable();
+            Mock.Arrange(() => _sessionHolder.HasActiveSession).Returns(true);
+            _sut.TrySendInstruction(dataToSend);
+            
+            Mock.Assert(() => _sessionHolder.SendInstruction(dataToSend), Occurs.Exactly(1));
+        }
+        
+        [Fact]
+        public void TrySendInstruction_WhenCalledWithoutSession_ShouldSendCachError()
+        {
+            var dataToSend = ((byte)0b1011_1111).ToEnumerable();
+            _sut.TrySendInstruction(dataToSend);
+            
+            Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Exactly(1));
+        }
+        #endregion
+        
+        #region InstructionReceived
         [Theory]
         [InlineData( 0b0100_1111 )]
         [InlineData( 0b0100_1001 )]
