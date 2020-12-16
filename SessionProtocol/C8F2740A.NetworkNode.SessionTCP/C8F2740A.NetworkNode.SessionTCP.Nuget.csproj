@@ -10,7 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="C8F2740A.Networking.ConnectionTCP" Version="1.8.0" />
+      <PackageReference Include="C8F2740A.Networking.ConnectionTCP" Version="1.9.0" />
     </ItemGroup>
 
 </Project>

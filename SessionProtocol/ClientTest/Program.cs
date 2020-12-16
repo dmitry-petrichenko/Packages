@@ -13,13 +13,16 @@ namespace ClientTest
     {
         static async Task Main(string[] args)
         {
+            var t = "fgfg";
+            Console.WriteLine("fgfg".GetType().FullName);
+            /*
             var factory = new DefaultInstructionSenderFactory();
             var instructionSender = factory.Create("127.0.0.1:12091");
             instructionSender.InstructionReceived += InstructionReceivedHandler;
 
             Loop(instructionSender);
 
-            await Task.Delay(10000000);
+            await Task.Delay(10000000);*/
         }
 
         private static async Task Loop(IInstructionSender instructionSender)
@@ -35,7 +38,6 @@ namespace ClientTest
                 Console.WriteLine(str2);
                 Console.ResetColor();
             }
-
         }
         
         private static IEnumerable<byte> InstructionReceivedHandler(IEnumerable<byte> instruction)

@@ -12,6 +12,7 @@
       <ProjectReference Include="..\..\NodeCommands\C8F2740A.NetworkNode.Commands.csproj" />
       <ProjectReference Include="..\..\Records\C8F2740A.Common.Records\C8F2740A.Common.Records.csproj" />
       <ProjectReference Include="..\..\SessionProtocol\C8F2740A.NetworkNode.SessionProtocol\C8F2740A.NetworkNode.SessionProtocol.csproj" />
+      <ProjectReference Include="..\..\SessionProtocol\C8F2740A.NetworkNode.SessionTCP\C8F2740A.NetworkNode.SessionTCP.csproj" />
       <ProjectReference Include="..\C8F2740A.NetworkNode.RemoteApiCommands\C8F2740A.NetworkNode.RemoteApiCommands.csproj" />
     </ItemGroup>
 

@@ -25,9 +25,7 @@ namespace C8F2740A.Networking.ConnectionTCP
 
         private void Initialize(string address)
         {
-            Regex addressPatern = new Regex(@"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\:\d{1,5}$");
-            
-            if (!addressPatern.IsMatch(address))
+            if (!address.IsCorrectIPv4Address())
             {
                 throw new Exception("Incorrect IP address");
             }

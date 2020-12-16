@@ -4,7 +4,12 @@ using C8F2740A.Networking.ConnectionTCP.Network;
 
 namespace C8F2740A.NetworkNode.SessionTCP.Factories
 {
-    public class DefaultInstructionSenderFactory
+    public interface IInstructionSenderFactory
+    {
+        IInstructionSender Create(string address);
+    }
+    
+    public class DefaultInstructionSenderFactory : IInstructionSenderFactory
     {
         private readonly IRecorder _recorder;
         

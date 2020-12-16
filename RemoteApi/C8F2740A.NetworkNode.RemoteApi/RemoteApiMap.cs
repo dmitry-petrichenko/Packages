@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using C8F2740A.NetworkNode.SessionTCP;
-using RemoteApiCommands;
 
 namespace RemoteApi
 {
@@ -32,6 +31,20 @@ namespace RemoteApi
             
             RegisterDefaultCommands();
         }
+        
+        public void RegisterCommand(string name, Func<IEnumerable<byte>> handler, string description = "")
+        {
+            _commandWithParametersMap.Add(name, false);
+            _commandHandlerMap.Add(name, s => handler.Invoke());
+            _commandDescriptionMap.Add(name, description);
+        }
+
+        public void RegisterCommandWithParameters(string name, Func<IEnumerable<string>, IEnumerable<byte>> handler, string description = "")
+        {
+            _commandWithParametersMap.Add(name, true);
+            _commandHandlerMap.Add(name, s => handler.Invoke(s));
+            _commandDescriptionMap.Add(name, description);
+        }
 
         private void RegisterDefaultCommands()
         {
@@ -46,7 +59,7 @@ namespace RemoteApi
                 result += $"{kvp.Key} {kvp.Value} {Environment.NewLine}";
             }
 
-            return Encoding.ASCII.GetBytes(result);
+            return result.ToEnumerableByte();
         }
 
         private IEnumerable<byte> CommandHandler(IEnumerable<byte> received)
@@ -62,7 +75,7 @@ namespace RemoteApi
                 return _commandHandlerMap[commandAndParameters.Item1].Invoke(Enumerable.Empty<string>());
             }
             
-            return new [] { (byte)Commands.INCORRECT_COMMAND };
+            return RemoteApiCommands.WRONG_COMMAND.ToEnumerableByte();
         }
 
         private (string, IEnumerable<string>) ExtractCommandWidthParameters(IEnumerable<byte> received)
@@ -71,20 +84,6 @@ namespace RemoteApi
             var array = result.Split(" ");
             
             return (array.First(), array.Skip(1).ToArray());
-        }
-
-        public void RegisterCommand(string name, Func<IEnumerable<byte>> handler, string description = "")
-        {
-            _commandWithParametersMap.Add(name, false);
-            _commandHandlerMap.Add(name, s => handler.Invoke());
-            _commandDescriptionMap.Add(name, description);
-        }
-
-        public void RegisterCommandWithParameters(string name, Func<IEnumerable<string>, IEnumerable<byte>> handler, string description = "")
-        {
-            _commandWithParametersMap.Add(name, true);
-            _commandHandlerMap.Add(name, s => handler.Invoke(s));
-            _commandDescriptionMap.Add(name, description);
         }
     }
 }

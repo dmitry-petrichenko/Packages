@@ -25,7 +25,6 @@ namespace C8F2740A.NetworkNode.SessionTCP
         private readonly IRecorder _recorder;
         
         private ISession _currentSession;
-        private bool _hasActiveSession;
         private TaskCompletionSource<IEnumerable<byte>> _sendInstructionTask;
 
         public SessionHolder(IRecorder recorder)
@@ -58,6 +57,8 @@ namespace C8F2740A.NetworkNode.SessionTCP
             }
             
             _currentSession.Close();
+            _currentSession.Dispose();
+            _currentSession = default;
         }
 
         public Task<(bool, IEnumerable<byte>)> SendInstruction(IEnumerable<byte> instruction)
