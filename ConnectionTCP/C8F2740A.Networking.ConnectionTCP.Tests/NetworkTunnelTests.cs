@@ -25,7 +25,7 @@ namespace C8F2740A.Networking.ConnectionTCP.Tests
             _recorder = Mock.Create<IRecorder>();
             _sut = new NetworkTunnel(_socket, _recorder);
             
-            Mock.Assert(() => _recorder.RecordInfo(Arg.AnyString, Arg.AnyString), Occurs.Exactly(2));
+            Mock.Assert(() => _recorder.RecordInfo(Arg.AnyString, Arg.AnyString), Occurs.Exactly(1));
         }
         
         [Fact]
@@ -60,7 +60,7 @@ namespace C8F2740A.Networking.ConnectionTCP.Tests
             
             _sut.Send(paramToSent);
 
-            Mock.Assert(() => _socket.Dispose(), Occurs.Exactly(2));
+            Mock.Assert(() => _socket.Dispose(), Occurs.Exactly(1));
             Mock.Assert(() => _recorder.RecordInfo(Arg.AnyString, Arg.AnyString), Occurs.Exactly(3));
             Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Never());
         }
@@ -101,6 +101,7 @@ namespace C8F2740A.Networking.ConnectionTCP.Tests
             Mock.Arrange(() => socket.Connected).Returns(true);
 
             _sut = new NetworkTunnel(socket, _recorder);
+            _sut.Listen();
             await Task.Delay(100);
             Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Once());
         }
