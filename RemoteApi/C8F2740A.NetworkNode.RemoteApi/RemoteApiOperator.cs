@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using C8F2740A.Networking.NetworkExtensions;
+using C8F2740A.Networking.ConnectionTCP;
 using C8F2740A.NetworkNode.SessionTCP;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
 
 namespace RemoteApi
 {
-    public interface IRemoteApiOperator2
+    public interface IRemoteApiOperator
     {
         Task<(bool, string)> ExecuteCommand(string command);
         
@@ -16,7 +16,7 @@ namespace RemoteApi
         event Action Disconnected;
     }
     
-    public class RemoteApiOperator2 : IRemoteApiOperator2
+    public class RemoteApiOperator : IRemoteApiOperator
     {
         private Dictionary<string, Func<IEnumerable<string>, Task<(bool, string)>>> _commandsMap;
         private IInstructionSender _currentInstructionSender;
@@ -24,7 +24,7 @@ namespace RemoteApi
         
         private readonly IInstructionSenderFactory _instructionsSenderFactory;
 
-        public RemoteApiOperator2(
+        public RemoteApiOperator(
             IInstructionSenderHolder instructionSenderHolder,
             IInstructionSenderFactory instructionsSenderFactory)
         {
