@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using C8F2740A.NetworkNode.SessionProtocol;
+using System.Threading.Tasks;
+using C8F2740A.NetworkNode.SessionTCP;
 using RemoteApi;
+using Telerik.JustMock;
+using Telerik.JustMock.Helpers;
 using Xunit;
 
 namespace SomeTests
@@ -19,14 +22,24 @@ namespace SomeTests
             _sut = new RemoteApiMap(_instructionsReceiverMock);
             Assert.True(true);
         }
+        
+        [Fact]
+        public void Constructor_WhenCalled_ShouldSubscribe()
+        {
+            var instructionReceiver = Mock.Create<IInstructionReceiver>();
+            instructionReceiver.ArrangeSet(x => x.InstructionReceived += null).IgnoreArguments().Occurs(1);
+            _sut = new RemoteApiMap(instructionReceiver);
+
+            instructionReceiver.AssertAll();
+        }
 
         [Fact]
         public void RegisterCommand_WhenCalled_ShouldShowItOnCapacity()
         {
             _sut.RegisterCommand("add", () => null, "description");
             
-            var result = _instructionsReceiverMock.SimulateCommandReceived(Encoding.UTF8.GetBytes("capacity"));
-            var str = Encoding.UTF8.GetString(result.ToArray());
+            var result = _instructionsReceiverMock.SimulateCommandReceived("capacity".ToEnumerableByte());
+            var str = result.ToText();
             var lines = str.Split(Environment.NewLine);
             
             Assert.Equal(3, lines.Length);
@@ -52,13 +65,23 @@ namespace SomeTests
         }
     }
 
-    internal class InstructionsReceiverMock : IInstructionsReceiver
+    internal class InstructionsReceiverMock : IInstructionReceiver
     {
-        public event Func<IEnumerable<byte>, IEnumerable<byte>> CommandReceived;
-
         public IEnumerable<byte> SimulateCommandReceived(IEnumerable<byte> value)
         {
-            return CommandReceived?.Invoke(value);
+            return InstructionReceived?.Invoke(value);
         }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<(bool, IEnumerable<byte>)> TrySendInstruction(IEnumerable<byte> instruction)
+        {
+            throw new NotImplementedException();
+        }
+
+        public event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived;
     }
 }
