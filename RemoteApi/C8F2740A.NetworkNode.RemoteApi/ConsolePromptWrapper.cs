@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace RemoteApi
 {
-    public interface IConsolePromptChat
+    public interface IConsolePromptWrapper
     {
         string Prompt { set; }
 
@@ -12,11 +12,11 @@ namespace RemoteApi
         event Func<string, Task> CommandReceived;
     }
     
-    public class ConsolePromptChat : IConsolePromptChat
+    public class ConsolePromptWrapper : IConsolePromptWrapper
     {
         private string _prompt;
         
-        public ConsolePromptChat()
+        public ConsolePromptWrapper()
         {
             Prompt = ">>>";
         }

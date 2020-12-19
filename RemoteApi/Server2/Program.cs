@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using C8F2740A.Common.Records;
-using C8F2740A.Networking.ConnectionTCP;
-using C8F2740A.NetworkNode.SessionProtocol;
 using RemoteApi;
 
 namespace Server2
@@ -34,11 +31,10 @@ namespace Server2
     {
         public IRemoteApiMap Create(string address)
         {
-            var recorder = new DefaultRecorder { ShowErrors = true, ShowInfo = true };
-            var instructionReceiver = new InstructionsReceiver(new NodeGatewayFactory(recorder), new NetworkAddress(address), recorder);
             var remoteMapApi = new RemoteApiMap(instructionReceiver);
             
             return remoteMapApi;
+            
         }
     }
 }

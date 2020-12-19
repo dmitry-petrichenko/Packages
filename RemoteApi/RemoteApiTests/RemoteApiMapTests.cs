@@ -63,6 +63,14 @@ namespace SomeTests
             Assert.Equal("p:12", acceptedParameters.First());
             Assert.Equal("s:21", acceptedParameters.ElementAtOrDefault(1));
         }
+        
+        [Fact]
+        public void Received_WhenWrongCommand_ShouldReturnWrongCommand()
+        {
+            var result = _instructionsReceiverMock.SimulateCommandReceived("reset p:12".ToEnumerableByte());
+
+            Assert.Equal(RemoteApiCommands.WRONG_COMMAND.ToEnumerableByte(), result);
+        }
     }
 
     internal class InstructionsReceiverMock : IInstructionReceiver

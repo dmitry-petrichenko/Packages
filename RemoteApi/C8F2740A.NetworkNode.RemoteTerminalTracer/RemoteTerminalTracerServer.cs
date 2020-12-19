@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using C8F2740A.Networking.NetworkExtensions;
+using C8F2740A.Networking.ConnectionTCP;
 using RemoteApi;
 
 namespace C8F2740A.NetworkNode.RemoteTerminalTracer

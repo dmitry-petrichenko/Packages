@@ -1,47 +1,49 @@
 ﻿using System;
 using System.Threading.Tasks;
 using RemoteApi;
+using RemoteApi.Trace;
 
 namespace Client2
 {
     class Program
     {
-        private static IConsolePromptChat _consolePromptChat;
+        //private static IConsolePromptChat _consolePromptChat;
         private static IRemoteApiOperator _remoteOperator;
-        
+
+        private static async Task Method()
+        {
+            IConsoleAbstraction console = new ConsoleAbstraction();
+            var key = await console.ReadKeyAsync();
+            Console.WriteLine($"key entered: {key}");
+        }
+
         static async Task Main(string[] args)
         {
-            var factory = new RemoteApiOperatorFactory();
-            _remoteOperator = factory.Create();
-            _remoteOperator.Error += e => Console.WriteLine(e);
-            _remoteOperator.ConnectedSuccess += OnConnectedSuccess;
+            var rtm = new RemoteTraceMonitor(4);
+            rtm.TextEntered += s =>
+            {
+                if (s[0] == "0"[0])
+                {
+                    rtm.SetPrompt(s);
+                }
+                else
+                {
+                    rtm.DisplayNextMessage(s);
+                }
+            };
+            rtm.Start();
             
-            _consolePromptChat = new ConsolePromptChat();
-            _consolePromptChat.CommandReceived += OnCommandReceived;
-            _consolePromptChat.ReadFromInput();
-
-            await new TaskCompletionSource<bool>().Task;
+            await Task.Delay(100_000);
         }
 
         private static void OnConnectedSuccess(string connected)
         {
-            _consolePromptChat.Prompt = connected;
+            //_consolePromptChat.Prompt = connected;
         }
 
         private static async Task OnCommandReceived(string command)
         {
-            await _remoteOperator.ExecuteCommand(command);
-        }
-    }
-
-    public class RemoteApiOperatorFactory
-    {
-        public IRemoteApiOperator Create()
-        {
-            var instructionsSenderFactory = new InstructionsSenderFactory();
-            var remoteApiOperator = new RemoteApiOperator(instructionsSenderFactory);
-
-            return remoteApiOperator;
+            //_consolePromptChat.Prompt = command;
         }
     }
 }
