@@ -35,7 +35,10 @@ namespace RemoteApi.Trace
 
                 if (key.Key == ConsoleKey.Backspace)
                 {
-                    input = input.Remove(input.Length -1);
+                    if (input.Length > 0)
+                    {
+                        input = input.Remove(input.Length -1);
+                    }
                 }
                 else
                 {

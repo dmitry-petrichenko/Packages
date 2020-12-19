@@ -9,7 +9,7 @@ namespace RemoteApi.Trace
         void ClearLine(int left, int top);
         void DrawSeparatorOnLine(int top, string pattern);
         Task<ConsoleKeyInfo> ReadKeyAsync();
-        void WriteOnPosition(string value, int left, int top);
+        void WriteOnPosition(string value, int left = 0, int top = 0, ConsoleColor color = ConsoleColor.White);
         void Clear();
         void WriteLine(string value);
     }
@@ -42,10 +42,12 @@ namespace RemoteApi.Trace
             return Task.Run(() => Console.ReadKey(true));
         }
 
-        public void WriteOnPosition(string value, int left, int top)
+        public void WriteOnPosition(string value, int left = 0, int top = 0, ConsoleColor color = ConsoleColor.White)
         {
             SetCursorPosition(left, top);
+            Console.ForegroundColor = color;
             Console.Write(value);
+            Console.ResetColor();
         }
 
         public void Clear()

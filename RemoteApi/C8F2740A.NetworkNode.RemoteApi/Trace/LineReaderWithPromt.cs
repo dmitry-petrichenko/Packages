@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace RemoteApi.Trace
 {
@@ -24,7 +25,7 @@ namespace RemoteApi.Trace
             _consoleAbstraction = consoleAbstraction;
             _asyncLineReader = asyncLineReader;
             _height = height;
-            SetPrompt("127.0.0.1:00000");
+            SetPrompt("127.0.0.1:0");
         }
 
         public void SetPrompt(string value)
@@ -35,7 +36,7 @@ namespace RemoteApi.Trace
 
         public Task<string> ReadLineAsync()
         {
-            _consoleAbstraction.WriteOnPosition(Prompt, 0, _height);
+            _consoleAbstraction.WriteOnPosition(Prompt, 0, _height, ConsoleColor.Green);
             return _asyncLineReader.ReadLineOnPositionAsync(Prompt.Length, _height);
         }
 
