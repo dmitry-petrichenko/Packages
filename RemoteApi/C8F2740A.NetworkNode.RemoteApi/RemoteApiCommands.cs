@@ -2,7 +2,7 @@
 {
     public class RemoteApiCommands
     {
-        public const string PING = "ping";
+        public const string TRACE = "ping";
         public const string WRONG_COMMAND = "wrongcommand";
     }
 }

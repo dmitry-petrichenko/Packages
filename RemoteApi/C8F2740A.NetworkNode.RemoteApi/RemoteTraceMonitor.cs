@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using RemoteApi.Trace;
 
 namespace RemoteApi
@@ -9,6 +8,7 @@ namespace RemoteApi
         void Start();
         void Stop();
         void DisplayNextMessage(string message);
+        void ClearTextBox();
 
         public void SetPrompt(string value);
 
@@ -53,7 +53,12 @@ namespace RemoteApi
             _consoleAbstraction.Clear();
             _consoleAbstraction.SetCursorPosition(0, 0);
         }
-        
+
+        public void ClearTextBox()
+        {
+            _consoleTextBox.Clear();
+        }
+
         public void SetPrompt(string value)
         {
             _lineReaderWithPrompt.SetPrompt(value);

@@ -7,6 +7,7 @@ namespace RemoteApi
     public interface IConsoleTextBox
     {
         void DisplayNextMessage(string message);
+        void Clear();
     }
     
     public class ConsoleTextBox : IConsoleTextBox
@@ -26,6 +27,11 @@ namespace RemoteApi
         {
             DrawText(message);
         }
+
+        public void Clear()
+        {
+            ClearInternal();
+        }
         
         private void DrawText(string value)
         {
@@ -33,17 +39,22 @@ namespace RemoteApi
             
             var result = _textBuffer.Strings.TakeLast(_height + 1);
 
-            for (int i = 0; i < _height; i++)
-            {
-                _consoleAbstraction.SetCursorPosition(i, 0);
-                _consoleAbstraction.ClearLine(0,i);
-            }
+            ClearInternal();
             
             _consoleAbstraction.SetCursorPosition(0, 0);
 
             foreach (var s in result)
             {
                 _consoleAbstraction.WriteLine(s);
+            }
+        }
+
+        private void ClearInternal()
+        {
+            for (int i = 0; i < _height; i++)
+            {
+                _consoleAbstraction.SetCursorPosition(i, 0);
+                _consoleAbstraction.ClearLine(0,i);
             }
         }
         

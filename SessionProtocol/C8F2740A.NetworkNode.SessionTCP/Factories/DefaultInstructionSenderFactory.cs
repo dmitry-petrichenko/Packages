@@ -26,7 +26,7 @@ namespace C8F2740A.NetworkNode.SessionTCP.Factories
                 NetworkTunnelFactory,
                 socketFactory);
             
-            var nodeVisitor = new NodeVisitor(networkConnector, _recorder);
+            var nodeVisitor = new NodeVisitor(networkConnector, SessionFactory, _recorder);
             
             var instructionSender = new InstructionSender(
                 nodeVisitor,
@@ -35,6 +35,11 @@ namespace C8F2740A.NetworkNode.SessionTCP.Factories
                 _recorder);
 
             return instructionSender;
+        }
+
+        private ISession SessionFactory(INetworkTunnel tunnel)
+        {
+            return new Session(tunnel, _recorder);
         }
         
         private INetworkTunnel NetworkTunnelFactory(ISocket socket)

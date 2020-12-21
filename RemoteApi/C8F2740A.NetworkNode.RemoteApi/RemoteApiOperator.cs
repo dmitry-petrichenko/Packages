@@ -12,12 +12,15 @@ namespace RemoteApi
     {
         Task<(bool, string)> ExecuteCommand(string command);
         
-        event Action<string> Connected;
+        event Action<string, string> Connected;
         event Action Disconnected;
     }
     
     public class RemoteApiOperator : IRemoteApiOperator
     {
+        public event Action<string, string> Connected;
+        public event Action Disconnected;
+        
         private Dictionary<string, Func<IEnumerable<string>, Task<(bool, string)>>> _commandsMap;
         private IInstructionSender _currentInstructionSender;
         private IInstructionSenderHolder _instructionSenderHolder;
@@ -77,9 +80,6 @@ namespace RemoteApi
             return (false, "wrong command");
         }
 
-        public event Action<string> Connected;
-        public event Action Disconnected;
-        
         private async Task<(bool, string)> ConnectHandler(IEnumerable<string> parameters)
         {
             var parametersArr = parameters.ToArray();
@@ -90,12 +90,12 @@ namespace RemoteApi
             }
             
             var instructionsSender = _instructionsSenderFactory.Create(address);
-            var result =  await instructionsSender.TrySendInstruction(RemoteApiCommands.PING.ToEnumerableByte());
+            var result =  await instructionsSender.TrySendInstruction(RemoteApiCommands.TRACE.ToEnumerableByte());
             if (result.Item1)
             {
                 _currentInstructionSender = instructionsSender;
                 _instructionSenderHolder.Set(_currentInstructionSender);
-                Connected?.Invoke(address);
+                Connected?.Invoke(address, result.Item2.ToText());
                 return (true, "success");
             }
             
@@ -108,6 +108,7 @@ namespace RemoteApi
             {
                 _instructionSenderHolder.Clear();
             }
+            
             Disconnected?.Invoke();
             
             return Task.FromResult((true, String.Empty));

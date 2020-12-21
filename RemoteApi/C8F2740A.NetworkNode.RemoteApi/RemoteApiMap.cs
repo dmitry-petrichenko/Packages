@@ -2,12 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using C8F2740A.NetworkNode.SessionTCP;
+using RemoteApi.Trace;
 
 namespace RemoteApi
 {
     public interface IRemoteApiMap
     {
+        event Func<IEnumerable<byte>> Connected;
+
+        Task<(bool, IEnumerable<byte>)> TrySendInstruction(IEnumerable<byte> instruction);
+        
         void RegisterCommand(string name, Func<IEnumerable<byte>> handler, string description = "");
         void RegisterCommandWithParameters(string name, Func<IEnumerable<string>, IEnumerable<byte>> handler, string description = "");
     }
@@ -19,6 +25,8 @@ namespace RemoteApi
         private Dictionary<string, bool> _commandWithParametersMap;
         private Dictionary<string, Func<IEnumerable<string>, IEnumerable<byte>>> _commandHandlerMap;
         private Dictionary<string, string> _commandDescriptionMap;
+
+        public event Func<IEnumerable<byte>> Connected;
         
         public RemoteApiMap(IInstructionReceiver instructionsReceiver)
         {
@@ -31,7 +39,7 @@ namespace RemoteApi
             
             RegisterDefaultCommands();
         }
-        
+
         public void RegisterCommand(string name, Func<IEnumerable<byte>> handler, string description = "")
         {
             _commandWithParametersMap.Add(name, false);
@@ -64,6 +72,11 @@ namespace RemoteApi
 
         private IEnumerable<byte> CommandHandler(IEnumerable<byte> received)
         {
+            if (received.ToText().Equals(RemoteApiCommands.TRACE))
+            {
+                return Connected?.Invoke();
+            }
+            
             var commandAndParameters = ExtractCommandWidthParameters(received);
             if (_commandWithParametersMap.TryGetValue(commandAndParameters.Item1, out bool withParameter))
             {
@@ -84,6 +97,11 @@ namespace RemoteApi
             var array = result.Split(" ");
             
             return (array.First(), array.Skip(1).ToArray());
+        }
+
+        public Task<(bool, IEnumerable<byte>)> TrySendInstruction(IEnumerable<byte> instruction)
+        {
+            return _instructionsReceiver.TrySendInstruction(instruction);
         }
     }
 }

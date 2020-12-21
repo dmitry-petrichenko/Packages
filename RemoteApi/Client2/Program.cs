@@ -35,15 +35,7 @@ namespace Client2
             
             await Task.Delay(100_000);
         }
-
-        private static void OnConnectedSuccess(string connected)
-        {
-            //_consolePromptChat.Prompt = connected;
-        }
-
-        private static async Task OnCommandReceived(string command)
-        {
-            //_consolePromptChat.Prompt = command;
-        }
+        
+        
     }
 }
