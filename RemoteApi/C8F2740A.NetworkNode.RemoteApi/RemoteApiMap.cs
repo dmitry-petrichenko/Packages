@@ -72,11 +72,6 @@ namespace RemoteApi
 
         private IEnumerable<byte> CommandHandler(IEnumerable<byte> received)
         {
-            if (received.ToText().Equals(RemoteApiCommands.TRACE))
-            {
-                return Connected?.Invoke();
-            }
-            
             var commandAndParameters = ExtractCommandWidthParameters(received);
             if (_commandWithParametersMap.TryGetValue(commandAndParameters.Item1, out bool withParameter))
             {

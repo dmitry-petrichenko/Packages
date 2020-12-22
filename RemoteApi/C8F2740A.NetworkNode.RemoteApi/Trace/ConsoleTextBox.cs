@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using RemoteApi.Trace;
 
@@ -19,7 +20,7 @@ namespace RemoteApi
         public ConsoleTextBox(IConsoleAbstraction consoleAbstraction, int height)
         {
             _consoleAbstraction = consoleAbstraction;
-            _textBuffer = new TextBuffer();
+            _textBuffer = new TextBuffer(height + 5);
             _height = height;
         }
 
@@ -37,7 +38,7 @@ namespace RemoteApi
         {
             _textBuffer.Add(value);
             
-            var result = _textBuffer.Strings.TakeLast(_height + 1);
+            var result = _textBuffer.Strings.TakeLast(_height);
 
             ClearInternal();
             
@@ -60,15 +61,32 @@ namespace RemoteApi
         
         private class TextBuffer
         {
-            private string content = string.Empty;
+            public IEnumerable<string> Strings => _allStrings;
 
-            public string[] Strings { get; private set; } 
-
+            private Queue<string> _allStrings;
+            private int _size;
+            
+            public TextBuffer(int size)
+            {
+                _size = size;
+                _allStrings = new Queue<string>();
+            }
+            
             public void Add(string value)
             {
-                content += value + Environment.NewLine;
-                Strings = content.Split(Environment.NewLine);
+                var splitByNewLine = value.Split(Environment.NewLine);
+                var valuableStrings = splitByNewLine.Where(s => !s.Equals(string.Empty)).ToArray();
+                
+                foreach (var line in valuableStrings)
+                {
+                    _allStrings.Enqueue(line);
+                }
+
+                while (_allStrings.Count > _size)
+                {
+                    _allStrings.Dequeue();
+                }
             }
-        } 
+        }
     }
 }

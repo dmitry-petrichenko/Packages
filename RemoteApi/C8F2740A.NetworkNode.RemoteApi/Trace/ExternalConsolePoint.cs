@@ -29,9 +29,9 @@ namespace C8F2740A.NetworkNode.RemoteApi.Nuget.Trace
             _remoteApiMap.RegisterCommand(RemoteApiCommands.TRACE, TraceHandler);
         }
 
-        private Task<(bool, IEnumerable<byte>)> MessageStreamerOnSendInstruction(IEnumerable<byte> arg)
+        private Task<(bool, IEnumerable<byte>)> MessageStreamerOnSendInstruction(IEnumerable<byte> instruction)
         {
-            return _remoteApiMap.TrySendInstruction(arg);
+            return _remoteApiMap.TrySendInstruction(instruction);
         }
 
         private IEnumerable<byte> TraceHandler()

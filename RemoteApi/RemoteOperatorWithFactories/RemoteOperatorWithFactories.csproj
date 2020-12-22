@@ -9,8 +9,4 @@
       <ProjectReference Include="..\C8F2740A.NetworkNode.RemoteApi\C8F2740A.NetworkNode.RemoteApi.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Autofac" Version="6.1.0" />
-    </ItemGroup>
-
 </Project>

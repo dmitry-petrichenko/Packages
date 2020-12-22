@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using C8F2740A.Common.ExecutionStrategies;
+using C8F2740A.Common.Records;
 
 namespace RemoteApi.Trace
 {
@@ -14,13 +15,16 @@ namespace RemoteApi.Trace
     {
         private readonly IRemoteTraceMonitor _remoteTraceMonitor;
         private readonly IConsoleOperatorBootstrapper _consoleOperatorBootstrapper;
+        private readonly IRecorder _recorder;
         
         public TraceMonitorFacade(
             IRemoteTraceMonitor remoteTraceMonitor,
-            IConsoleOperatorBootstrapper consoleOperatorBootstrapper)
+            IConsoleOperatorBootstrapper consoleOperatorBootstrapper,
+            IRecorder recorder)
         {
             _remoteTraceMonitor = remoteTraceMonitor;
             _consoleOperatorBootstrapper = consoleOperatorBootstrapper;
+            _recorder = recorder;
 
             _consoleOperatorBootstrapper.Connected += ConnectedHandler;
             _remoteTraceMonitor.TextEntered += CommandEnteredHandler;
@@ -45,13 +49,14 @@ namespace RemoteApi.Trace
 
             if (!result.Item1)
             {
-                throw new Exception("fail to send");
+                _recorder.RecordError("", result.Item2);
             }
         }
 
         public void Start()
         {
             _remoteTraceMonitor.Start();
+            _consoleOperatorBootstrapper.Start();
         }
     }
 }

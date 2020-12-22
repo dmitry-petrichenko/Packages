@@ -3,7 +3,10 @@ using Autofac;
 using C8F2740A.Common.Records;
 using C8F2740A.Networking.ConnectionTCP;
 using C8F2740A.Networking.ConnectionTCP.Network;
+using C8F2740A.NetworkNode.RemoteApi.Nuget.Trace;
 using C8F2740A.NetworkNode.SessionTCP;
+using C8F2740A.NetworkNode.SessionTCP.Factories;
+using RemoteApi;
 using RemoteApi.Trace;
 
 namespace RemoteOperator
@@ -40,7 +43,21 @@ namespace RemoteOperator
                 c =>
                     tunnel => new Session(tunnel, c.Resolve<IRecorder>()));
 
-            _containerBuilder.RegisterType<Test>();
+            _containerBuilder.RegisterType<NetworkPoint>().As<INetworkPoint>();
+            _containerBuilder.RegisterType<DefaultInstructionSenderFactory>().As<IInstructionSenderFactory>();
+            _containerBuilder.RegisterType<InstructionSenderHolder>().As<IInstructionSenderHolder>();
+            _containerBuilder.RegisterType<RemoteApiOperator>().As<IRemoteApiOperator>();
+            _containerBuilder.RegisterType<SessionHolder>().As<ISessionHolder>();
+            
+            _containerBuilder.RegisterType<LocalConsolePoint>();
+            _containerBuilder.RegisterType<ExternalConsolePoint>().As<IExternalConsolePoint>();
+            _containerBuilder.RegisterType<MessageStreamer>().As<IMessageStreamer>();
+            _containerBuilder.RegisterType<RemoteApiMap>().As<IRemoteApiMap>();
+            _containerBuilder.RegisterType<InstructionReceiver>().As<IInstructionReceiver>();
+            
+            _containerBuilder.RegisterType<TraceMonitorFacade>().As<ITraceMonitorFacade>();
+            _containerBuilder.Register(c => new RemoteTraceMonitor(8)).As<IRemoteTraceMonitor>();
+            _containerBuilder.RegisterType<ConsoleOperatorBootstrapper>().As<IConsoleOperatorBootstrapper>();
             //--------------
             
             return this;
@@ -48,7 +65,12 @@ namespace RemoteOperator
 
         public void Run()
         {
-            _containerBuilder.Build().Resolve<Test>();
+            var context = _containerBuilder.Build();
+            var streamer = context.Resolve<IMessageStreamer>();
+            streamer.SetLocalStreaming(true);
+            var localPoint = context.Resolve<LocalConsolePoint>();
+            var facade = context.Resolve<ITraceMonitorFacade>();
+            facade.Start();
         }
     }
 }

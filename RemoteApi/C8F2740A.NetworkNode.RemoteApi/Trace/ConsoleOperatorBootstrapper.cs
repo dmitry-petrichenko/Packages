@@ -39,7 +39,7 @@ namespace RemoteApi.Trace
 
         private void ConnectToLocal()
         {
-            _remoteApiOperator.ExecuteCommand("connect 127.0.0.1:25757");
+            _remoteApiOperator.ExecuteCommand("connect 127.0.0.1:55555");
         }
 
         private void DisconnectedHandler()

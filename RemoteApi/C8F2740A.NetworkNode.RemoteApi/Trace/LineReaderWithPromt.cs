@@ -7,8 +7,8 @@ namespace RemoteApi.Trace
     {
         void SetPrompt(string value);
         Task<string> ReadLineAsync();
-
-        string Prompt { get; }
+        void SetCursorAfterPrompt();
+        void Start();
     }
     
     public class LineReaderWithPrompt : ILineReaderWithPrompt
@@ -25,21 +25,46 @@ namespace RemoteApi.Trace
             _consoleAbstraction = consoleAbstraction;
             _asyncLineReader = asyncLineReader;
             _height = height;
-            SetPrompt("127.0.0.1:0");
         }
 
         public void SetPrompt(string value)
         {
             _consoleAbstraction.ClearLine(0, _height);
             Prompt = value + " ";
+            DisplayPrompt();
         }
 
-        public Task<string> ReadLineAsync()
+        public async Task<string> ReadLineAsync()
         {
-            _consoleAbstraction.WriteOnPosition(Prompt, 0, _height, ConsoleColor.Green);
-            return _asyncLineReader.ReadLineOnPositionAsync(Prompt.Length, _height);
+            var result = string.Empty;
+            try
+            {
+                result = await _asyncLineReader.ReadLineOnPositionAsync(() => Prompt.Length, _height);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+            return result;
+        }
+
+        public void SetCursorAfterPrompt()
+        {
+            _consoleAbstraction.SetCursorPosition( Prompt.Length, _height);
+        }
+
+        public void Start()
+        {
+            SetPrompt(".");
         }
 
         public string Prompt { get; private set; }
+        
+        private void DisplayPrompt()
+        {
+            _consoleAbstraction.WriteOnPosition(Prompt, 0, _height, ConsoleColor.Green);
+        }
     }
 }

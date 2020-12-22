@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using C8F2740A.Common.ExecutionStrategies;
 using C8F2740A.Common.Records;
 
 namespace RemoteApi.Trace
@@ -23,21 +22,14 @@ namespace RemoteApi.Trace
         private bool IsLocalActivated { get; set; }
         private bool IsRemoteActivated { get; set; }
 
-        public MessageStreamer(IRecorderStream recorderStream, IRecorder recorder)
+        public MessageStreamer(IRecorderStream recorderStream)
         {
             _recorderStream = recorderStream;
-            _recorder = recorder;
-            
+
             _recorderStream.MessageReceived += MessageReceivedHandler;
         }
         
         private void MessageReceivedHandler(string message)
-        {
-            SafeExecution.TryCatchAsync(MessageReceivedHandlerInternal(message),
-                exception => _recorder.DefaultException(this, exception));
-        }
-
-        private async Task MessageReceivedHandlerInternal(string message)
         {
             if (IsRemoteActivated)
             {

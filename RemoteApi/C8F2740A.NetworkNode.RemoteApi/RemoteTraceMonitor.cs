@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using C8F2740A.Common.ExecutionStrategies;
 using RemoteApi.Trace;
 
 namespace RemoteApi
@@ -34,12 +36,19 @@ namespace RemoteApi
             _consoleTextBox = new ConsoleTextBox(_consoleAbstraction, _numberOfLines);
         }
 
-        public async void Start()
+        public void Start()
+        {
+            SafeExecution.TryCatchAsync(StartInternal(), exception => 
+                Console.WriteLine(exception.Message));
+        }
+
+        private async Task StartInternal()
         {
             _isStarted = true;
             _consoleAbstraction.Clear();
+            _lineReaderWithPrompt.Start();
             _consoleAbstraction.DrawSeparatorOnLine(_numberOfLines, ".");
-
+            
             while (_isStarted)
             {
                 var text = await _lineReaderWithPrompt.ReadLineAsync();
@@ -57,16 +66,19 @@ namespace RemoteApi
         public void ClearTextBox()
         {
             _consoleTextBox.Clear();
+            _lineReaderWithPrompt.SetCursorAfterPrompt();
         }
 
         public void SetPrompt(string value)
         {
             _lineReaderWithPrompt.SetPrompt(value);
+            _lineReaderWithPrompt.SetCursorAfterPrompt();
         }
 
         public void DisplayNextMessage(string message)
         {
             _consoleTextBox.DisplayNextMessage(message);
+            _lineReaderWithPrompt.SetCursorAfterPrompt();
         }
     }
 

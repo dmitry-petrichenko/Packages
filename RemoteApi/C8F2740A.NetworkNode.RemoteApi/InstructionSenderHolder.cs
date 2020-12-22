@@ -39,6 +39,7 @@ namespace RemoteApi
             
             _currentInstructionSender = instructionSender;
             _currentInstructionSender.InstructionReceived += InstructionReceivedHandler;
+            HasActiveSender = true;
         }
 
         private IEnumerable<byte> InstructionReceivedHandler(IEnumerable<byte> instruction)

@@ -13,9 +13,9 @@ namespace C8F2740A.NetworkNode.SessionTCP.Factories
     {
         private readonly IRecorder _recorder;
         
-        public DefaultInstructionSenderFactory()
+        public DefaultInstructionSenderFactory(IRecorder recorder)
         {
-            _recorder = new DefaultRecorder(new RecorderSettings());
+            _recorder = recorder;
         }
 
         public IInstructionSender Create(string address)

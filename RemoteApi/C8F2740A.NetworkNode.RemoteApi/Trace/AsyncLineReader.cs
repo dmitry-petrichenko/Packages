@@ -5,7 +5,7 @@ namespace RemoteApi.Trace
 {
     public interface IAsyncLineReader
     {
-        Task<string> ReadLineOnPositionAsync(int left, int top);
+        Task<string> ReadLineOnPositionAsync(Func<int> leftIndentResolver, int top);
     }
     
     public class AsyncLineReader : IAsyncLineReader
@@ -17,16 +17,16 @@ namespace RemoteApi.Trace
             _consoleAbstraction = consoleAbstraction;
         }
 
-        public async Task<string> ReadLineOnPositionAsync(int left, int top)
+        public async Task<string> ReadLineOnPositionAsync(Func<int> leftIndentResolver, int top)
         {
             var input = string.Empty;
             
             while (true)
             {
-                _consoleAbstraction.SetCursorPosition( left + input.Length, top);
+                _consoleAbstraction.SetCursorPosition( leftIndentResolver.Invoke() + input.Length, top);
 
                 var key = await _consoleAbstraction.ReadKeyAsync();
-                _consoleAbstraction.ClearLine(left, top);
+                _consoleAbstraction.ClearLine(leftIndentResolver.Invoke(), top);
 
                 if (key.Key == ConsoleKey.Enter)
                 {
@@ -45,7 +45,7 @@ namespace RemoteApi.Trace
                     input += key.KeyChar;
                 }
                 
-                _consoleAbstraction.WriteOnPosition(input, left, top);
+                _consoleAbstraction.WriteOnPosition(input, leftIndentResolver.Invoke(), top);
             }
         }
     }

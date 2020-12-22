@@ -17,18 +17,4 @@ namespace RemoteOperator
             return new ApplicationBuilder();
         }
     }
-
-    public class Test
-    {
-        public Test(IRecorder r, IRecorderStream s)
-        {
-            r.RecordError("e", "error1");
-            r.RecordError("e", "error2");
-            r.RecordInfo("i", "info1");
-
-            var c = s.GetCache();
-            
-            Console.WriteLine(c);
-        }
-    }
 }

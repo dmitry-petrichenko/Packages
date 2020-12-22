@@ -8,7 +8,7 @@
         {
             _externalConsolePoint = externalConsolePoint;
             _externalConsolePoint.SetLocalStreaming(false);
-            _externalConsolePoint.SetRemoteStreaming(true);
+            _externalConsolePoint.SetRemoteStreaming(false);
         }
     }
 }

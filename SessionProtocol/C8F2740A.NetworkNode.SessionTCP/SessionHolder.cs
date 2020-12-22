@@ -16,7 +16,7 @@ namespace C8F2740A.NetworkNode.SessionTCP
         bool HasActiveSession { get; }
     }
     
-    internal class SessionHolder : ISessionHolder
+    public class SessionHolder : ISessionHolder
     {
         public bool HasActiveSession { get; private set; }
         

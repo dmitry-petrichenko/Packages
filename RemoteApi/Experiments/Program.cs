@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using RemoteApi.Trace;
+using Autofac;
+using Autofac.Core;
 
 namespace Experiments
 {
@@ -8,36 +8,88 @@ namespace Experiments
     {
         static void Main(string[] args)
         {
-            var r = new RecorderStream();
-            var i = 0;
+            var containerBuilder = new ContainerBuilder();
 
-            while (i < 7)
-            {
-                r.RecordError("Class", $"Message{i}");
-                i++;
-            }
+            containerBuilder.RegisterType<Class11>().As<IClass11>();
+            containerBuilder.Register(c => new Sender(17))
+                .As<ISender>()
+                .Keyed<ISender>("17");
+            
+            containerBuilder.Register(c => new Sender(6))
+                .As<ISender>()
+                .Keyed<ISender>("6");
+            
+            containerBuilder.RegisterType<Class2>()
+                .WithParameter(
+                    new ResolvedParameter(
+                        (pi, ctx) => pi.ParameterType == typeof(ISender),
+                        (pi, ctx) => ctx.ResolveKeyed<ISender>("17")))
+                .As<IClass2>();
+            
+            containerBuilder.RegisterType<Class1>()
+                .WithParameter(
+                    new ResolvedParameter(
+                        (pi, ctx) => pi.ParameterType == typeof(ISender),
+                        (pi, ctx) => ctx.ResolveKeyed<ISender>("6")))
+                .As<IClass1>();
 
-            foreach (var s in r.GetCache())
-            {
-                Console.WriteLine(s);
-            }
+            var c = containerBuilder.Build();
+            //var v1 = c.Resolve<IClass1>();
+            var v2 = c.Resolve<IClass2>();
 
             Console.ReadKey();
         }
     }
-
-    public static class Extensions
+    
+    public interface IClass1
     {
-        public static string ToS(this IEnumerable<int> value)
-        {
-            var result = string.Empty;
-            
-            foreach (var i in value)
-            {
-                result += $"{i} ";
-            }
+        
+    }
 
-            return result;
+    public class Class1 : IClass1
+    {
+        public Class1(IClass11 class11)
+        {
         }
+    }
+    
+    public interface IClass2
+    {
+        
+    }
+    
+    public class Class2 : IClass2
+    {
+        public Class2(IClass11 class11)
+        {
+        }
+    }
+
+    public interface IClass11
+    {
+        
+    }
+    
+    public class Class11 : IClass11
+    {
+        public Class11(ISender senderWith)
+        {
+            Console.WriteLine(senderWith.Index);
+        }
+    }
+
+    public interface ISender
+    {
+        int Index { get; }
+    }
+    
+    public class Sender : ISender
+    {
+        public Sender(int index)
+        {
+            Index = index;
+        }
+
+        public int Index { get; }
     }
 }
