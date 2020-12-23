@@ -32,11 +32,9 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
             _sessionHolder = Mock.Create<ISessionHolder>();
             _recorder = Mock.Create<IRecorder>();
             _nodeGateway.ArrangeSet(x => x.ConnectionReceived += null).IgnoreArguments().Occurs(1);
-            _sessionHolder.ArrangeSet(x => x.InstructionReceived += null).IgnoreArguments().Occurs(1);
-            
+
             _sut = new InstructionReceiver(_nodeGateway, _sessionHolder, _recorder);
             
-            _sessionHolder.AssertAll();
             _nodeGateway.AssertAll();
         }
         #endregion
@@ -118,8 +116,7 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
         public void Dispose_WhenCalled_ShouldClearAndUnsubscribe()
         {
             _nodeGateway.ArrangeSet(x => x.ConnectionReceived -= null).IgnoreArguments().Occurs(1);
-            _sessionHolder.ArrangeSet(x => x.InstructionReceived -= null).IgnoreArguments().Occurs(1);
-            
+
             _sut.Dispose();
 
             _sessionHolder.AssertAll();

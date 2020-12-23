@@ -27,20 +27,7 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
             
             _sut = new InstructionSender(_nodeVisitor, _networkAddress, _sessionHolder, _recorder);
         }
-        
-        #region Constructor
-        [Fact]
-        public void Constructor_WhenCalled_ShouldSubscribe()
-        {
-            _sessionHolder.ArrangeSet(x => x.InstructionReceived += null).IgnoreArguments().Occurs(1);
-            
-            _sut = new InstructionSender(_nodeVisitor, _networkAddress, _sessionHolder, _recorder);
-            
-            _sessionHolder.AssertAll();
 
-        }
-        #endregion
-        
         #region Dispose
         [Fact]
         public void Dispose_WhenCalled_ShouldClear()
@@ -105,7 +92,7 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
 
             _sut.TrySendInstruction(((byte)0b1101_1111).ToEnumerable());
             
-            Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Exactly(1));
+            Mock.Assert(() => _recorder.DefaultException(Arg.IsAny<Object>(), Arg.IsAny<Exception>()), Occurs.Exactly(1));
         }
         #endregion
     }

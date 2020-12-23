@@ -178,8 +178,14 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
                 return dataToResponseEnum;
             };
             _sut.Set(session);
-            
-            session.TriggerReceiveReceived(dataToReceiveEnum);
+            try
+            {
+                session.TriggerReceiveReceived(dataToReceiveEnum);
+            }
+            catch (Exception e)
+            {
+                var t = 10;
+            }
             
             Assert.NotEqual(responseActualData, dataToResponseEnum);
             Assert.Equal(receivedActualData, dataToReceiveEnum);

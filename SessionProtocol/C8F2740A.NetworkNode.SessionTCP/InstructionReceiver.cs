@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using C8F2740A.Common.Records;
 
@@ -14,11 +15,15 @@ namespace C8F2740A.NetworkNode.SessionTCP
 
     public class InstructionReceiver : IInstructionReceiver
     {
-        public event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived;
-        
         private readonly IRecorder _recorder;
         private readonly INodeGateway _nodeGateway;
         private readonly ISessionHolder _sessionHolder;
+        
+        public event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived
+        {
+            add => _sessionHolder.InstructionReceived += value;
+            remove => _sessionHolder.InstructionReceived -= value;
+        }
         
         public InstructionReceiver(
             INodeGateway nodeGateway, 
@@ -28,7 +33,6 @@ namespace C8F2740A.NetworkNode.SessionTCP
             _recorder = recorder;
             _nodeGateway = nodeGateway;
             _sessionHolder = sessionHolder;
-            _sessionHolder.InstructionReceived += InstructionReceivedHandler;
 
             _nodeGateway.ConnectionReceived += ConnectionReceivedHandler;
         }
@@ -43,15 +47,9 @@ namespace C8F2740A.NetworkNode.SessionTCP
             _sessionHolder.Set(session);
         }
 
-        private IEnumerable<byte> InstructionReceivedHandler(IEnumerable<byte> value)
-        {
-            return InstructionReceived?.Invoke(value);
-        }
-
         public void Dispose()
         {
             _sessionHolder.Clear();
-            _sessionHolder.InstructionReceived -= InstructionReceivedHandler;
             _nodeGateway.ConnectionReceived -= ConnectionReceivedHandler;
         }
 
@@ -63,7 +61,7 @@ namespace C8F2740A.NetworkNode.SessionTCP
             }
             
             _recorder.RecordError(GetType().Name, "Trying to sent instruction without session");
-            return Task.FromResult<(bool, IEnumerable<byte>)>((false, default));
+            return Task.FromResult((false, Enumerable.Empty<byte>()));
         }
     }
 }

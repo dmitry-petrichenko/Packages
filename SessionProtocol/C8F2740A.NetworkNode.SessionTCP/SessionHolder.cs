@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using C8F2740A.Common.ExecutionStrategies;
 using C8F2740A.Common.Records;
@@ -61,10 +62,19 @@ namespace C8F2740A.NetworkNode.SessionTCP
             _currentSession = default;
         }
 
-        public Task<(bool, IEnumerable<byte>)> SendInstruction(IEnumerable<byte> instruction)
+        public async Task<(bool, IEnumerable<byte>)> SendInstruction(IEnumerable<byte> instruction)
         {
-            return SafeExecution.TryCatchWithResultAsync(() => SendInstructionInternal(instruction),
-                exception => _recorder.DefaultException(this, exception));
+            var result = (false, Enumerable.Empty<byte>());
+            try
+            {
+                result = await SendInstructionInternal(instruction);
+            }
+            catch (Exception exception)
+            {
+                _recorder.DefaultException(this, exception);
+            }
+
+            return result;
         }
         
         private async Task<(bool, IEnumerable<byte>)> SendInstructionInternal(IEnumerable<byte> instruction)
@@ -106,20 +116,29 @@ namespace C8F2740A.NetworkNode.SessionTCP
 
         private void ReceivedHandler(IEnumerable<byte> value)
         {
-            SafeExecution.TryCatch(() => ReceivedHandlerInternal(value),
-                exception => _recorder.DefaultException(this, exception));
-        }
-        
-        private void ReceivedHandlerInternal(IEnumerable<byte> value)
-        {
-            var result = InstructionReceived.Invoke(value);
-            
-            if (_currentSession != default)
+            var result = Enumerable.Empty<byte>();
+            try
             {
-                _currentSession.Response(result);
+                result = InstructionReceived?.Invoke(value);
+            }
+            catch (Exception exception)
+            {
+                _recorder.DefaultException(this, exception);
+            }
+
+            try
+            {
+                if (_currentSession != default)
+                {
+                    _currentSession.Response(result);
+                }
+            }
+            catch (Exception exception)
+            {
+                _recorder.DefaultException(this, exception);
             }
         }
-        
+
         private void ValidateSend()
         {
             if (_sendInstructionTask != default && !_sendInstructionTask.Task.IsCompleted)

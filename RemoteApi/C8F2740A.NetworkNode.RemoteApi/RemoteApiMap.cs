@@ -4,14 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using C8F2740A.NetworkNode.SessionTCP;
-using RemoteApi.Trace;
 
 namespace RemoteApi
 {
     public interface IRemoteApiMap
     {
-        event Func<IEnumerable<byte>> Connected;
-
         Task<(bool, IEnumerable<byte>)> TrySendInstruction(IEnumerable<byte> instruction);
         
         void RegisterCommand(string name, Func<IEnumerable<byte>> handler, string description = "");
@@ -26,8 +23,6 @@ namespace RemoteApi
         private Dictionary<string, Func<IEnumerable<string>, IEnumerable<byte>>> _commandHandlerMap;
         private Dictionary<string, string> _commandDescriptionMap;
 
-        public event Func<IEnumerable<byte>> Connected;
-        
         public RemoteApiMap(IInstructionReceiver instructionsReceiver)
         {
             _commandWithParametersMap = new Dictionary<string, bool>();
@@ -59,6 +54,7 @@ namespace RemoteApi
             RegisterCommand("capacity", ShowCapacity);
         }
 
+        //TODO Reprecated
         private IEnumerable<byte> ShowCapacity()
         {
             var result = string.Empty;
@@ -83,7 +79,7 @@ namespace RemoteApi
                 return _commandHandlerMap[commandAndParameters.Item1].Invoke(Enumerable.Empty<string>());
             }
             
-            return RemoteApiCommands.WRONG_COMMAND.ToEnumerableByte();
+            return RemoteApiCommands.WRONG_COMMAND.ToEnumerableByte(); //TODO 
         }
 
         private (string, IEnumerable<string>) ExtractCommandWidthParameters(IEnumerable<byte> received)
