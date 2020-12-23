@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using RemoteApi;
 using RemoteApi.Trace;
@@ -17,6 +18,8 @@ namespace C8F2740A.NetworkNode.RemoteApi.Nuget.Trace
         private IMessageStreamer _messageStreamer;
         private IRemoteApiMap _remoteApiMap;
 
+        private bool IsActiveMessageStream = false;
+
         public ExternalConsolePoint(
             IRemoteApiMap remoteApiMap,
             IMessageStreamer messageStreamer)
@@ -31,11 +34,17 @@ namespace C8F2740A.NetworkNode.RemoteApi.Nuget.Trace
 
         private Task<(bool, IEnumerable<byte>)> MessageStreamerOnSendInstruction(IEnumerable<byte> instruction)
         {
-            return _remoteApiMap.TrySendInstruction(instruction);
+            if (IsActiveMessageStream)
+            {
+                return _remoteApiMap.TrySendInstruction(instruction);
+            }
+
+            return Task.FromResult((true, Enumerable.Empty<byte>()));
         }
 
         private IEnumerable<byte> TraceHandler()
         {
+            IsActiveMessageStream = true;
             return Convert(_messageStreamer.GetCache());
         }
 

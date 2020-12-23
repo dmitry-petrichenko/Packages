@@ -150,7 +150,7 @@ namespace C8F2740A.NetworkNode.SessionTCP
             if (!_requestToRemoteSent)
             {
                 _recorder.RecordError(this.GetType().Name, 
-                    "Trying to receive responce without outer call");
+                    "Trying to receive response without outer call");
                 return;
             }
             

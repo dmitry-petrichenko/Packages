@@ -12,6 +12,7 @@ namespace RemoteApi
     {
         Task<(bool, string)> ExecuteCommand(string command);
         
+        event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived;
         event Action<string, string> Connected;
         event Action Disconnected;
     }
@@ -20,11 +21,16 @@ namespace RemoteApi
     {
         public event Action<string, string> Connected;
         public event Action Disconnected;
-        
+        public event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived
+        {
+            add => _instructionSenderHolder.InstructionReceived += value; 
+            remove => _instructionSenderHolder.InstructionReceived -= value; 
+        }
+
         private Dictionary<string, Func<IEnumerable<string>, Task<(bool, string)>>> _commandsMap;
         private IInstructionSender _currentInstructionSender;
         private IInstructionSenderHolder _instructionSenderHolder;
-        
+
         private readonly IInstructionSenderFactory _instructionsSenderFactory;
 
         public RemoteApiOperator(
@@ -33,7 +39,7 @@ namespace RemoteApi
         {
             _instructionSenderHolder = instructionSenderHolder;
             _instructionsSenderFactory = instructionsSenderFactory;
-            
+
             _commandsMap = new Dictionary<string, Func<IEnumerable<string>, Task<(bool, string)>>>
             {
                 {"connect", ConnectHandler}, 

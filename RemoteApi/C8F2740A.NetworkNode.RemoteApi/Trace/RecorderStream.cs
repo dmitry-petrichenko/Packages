@@ -14,9 +14,9 @@ namespace RemoteApi.Trace
     {
         private readonly MessagesCache _messagesCache;
         
-        public RecorderStream()
+        public RecorderStream(int messageCache)
         {
-            _messagesCache = new MessagesCache(3);
+            _messagesCache = new MessagesCache(messageCache);
         }
 
         public IEnumerable<string> GetCache()
@@ -35,7 +35,7 @@ namespace RemoteApi.Trace
 
         public void RecordInfo(string tag, string message)
         {
-            WriteMessage($"(i){tag}", message);
+            //WriteMessage($"(i){tag}", message);
         }
 
         public void RecordError(string tag, string message)

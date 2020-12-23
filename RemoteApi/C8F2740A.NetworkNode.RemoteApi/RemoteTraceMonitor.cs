@@ -28,10 +28,10 @@ namespace RemoteApi
         private ILineReaderWithPrompt _lineReaderWithPrompt;
         private int _numberOfLines;
 
-        public RemoteTraceMonitor(int numberOfLines)
+        public RemoteTraceMonitor(IConsoleAbstraction consoleAbstraction, int numberOfLines)
         {
             _numberOfLines = numberOfLines;
-            _consoleAbstraction = new ConsoleAbstraction();
+            _consoleAbstraction = consoleAbstraction;
             _lineReaderWithPrompt = new LineReaderWithPrompt(new AsyncLineReader(_consoleAbstraction), _consoleAbstraction, _numberOfLines + 1);
             _consoleTextBox = new ConsoleTextBox(_consoleAbstraction, _numberOfLines);
         }

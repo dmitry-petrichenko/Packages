@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using C8F2740A.Common.ExecutionStrategies;
@@ -28,6 +30,14 @@ namespace RemoteApi.Trace
 
             _consoleOperatorBootstrapper.Connected += ConnectedHandler;
             _remoteTraceMonitor.TextEntered += CommandEnteredHandler;
+
+            _consoleOperatorBootstrapper.InstructionReceived += InstructionReceivedHandler;
+        }
+
+        private IEnumerable<byte> InstructionReceivedHandler(IEnumerable<byte> value)
+        {
+            _remoteTraceMonitor.DisplayNextMessage(value.ToText());
+            return Enumerable.Empty<byte>();
         }
 
         private void ConnectedHandler(string address, string cache)

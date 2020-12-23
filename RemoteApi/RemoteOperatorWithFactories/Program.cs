@@ -13,8 +13,11 @@ namespace RemoteOperatorWithFactories
     {
         static async Task Main(string[] args)
         {
-            var recorderStream = new RecorderStream();
-            var messageStreamer = new MessageStreamer(recorderStream);
+            var consoleAbstraction = new ConsoleAbstraction();
+            var recorderStream = new RecorderStream(5);
+            var internalExceptionHandler = new InternalExceptionHandler();
+            var consistentMessageSender = new СonsistentMessageSender(internalExceptionHandler);
+            var messageStreamer = new MessageStreamer(recorderStream, consoleAbstraction, consistentMessageSender);
             messageStreamer.SetLocalStreaming(false);
             var instructionReceiverFactory = new DefaultInstructionReceiverFactory(recorderStream);
             var instructionReceiver = instructionReceiverFactory.Create("127.0.0.1:55555");
@@ -30,7 +33,7 @@ namespace RemoteOperatorWithFactories
             
             //var r = await remoteApiOperator.ExecuteCommand("connect 127.0.0.1:55555");
             var consoleOperatorBootstrapper = new ConsoleOperatorBootstrapper(remoteApiOperator);
-            var remoteTraceMonitor = new RemoteTraceMonitor(4);
+            var remoteTraceMonitor = new RemoteTraceMonitor(consoleAbstraction, 4);
             //remoteTraceMonitor.Start();
            // remoteTraceMonitor.SetPrompt("text");
            // remoteTraceMonitor.ClearTextBox();

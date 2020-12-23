@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace RemoteApi.Trace
@@ -9,11 +10,18 @@ namespace RemoteApi.Trace
         Task<(bool, string)> ExecuteCommand(string command);
         
         event Action<string, string> Connected;
+        event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived;
     }
     
     public class ConsoleOperatorBootstrapper : IConsoleOperatorBootstrapper
     {
         private readonly IRemoteApiOperator _remoteApiOperator;
+        
+        public event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived
+        {
+            add => _remoteApiOperator.InstructionReceived += value; 
+            remove => _remoteApiOperator.InstructionReceived -= value; 
+        }
         
         public ConsoleOperatorBootstrapper(IRemoteApiOperator remoteApiOperator)
         {

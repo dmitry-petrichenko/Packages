@@ -17,38 +17,41 @@ namespace RemoteApi.Trace
     public class MessageStreamer : IMessageStreamer
     {
         private readonly IRecorderStream _recorderStream;
+        private readonly IConsoleAbstraction _consoleAbstraction;
+        private readonly IСonsistentMessageSender _consistentMessageSender;
         private readonly IRecorder _recorder;
 
         private bool IsLocalActivated { get; set; }
         private bool IsRemoteActivated { get; set; }
 
-        public MessageStreamer(IRecorderStream recorderStream)
+        public MessageStreamer(
+            IRecorderStream recorderStream, 
+            IConsoleAbstraction consoleAbstraction,
+            IСonsistentMessageSender consistentMessageSender)
         {
             _recorderStream = recorderStream;
+            _consoleAbstraction = consoleAbstraction;
+            _consistentMessageSender = consistentMessageSender;
 
+            _consistentMessageSender.SendMessage += SendRemoteMessageHandler;
             _recorderStream.MessageReceived += MessageReceivedHandler;
         }
-        
+
+        private Task<(bool, IEnumerable<byte>)> SendRemoteMessageHandler(IEnumerable<byte> value)
+        {
+            return SendInstruction?.Invoke(value);
+        }
+
         private void MessageReceivedHandler(string message)
         {
             if (IsRemoteActivated)
             {
-                SendRemote(message);
+                _consistentMessageSender.SendRemote(message);
             }
 
             if (IsLocalActivated)
             {
                 SendLocal(message);
-            }
-        }
-
-        private async Task SendRemote(string message)
-        {
-            var result = await SendInstruction?.Invoke(message.ToEnumerableByte());
-
-            if (!result.Item1)
-            {
-                throw new Exception("Fail to send message");
             }
         }
 
@@ -71,7 +74,7 @@ namespace RemoteApi.Trace
 
         private void SendLocal(string message)
         {
-            Console.WriteLine(message);
+            _consoleAbstraction.WriteLine(message);
         }
     }
 }

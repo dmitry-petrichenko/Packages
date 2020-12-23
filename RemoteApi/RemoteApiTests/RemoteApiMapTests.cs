@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using C8F2740A.NetworkNode.SessionTCP;
-using RemoteApi;
 using Telerik.JustMock;
 using Telerik.JustMock.Helpers;
 using Xunit;
 
-namespace SomeTests
+namespace RemoteApi
 {
     public class RemoteApiMapTests
     {
@@ -20,7 +19,6 @@ namespace SomeTests
         {
             _instructionsReceiverMock = new InstructionsReceiverMock();
             _sut = new RemoteApiMap(_instructionsReceiverMock);
-            Assert.True(true);
         }
         
         [Fact]
