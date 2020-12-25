@@ -2,122 +2,97 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using C8F2740A.Common.Records;
 using C8F2740A.Networking.ConnectionTCP;
-using C8F2740A.NetworkNode.SessionTCP;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
 
 namespace RemoteApi
 {
     public interface IRemoteApiOperator
     {
-        Task<(bool, string)> ExecuteCommand(string command);
+        Task<bool> ExecuteCommand(string command);
+        Task<bool> Connect(string address);
+        void Disconnect();
         
-        event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived;
-        event Action<string, string> Connected;
-        event Action Disconnected;
+        event Action<string> InstructionReceived;
     }
     
     public class RemoteApiOperator : IRemoteApiOperator
     {
-        public event Action<string, string> Connected;
-        public event Action Disconnected;
-        public event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived
-        {
-            add => _instructionSenderHolder.InstructionReceived += value; 
-            remove => _instructionSenderHolder.InstructionReceived -= value; 
-        }
-
+        public event Action<string> InstructionReceived;
+        
         private Dictionary<string, Func<IEnumerable<string>, Task<(bool, string)>>> _commandsMap;
-        private IInstructionSender _currentInstructionSender;
         private IInstructionSenderHolder _instructionSenderHolder;
+        private IRecorder _recorder;
 
         private readonly IInstructionSenderFactory _instructionsSenderFactory;
 
         public RemoteApiOperator(
             IInstructionSenderHolder instructionSenderHolder,
-            IInstructionSenderFactory instructionsSenderFactory)
+            IInstructionSenderFactory instructionsSenderFactory,
+            IRecorder recorder)
         {
             _instructionSenderHolder = instructionSenderHolder;
             _instructionsSenderFactory = instructionsSenderFactory;
+            _recorder = recorder;
 
-            _commandsMap = new Dictionary<string, Func<IEnumerable<string>, Task<(bool, string)>>>
-            {
-                {"connect", ConnectHandler}, 
-                {"disconnect", DisconnectHandler}
-            };
+            _instructionSenderHolder.InstructionReceived += InstructionReceivedHandler;
         }
 
-        public async Task<(bool, string)> ExecuteCommand(string command)
+        private IEnumerable<byte> InstructionReceivedHandler(IEnumerable<byte> value)
         {
-            var textCommand = new TextCommand(command);
-            
-            if (_commandsMap.TryGetValue(textCommand.Command, out Func<IEnumerable<string>, Task<(bool, string)>> handler))
-            {
-                return await handler.Invoke(textCommand.Parameters);
-            }
-            
+            InstructionReceived?.Invoke(value.ToText());
+            return Enumerable.Empty<byte>();
+        }
+
+        public async Task<bool> ExecuteCommand(string command)
+        {
             if (_instructionSenderHolder.HasActiveSender)
             {
                 return await TrySendInstructionInternal(command);
             }
-            
-            return GenerateWrongCommandResult();
+
+            return false;
         }
 
-        private async Task<(bool, string)> TrySendInstructionInternal(string command)
+        private async Task<bool> TrySendInstructionInternal(string command)
         {
             var result = await _instructionSenderHolder.TrySendInstruction(command.ToEnumerableByte());
-            
+
             if (!result.Item1)
             {
-                return (result.Item1, result.Item2.ToText());
+                _recorder.RecordError(GetType().Name, "Fail to execute command");
             }
 
-            if (result.Item2.ToText().Equals(RemoteApiCommands.WRONG_COMMAND))
-            {
-                return GenerateWrongCommandResult();
-            }
-            
-            return (result.Item1, result.Item2.ToText());
+            return result.Item1;
         }
 
-        private (bool, string) GenerateWrongCommandResult()
+        public async Task<bool> Connect(string address)
         {
-            return (false, "wrong command");
-        }
-
-        private async Task<(bool, string)> ConnectHandler(IEnumerable<string> parameters)
-        {
-            var parametersArr = parameters.ToArray();
-            var address = parametersArr.First();
-            if (parametersArr.Length != 1 || !address.IsCorrectIPv4Address())
+            if (!address.IsCorrectIPv4Address())
             {
-                return (false, "wrong remote address");
+                _recorder.RecordError(GetType().Name, "Wrong remote address");
+                return false;
             }
             
             var instructionsSender = _instructionsSenderFactory.Create(address);
             var result =  await instructionsSender.TrySendInstruction(RemoteApiCommands.TRACE.ToEnumerableByte());
             if (result.Item1)
             {
-                _currentInstructionSender = instructionsSender;
-                _instructionSenderHolder.Set(_currentInstructionSender);
-                Connected?.Invoke(address, result.Item2.ToText());
-                return (true, "success");
+                _instructionSenderHolder.Set(instructionsSender);
+                return true;
             }
-            
-            return (false, $"fail to connect {address}");
+
+            _recorder.RecordError(GetType().Name, "Fail to connect to remote address");
+            return false;
         }
-        
-        private Task<(bool, string)> DisconnectHandler(IEnumerable<string> _)
+
+        public void Disconnect()
         {
             if (_instructionSenderHolder.HasActiveSender)
             {
                 _instructionSenderHolder.Clear();
             }
-            
-            Disconnected?.Invoke();
-            
-            return Task.FromResult((true, String.Empty));
         }
     }
 }

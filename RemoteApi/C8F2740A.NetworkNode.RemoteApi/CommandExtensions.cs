@@ -16,5 +16,10 @@ namespace RemoteApi
         {
             return Encoding.ASCII.GetString(value.ToArray());
         }
+        
+        public static ITextCommand ParseToTextCommand(this string value)
+        {
+            return new TextCommand(value);
+        }
     }
 }
