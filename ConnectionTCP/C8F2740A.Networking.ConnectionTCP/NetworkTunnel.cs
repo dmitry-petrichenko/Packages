@@ -32,12 +32,12 @@ namespace C8F2740A.Networking.ConnectionTCP
             _recorder = recorder;
             _socket = socket;
             
-            RecordInfo("Tunnel opened");
+            RecordOpenCloseInfo("Tunnel opened");
         }
 
         public void Send(byte[] data)
         {
-            RecordInfo($"Tunnel.Send {data.Length}");
+            RecordSendInfo($"Tunnel.Send {data.Length}");
             SafeExecution.TryCatch(() => _socket.Send(data), ExceptionHandler);
         }
 
@@ -72,7 +72,8 @@ namespace C8F2740A.Networking.ConnectionTCP
             while (_socket.Connected)
             {
                 var bytes = _socket.Receive(data);
-                RecordInfo($"Tunnel bytes received {bytes}");
+                RecordReceivedInfo($"Bytes received {bytes}");
+                
                 if (bytes == 0) 
                     break;
                 
@@ -104,26 +105,44 @@ namespace C8F2740A.Networking.ConnectionTCP
 
         private void CloseInternal()
         {
-            RecordInfo("Tunnel closed");
+            RecordOpenCloseInfo("Tunnel closed");
             Closed?.Invoke();
             _socket.Close();
             _socket.Dispose();
         }
 
-        private void RecordInfo(string message)
-        {
-            _recorder.RecordInfo(nameof(NetworkTunnel), BuildMessage(message));
-        }
-        
         private void RecordError(string message)
         {
-            _recorder.RecordError(nameof(NetworkTunnel), BuildMessage(message));
+            _recorder.RecordError(nameof(NetworkTunnel), BuildMessageError(message));
+        }
+        
+        private void RecordReceivedInfo(string message)
+        {
+            IPEndPoint local = _socket.LocalEndPoint;
+            IPEndPoint remote = _socket.RemoteEndPoint;
+            _recorder.RecordInfo(GetType().Name, 
+                $"{message}: ({remote.Address}:{remote.Port}) -> ({local.Address}:{local.Port})");
+        }
+        
+        private void RecordSendInfo(string message)
+        {
+            IPEndPoint local = _socket.LocalEndPoint;
+            IPEndPoint remote = _socket.RemoteEndPoint;
+            _recorder.RecordInfo(GetType().Name, 
+                $"{message}: ({local.Address}:{local.Port}) -> ({remote.Address}:{remote.Port})");
+        }
+        
+        private void RecordOpenCloseInfo(string message)
+        {
+            IPEndPoint local = _socket.LocalEndPoint;
+            _recorder.RecordInfo(GetType().Name, 
+                $"{message}: local ({local.Address}:{local.Port})");
         }
 
-        private string BuildMessage(string message)
+        private string BuildMessageError(string message)
         {
-            IPEndPoint ipEndPoint = _socket.RemoteEndPoint;
-            return $"{message}: {ipEndPoint.Address}:{ipEndPoint.Port}";
+            IPEndPoint ipEndPoint = _socket.LocalEndPoint;
+            return $"{message}: local ({ipEndPoint.Address}:{ipEndPoint.Port})";
         }
     }
 }
