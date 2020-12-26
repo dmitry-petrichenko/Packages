@@ -57,7 +57,21 @@ namespace RemoteApi.Trace
             });
         }
 
-        private async Task ExecuteSendMessage(string message)
+        private Task ExecuteSendMessage(string message)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            ExecuteSendMessageInternal(message).ContinueWith(t =>
+            {
+                Task.Run(() =>
+                {
+                    tcs.SetResult(true);
+                });
+            });
+            
+            return tcs.Task;
+        }
+        
+        private async Task ExecuteSendMessageInternal(string message)
         {
             var isSent = await _textToRemoteSender.TrySendText(message);
 

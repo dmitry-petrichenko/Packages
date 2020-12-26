@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using C8F2740A.Common.Records;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
 using RemoteApi;
+using RemoteApi.Trace;
 
 namespace Server3
 {
@@ -14,20 +15,32 @@ namespace Server3
         {
             var source = new TaskCompletionSource<bool>();
 
-            Task.Run(async () =>
-            {
-                await Task.Delay(1000);
-                Console.WriteLine($"set result thread {Thread.CurrentThread.ManagedThreadId}");
-                
-                source.SetResult(false);
-            });
-            
-            Console.WriteLine($"before method {Thread.CurrentThread.ManagedThreadId}");
-            await Method(source);
+            var cms = new СonsistentMessageSender(new TextToRemoteSender(source), new DefaultRecorder(new DefaultRecorderSettings()));
+            Console.WriteLine($"before send {Thread.CurrentThread.ManagedThreadId}");
+            cms.SendRemote("text");
 
-            Console.WriteLine($"after method {Thread.CurrentThread.ManagedThreadId}");
+            await Task.Delay(4000);
+            Console.WriteLine($"before SetResult {Thread.CurrentThread.ManagedThreadId}");
+            source.SetResult(true);
+            Console.WriteLine("released");
             
             await new TaskCompletionSource<bool>().Task;
+        }
+
+        private class TextToRemoteSender : ITextToRemoteSender
+        {
+            private readonly TaskCompletionSource<bool> _source;
+            
+            public TextToRemoteSender(TaskCompletionSource<bool> source)
+            {
+                _source = source;
+            }
+
+            public async Task<bool> TrySendText(string instruction)
+            {
+                await _source.Task;
+                return true;
+            }
         }
 
         public static async Task Method(TaskCompletionSource<bool> source)
@@ -35,7 +48,6 @@ namespace Server3
             await Task.Run(async () =>
             {
                 await source.Task;
-                
             });
         }
     }

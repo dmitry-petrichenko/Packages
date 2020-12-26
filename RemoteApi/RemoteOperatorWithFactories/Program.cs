@@ -15,7 +15,7 @@ namespace RemoteOperatorWithFactories
         static async Task Main(string[] args)
         {
             var consoleAbstraction = new ConsoleAbstraction();
-            _remoteTraceMonitor = new RemoteTraceMonitorMock();//new RemoteTraceMonitor(consoleAbstraction, 4);
+            _remoteTraceMonitor = new RemoteTraceMonitor(consoleAbstraction, 4);
             _remoteTraceMonitor.Start();
             
             var recorder = new ApplicationRecorder(new SystemRecorder(), new MessagesCache(10));
