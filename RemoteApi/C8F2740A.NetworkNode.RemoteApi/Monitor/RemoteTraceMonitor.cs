@@ -10,6 +10,7 @@ namespace RemoteApi
         void Start();
         void Stop();
         void DisplayNextMessage(string message);
+        void DisplayDebugMessage(string message);
         void ClearTextBox();
 
         public void SetPrompt(string value);
@@ -23,7 +24,8 @@ namespace RemoteApi
         
         public event Action<string> TextEntered;
 
-        private IConsoleTextBox _consoleTextBox;
+        private IConsoleTextBox _remoteTextBox;
+        private IConsoleTextBox _debugTextBox;
         private IConsoleAbstraction _consoleAbstraction;
         private ILineReaderWithPrompt _lineReaderWithPrompt;
         private int _numberOfLines;
@@ -33,7 +35,8 @@ namespace RemoteApi
             _numberOfLines = numberOfLines;
             _consoleAbstraction = consoleAbstraction;
             _lineReaderWithPrompt = new LineReaderWithPrompt(new AsyncLineReader(_consoleAbstraction), _consoleAbstraction, _numberOfLines + 1);
-            _consoleTextBox = new ConsoleTextBox(_consoleAbstraction, _numberOfLines);
+            _remoteTextBox = new ConsoleTextBox(_consoleAbstraction, 0, _numberOfLines);
+            _debugTextBox = new ConsoleTextBox(_consoleAbstraction, _numberOfLines + 2, 7);
         }
 
         public void Start()
@@ -65,7 +68,7 @@ namespace RemoteApi
 
         public void ClearTextBox()
         {
-            _consoleTextBox.Clear();
+            _remoteTextBox.Clear();
             _lineReaderWithPrompt.SetCursorAfterPrompt();
         }
 
@@ -77,7 +80,13 @@ namespace RemoteApi
 
         public void DisplayNextMessage(string message)
         {
-            _consoleTextBox.DisplayNextMessage(message);
+            _remoteTextBox.DisplayNextMessage(message);
+            _lineReaderWithPrompt.SetCursorAfterPrompt();
+        }
+        
+        public void DisplayDebugMessage(string message)
+        {
+            _debugTextBox.DisplayNextMessage(message);
             _lineReaderWithPrompt.SetCursorAfterPrompt();
         }
     }

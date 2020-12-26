@@ -16,12 +16,14 @@ namespace RemoteApi
         private readonly TextBuffer _textBuffer;
         private readonly IConsoleAbstraction _consoleAbstraction;
         private readonly int _height;
+        private readonly int _top;
         
-        public ConsoleTextBox(IConsoleAbstraction consoleAbstraction, int height)
+        public ConsoleTextBox(IConsoleAbstraction consoleAbstraction, int top, int height)
         {
             _consoleAbstraction = consoleAbstraction;
             _textBuffer = new TextBuffer(height + 5);
             _height = height;
+            _top = top;
         }
 
         public void DisplayNextMessage(string message)
@@ -42,7 +44,7 @@ namespace RemoteApi
 
             ClearInternal();
             
-            _consoleAbstraction.SetCursorPosition(0, 0);
+            _consoleAbstraction.SetCursorPosition(0, _top);
 
             foreach (var s in result)
             {
@@ -52,9 +54,8 @@ namespace RemoteApi
 
         private void ClearInternal()
         {
-            for (int i = 0; i < _height; i++)
+            for (int i = _top; i < _top + _height; i++)
             {
-                _consoleAbstraction.SetCursorPosition(i, 0);
                 _consoleAbstraction.ClearLine(0,i);
             }
         }

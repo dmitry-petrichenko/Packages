@@ -11,11 +11,6 @@ namespace C8F2740A.Common.Records
             _recorderSettings = recorderSettings;
         }
 
-        public string GetHexCodeByHesh(int heshCode)
-        {
-            return heshCode.ToString("X");
-        }
-
         public virtual void RecordInfo(string tag, string message)
         {
             if (_recorderSettings.ShowInfo)

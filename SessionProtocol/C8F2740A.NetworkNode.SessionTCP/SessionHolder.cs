@@ -119,13 +119,16 @@ namespace C8F2740A.NetworkNode.SessionTCP
             var result = Enumerable.Empty<byte>();
             try
             {
-                result = InstructionReceived?.Invoke(value);
+                if (InstructionReceived != default)
+                {
+                    result = InstructionReceived?.Invoke(value);
+                }
             }
             catch (Exception exception)
             {
                 _recorder.DefaultException(this, exception);
             }
-
+            
             try
             {
                 if (_currentSession != default)

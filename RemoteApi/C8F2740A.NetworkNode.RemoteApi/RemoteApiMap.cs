@@ -81,9 +81,11 @@ namespace RemoteApi
                 if (withParameter)
                 {
                     _commandHandlerMap[commandAndParameters.Item1].Invoke(commandAndParameters.Item2);
+                    return;
                 }
 
                 _commandHandlerMap[commandAndParameters.Item1].Invoke(Enumerable.Empty<string>());
+                return;
             }
             
             WrongCommandHandler?.Invoke();

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using C8F2740A.NetworkNode.RemoteApi.Nuget.Trace;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
 using RemoteApi;
 using RemoteApi.Trace;
@@ -11,61 +8,106 @@ namespace RemoteOperatorWithFactories
 {
     class Program
     {
+        private static IApplicationRecorder _recorder;
+        private static IRemoteTraceMonitor _remoteTraceMonitor;
+        private static ITextToRemoteSender _textToRemoteSender; 
+        
         static async Task Main(string[] args)
         {
             var consoleAbstraction = new ConsoleAbstraction();
-            var recorderStream = new RecorderStream(5);
-            var internalExceptionHandler = new InternalExceptionHandler();
-            var consistentMessageSender = new СonsistentMessageSender(internalExceptionHandler);
-            var messageStreamer = new MessageStreamer(recorderStream, consoleAbstraction, consistentMessageSender);
-            messageStreamer.SetLocalStreaming(false);
-            var instructionReceiverFactory = new DefaultInstructionReceiverFactory(recorderStream);
-            var instructionReceiver = instructionReceiverFactory.Create("127.0.0.1:55555");
-            var remoteApiMap = new RemoteApiMap(instructionReceiver);
-
-            var externalConsolePoint = new ExternalConsolePoint(remoteApiMap, messageStreamer);
-            var localConsolePoint = new LocalConsolePoint(externalConsolePoint);
-            //-----------------------------------------------------------------------
-
-            var instructionSenderHolder = new InstructionSenderHolder(recorderStream);
-            var instructionSenderFactory = new DefaultInstructionSenderFactory(recorderStream);
-            var remoteApiOperator = new RemoteApiOperator(instructionSenderHolder, instructionSenderFactory);
+            _remoteTraceMonitor = new RemoteTraceMonitorMock();//new RemoteTraceMonitor(consoleAbstraction, 4);
+            _remoteTraceMonitor.Start();
             
-            //var r = await remoteApiOperator.ExecuteCommand("connect 127.0.0.1:55555");
-            var consoleOperatorBootstrapper = new ConsoleOperatorBootstrapper(remoteApiOperator);
-            var remoteTraceMonitor = new RemoteTraceMonitor(consoleAbstraction, 4);
-            //remoteTraceMonitor.Start();
-           // remoteTraceMonitor.SetPrompt("text");
-           // remoteTraceMonitor.ClearTextBox();
+            var recorder = new ApplicationRecorder(new SystemRecorder(), new MessagesCache(10));
+            _recorder = recorder;
+            var instructionReceiverFactory = new DefaultInstructionReceiverFactory(recorder);
+            var instructionReceiver = instructionReceiverFactory.Create("127.0.0.1:10000");
+            var remoteApiMap = new RemoteApiMap(instructionReceiver, recorder);
+            _textToRemoteSender = remoteApiMap;
+            var consistentMessageSender = new СonsistentMessageSender(remoteApiMap, recorder);
 
-/*test
-            var cache = "1\r\n2\r\n3\r\n4\r\n5\r\n6\r\n6\r\n7\r\n";
-            var cache2 = "fg\r\nty\r\nfgh\r\nyui\r\njkl\r\njkl\r\nkl;\r\nkl7\r\n";
-            remoteTraceMonitor.DisplayNextMessage(cache);
-            remoteTraceMonitor.DisplayNextMessage(cache2);
-*/
-            var traceMonitorFacade = new TraceMonitorFacade(remoteTraceMonitor, consoleOperatorBootstrapper, recorderStream);
-            traceMonitorFacade.Start();
-            //Console.Write(WriteCache(messageStreamer.GetCache()));
-            await Task.Delay(100_000);
+            var remoteRecorderSender = new RemoteRecordsSender(consistentMessageSender, recorder, recorder);
+
+            var instructionSenderHolder = new InstructionSenderHolder(recorder);
+            var remoteApiOperator = new RemoteApiOperator(
+                instructionSenderHolder, 
+                new DefaultInstructionSenderFactory(recorder),
+                recorder);
+            
+            var connectParser = new ConnectParser(remoteApiOperator, recorder);
+            var autoLocalConnector = new AutoLocalConnector(connectParser, recorder);
+            
+            var application = new Application(autoLocalConnector, _remoteTraceMonitor);
+            
+            var traceableRemoteApiMap = new TraceableRemoteApiMap(remoteApiMap, remoteRecorderSender);
+            traceableRemoteApiMap.RegisterCommand("sayhello", SayHelloHandler);
+            traceableRemoteApiMap.RegisterWrongCommandHandler(WrongCommandHandler);
+            
+            await application.Start();
+            //-----------------------------------------------------------------------
+            
+            await new TaskCompletionSource<bool>().Task;
         }
 
-        private static void OnConnected(string address, string cache)
+        private static void WrongCommandHandler()
         {
-            Console.WriteLine("----------------------------");
-            Console.WriteLine($"{address}\n{cache}");
+            //var r = await _textToRemoteSender.TrySendText("Wrong");
+            _recorder.RecordInfo("", "Wrong");
+        }
+
+        private static void SayHelloHandler()
+        {
+            _recorder.RecordInfo("", "Hello");
+        }
+
+        private class SystemRecorder : ISystemRecorder
+        {
+            public void Record(string message)
+            {
+                _remoteTraceMonitor.DisplayDebugMessage(message);
+            }
         }
         
-        public static string WriteCache(IEnumerable<string> values)
+        private class RemoteTraceMonitorMock : IRemoteTraceMonitor
         {
-            var result = string.Empty;
-            
-            foreach (var s in values)
+            public void Start()
             {
-                result = s + Environment.NewLine;
+                Task.Run(() =>
+                {
+                    while (true)
+                    {
+                        var line = Console.ReadLine();
+                        TextEntered?.Invoke(line);
+                    }
+                });
             }
 
-            return result;
+            public void Stop()
+            {
+                
+            }
+
+            public void DisplayNextMessage(string message)
+            {
+                Console.WriteLine($"(rmt):{message}");
+            }
+
+            public void DisplayDebugMessage(string message)
+            {
+                Console.WriteLine($"(dbg):{message}");
+            }
+
+            public void ClearTextBox()
+            {
+
+            }
+
+            public void SetPrompt(string value)
+            {
+                
+            }
+
+            public event Action<string> TextEntered;
         }
     }
 }

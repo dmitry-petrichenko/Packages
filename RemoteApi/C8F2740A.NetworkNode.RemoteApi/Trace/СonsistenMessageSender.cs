@@ -1,29 +1,29 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using C8F2740A.Common.ExecutionStrategies;
+using C8F2740A.Common.Records;
 
 namespace RemoteApi.Trace
 {
     public interface IСonsistentMessageSender
     {
         void SendRemote(string message);
-        
-        event Func<IEnumerable<byte>, Task<(bool, IEnumerable<byte>)>> SendMessage;
     }
     
     public class СonsistentMessageSender : IСonsistentMessageSender
     {
-        private readonly IInternalExceptionHandler _internalExceptionHandler;
+        private readonly ITextToRemoteSender _textToRemoteSender;
+        private readonly IRecorder _recorder;
         
         private BlockingCollection<string> _messageQueue;
         private Task _sendingTask;
 
-        public СonsistentMessageSender(IInternalExceptionHandler internalExceptionHandler)
+        public СonsistentMessageSender(ITextToRemoteSender textToRemoteSender, IRecorder recorder)
         {
             _messageQueue = new BlockingCollection<string>();
-            _internalExceptionHandler = internalExceptionHandler;
+            _textToRemoteSender = textToRemoteSender;
+            _recorder = recorder;
 
             StartProducing();
         }
@@ -36,7 +36,7 @@ namespace RemoteApi.Trace
         private void StartProducing()
         {
             SafeExecution.TryCatchAsync(StartProducingInternal(),
-                exception => _internalExceptionHandler.LogException($"{GetType().Name}: {exception.Message}"));
+                exception => _recorder.DefaultException(this, exception));
         }
 
         private async Task StartProducingInternal()
@@ -52,24 +52,19 @@ namespace RemoteApi.Trace
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
-                    throw;
+                    _recorder.DefaultException(this, e);
                 }
-
             });
-            int i = 0;
         }
 
         private async Task ExecuteSendMessage(string message)
         {
-            var result = await SendMessage.Invoke(message.ToEnumerableByte());
+            var isSent = await _textToRemoteSender.TrySendText(message);
 
-            if (!result.Item1)
+            if (!isSent)
             {
-                _internalExceptionHandler.LogException($"{GetType().Name}: Message did not sent");
+                _recorder.RecordError(GetType().Name, "Message did not send");
             }
         }
-
-        public event Func<IEnumerable<byte>, Task<(bool, IEnumerable<byte>)>> SendMessage;
     }
 }

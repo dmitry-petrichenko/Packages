@@ -1,7 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
-using C8F2740A.Common.ExecutionStrategies;
+﻿using C8F2740A.Common.ExecutionStrategies;
 using C8F2740A.Common.Records;
+using RemoteApi.Trace;
 
 namespace RemoteApi
 {
@@ -14,16 +13,16 @@ namespace RemoteApi
     {
         private bool Activated { get; set; }
 
-        private readonly ITextToRemoteSender _textToRemoteSender;
+        private readonly IСonsistentMessageSender _consistentMessageSender;
         private readonly IApplicationRecorder _applicationRecorder;
         private readonly IRecorder _recorder;
         
         public RemoteRecordsSender(
-            ITextToRemoteSender textToRemoteSender,
+            IСonsistentMessageSender consistentMessageSender,
             IApplicationRecorder applicationRecorder,
             IRecorder recorder)
         {
-            _textToRemoteSender = textToRemoteSender;
+            _consistentMessageSender = consistentMessageSender;
             _applicationRecorder = applicationRecorder;
             _recorder = recorder;
 
@@ -34,19 +33,14 @@ namespace RemoteApi
         {
             if (Activated)
             {
-                SafeExecution.TryCatchAsync(TrySendText(value),
+                SafeExecution.TryCatch(() => TrySendText(value),
                     exception => _recorder.DefaultException(this, exception));
             }
         }
 
-        private async Task TrySendText(string value)
+        private void TrySendText(string value)
         {
-            var isSent = await _textToRemoteSender.TrySendText(value);
-
-            if (!isSent)
-            {
-                _recorder.RecordError(GetType().Name, "Fail to send text");
-            }
+            _consistentMessageSender.SendRemote(value);
         }
 
         public void ActivateAndSendCache()
