@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using C8F2740A.Common.ExecutionStrategies;
 using C8F2740A.Common.Records;
 using C8F2740A.NetworkNode.SessionTCP;
 
@@ -66,21 +67,26 @@ namespace RemoteApi
         
         private IEnumerable<byte> CommandHandler(IEnumerable<byte> received)
         {
+            SafeExecution.TryCatch(() => CommandHandlerInternal(received),
+                exception => _recorder.DefaultException(this, exception));
+            
+            return Enumerable.Empty<byte>();
+        }
+        
+        private void CommandHandlerInternal(IEnumerable<byte> received)
+        {
             var commandAndParameters = ExtractCommandWidthParameters(received);
             if (_commandWithParametersMap.TryGetValue(commandAndParameters.Item1, out bool withParameter))
             {
                 if (withParameter)
                 {
                     _commandHandlerMap[commandAndParameters.Item1].Invoke(commandAndParameters.Item2);
-                    return Enumerable.Empty<byte>();
                 }
 
                 _commandHandlerMap[commandAndParameters.Item1].Invoke(Enumerable.Empty<string>());
-                return Enumerable.Empty<byte>();
             }
             
             WrongCommandHandler?.Invoke();
-            return Enumerable.Empty<byte>();
         }
 
         private (string, IEnumerable<string>) ExtractCommandWidthParameters(IEnumerable<byte> received)
