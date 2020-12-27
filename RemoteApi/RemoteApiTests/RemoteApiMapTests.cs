@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using C8F2740A.Common.Records;
 using C8F2740A.NetworkNode.SessionTCP;
 using Telerik.JustMock;
 using Telerik.JustMock.Helpers;
@@ -14,11 +15,13 @@ namespace RemoteApi
     {
         private IRemoteApiMap _sut;
         private InstructionsReceiverMock _instructionsReceiverMock;
+        private IRecorder _recorder;
         
         public RemoteApiMapTests()
         {
             _instructionsReceiverMock = new InstructionsReceiverMock();
-            _sut = new RemoteApiMap(_instructionsReceiverMock);
+            _recorder = Mock.Create<IRecorder>();
+            _sut = new RemoteApiMap(_instructionsReceiverMock, _recorder);
         }
         
         [Fact]
@@ -26,7 +29,7 @@ namespace RemoteApi
         {
             var instructionReceiver = Mock.Create<IInstructionReceiver>();
             instructionReceiver.ArrangeSet(x => x.InstructionReceived += null).IgnoreArguments().Occurs(1);
-            _sut = new RemoteApiMap(instructionReceiver);
+            _sut = new RemoteApiMap(instructionReceiver, _recorder);
 
             instructionReceiver.AssertAll();
         }
@@ -34,13 +37,6 @@ namespace RemoteApi
         [Fact]
         public void RegisterCommand_WhenCalled_ShouldShowItOnCapacity()
         {
-            _sut.RegisterCommand("add", () => null, "description");
-            
-            var result = _instructionsReceiverMock.SimulateCommandReceived("capacity".ToEnumerableByte());
-            var str = result.ToText();
-            var lines = str.Split(Environment.NewLine);
-            
-            Assert.Equal(3, lines.Length);
         }
         
         [Fact]
@@ -48,10 +44,9 @@ namespace RemoteApi
         {
             IEnumerable<string> acceptedParameters = Enumerable.Empty<string>();
             
-            IEnumerable<byte> ResetHandler(IEnumerable<string> parameters)
+            void ResetHandler(IEnumerable<string> parameters)
             {
                 acceptedParameters = parameters;
-                return null;
             }
             
             _sut.RegisterCommandWithParameters("reset", ResetHandler);
@@ -63,11 +58,14 @@ namespace RemoteApi
         }
         
         [Fact]
-        public void Received_WhenWrongCommand_ShouldReturnWrongCommand()
+        public void Received_WhenWrongCommand_ShouldCallWrongCommandHandler()
         {
+            bool wasCalled = false;
+            _sut.RegisterWrongCommandHandler(() => wasCalled = true);
             var result = _instructionsReceiverMock.SimulateCommandReceived("reset p:12".ToEnumerableByte());
-
-            Assert.Equal(RemoteApiCommands.WRONG_COMMAND.ToEnumerableByte(), result);
+            
+            Assert.True(wasCalled);
+            Assert.Equal(result, Enumerable.Empty<byte>());
         }
     }
 

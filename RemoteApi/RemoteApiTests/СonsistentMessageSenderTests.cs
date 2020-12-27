@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using C8F2740A.Common.Records;
 using RemoteApi.Trace;
 using Telerik.JustMock;
 using Xunit;
@@ -11,12 +11,14 @@ namespace RemoteApi
     public class СonsistentMessageSenderTests
     {
         private IСonsistentMessageSender _sut;
-        private IInternalExceptionHandler _internalExceptionHandler;
+        private IRecorder _recorder;
+        private ITextToRemoteSender _textToRemoteSender;
 
         public СonsistentMessageSenderTests()
         {
-            _internalExceptionHandler = Mock.Create<IInternalExceptionHandler>();
-            _sut = new СonsistentMessageSender(_internalExceptionHandler);
+            _recorder = Mock.Create<IRecorder>();
+            _textToRemoteSender = Mock.Create<ITextToRemoteSender>();
+            _sut = new СonsistentMessageSender(_textToRemoteSender, _recorder);
         }
         
         [Fact]
@@ -24,21 +26,17 @@ namespace RemoteApi
         {
             var wasCalled = false;
             var wasException = false;
-            _sut.SendMessage += bytes =>
-            {
-                wasCalled = true;
-                return default;
-            };
             
             try
             {
-                _sut = new СonsistentMessageSender(_internalExceptionHandler);
+                _sut = new СonsistentMessageSender(_textToRemoteSender, _recorder);
             }
             catch (Exception e)
             {
                 wasException = true;
             }
 
+            Mock.Assert(() => _textToRemoteSender.TrySendText(Arg.IsAny<string>()), Occurs.Never());
             Assert.False(wasCalled);
             Assert.False(wasException);
         }
@@ -47,21 +45,16 @@ namespace RemoteApi
         public async void SendRemote_AfterCallSeveralTimes_ShouldSendMessagesConsistently()
         {
             var taskCompletion = default(TaskCompletionSource<bool>);
-            var calledTimes = 0;
-            _sut = new СonsistentMessageSender(_internalExceptionHandler);
-            _sut.SendMessage += async data =>
-            {
-                calledTimes++;
-                taskCompletion = CreateCompletion();
-                await taskCompletion.Task;
-                return (true, Enumerable.Empty<byte>());
-            };
+            _sut = new СonsistentMessageSender(_textToRemoteSender, _recorder);
+
+            Mock.Arrange(() => _textToRemoteSender.TrySendText(Arg.IsAny<string>())).Returns(CreateCompletion().Task);
+
             _sut.SendRemote("message1");
             _sut.SendRemote("message2");
             _sut.SendRemote("message3");
             await Task.Delay(200);
 
-            Assert.Equal(calledTimes, 1);
+            Mock.Assert(() => _textToRemoteSender.TrySendText(Arg.IsAny<string>()), Occurs.Once());
         }
 
         private TaskCompletionSource<bool> CreateCompletion()
