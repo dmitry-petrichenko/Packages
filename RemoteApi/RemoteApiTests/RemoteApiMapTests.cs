@@ -14,6 +14,7 @@ namespace RemoteApi
     public class RemoteApiMapTests
     {
         private IRemoteApiMap _sut;
+        private ITextToRemoteSender _sutSender;
         private InstructionsReceiverMock _instructionsReceiverMock;
         private IRecorder _recorder;
         
@@ -22,6 +23,7 @@ namespace RemoteApi
             _instructionsReceiverMock = new InstructionsReceiverMock();
             _recorder = Mock.Create<IRecorder>();
             _sut = new RemoteApiMap(_instructionsReceiverMock, _recorder);
+            _sutSender = new RemoteApiMap(_instructionsReceiverMock, _recorder);
         }
         
         [Fact]
@@ -66,6 +68,30 @@ namespace RemoteApi
             
             Assert.True(wasCalled);
             Assert.Equal(result, Enumerable.Empty<byte>());
+        }
+        
+        [Fact]
+        public void TrySendText_WhenCalled_ShouldCallTrySendInstruction()
+        {
+            var instructionsReceiver = Mock.Create<IInstructionReceiver>();
+            Mock.Arrange(() => instructionsReceiver.TrySendInstruction(Arg.IsAny<IEnumerable<byte>>())).Returns(Task.FromResult((true, Enumerable.Empty<byte>())));
+            _sutSender = new RemoteApiMap(instructionsReceiver, _recorder);
+            _sutSender.TrySendText("Test");
+
+            Mock.Assert(() => instructionsReceiver.TrySendInstruction(Arg.IsAny<IEnumerable<byte>>()), Occurs.Once());
+            Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Never());
+        }
+        
+        [Fact]
+        public void TrySendText_WhenCalledWithFace_ShouldLogError()
+        {
+            var instructionsReceiver = Mock.Create<IInstructionReceiver>();
+            Mock.Arrange(() => instructionsReceiver.TrySendInstruction(Arg.IsAny<IEnumerable<byte>>())).Returns(Task.FromResult((false, Enumerable.Empty<byte>())));
+            _sutSender = new RemoteApiMap(instructionsReceiver, _recorder);
+            _sutSender.TrySendText("Test");
+
+            Mock.Assert(() => instructionsReceiver.TrySendInstruction(Arg.IsAny<IEnumerable<byte>>()), Occurs.Once());
+            Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Once());
         }
     }
 
