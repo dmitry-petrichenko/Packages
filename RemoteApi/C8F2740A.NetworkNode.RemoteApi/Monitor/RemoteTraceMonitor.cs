@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using C8F2740A.Common.ExecutionStrategies;
-using RemoteApi.Trace;
 
-namespace RemoteApi
+namespace RemoteApi.Monitor
 {
     public interface IRemoteTraceMonitor
     {

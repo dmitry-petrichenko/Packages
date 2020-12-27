@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using RemoteApi.Monitor;
 using RemoteApi.Trace;
 
 namespace RemoteApi

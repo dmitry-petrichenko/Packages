@@ -12,12 +12,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.Common.Records", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.Common.ExecutionStrategies", "..\ExecutionStrategies\C8F2740A.Common.ExecutionStrategies\C8F2740A.Common.ExecutionStrategies.csproj", "{CF5EC974-FCE7-4D41-8B7D-C76D3465BFED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server2", "Server2\Server2.csproj", "{5D35E56A-3132-4A94-9576-676751383E74}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client2", "Client2\Client2.csproj", "{488C2DE4-2FBB-47FD-9AC4-9837B8605488}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.RemoteTerminalTracer", "C8F2740A.NetworkNode.RemoteTerminalTracer\C8F2740A.NetworkNode.RemoteTerminalTracer.csproj", "{CD82D207-F49E-4155-B190-54F2384EC4EA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.SessionTCP", "..\SessionProtocol\C8F2740A.NetworkNode.SessionTCP\C8F2740A.NetworkNode.SessionTCP.csproj", "{7C59F6D3-FC8F-4F85-A9E1-97CA439C85CB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Experiments", "Experiments\Experiments.csproj", "{D3720B80-D2F1-4B28-B4DC-A99E78DFE1DD}"
@@ -27,6 +21,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteOperatorWithFactories", "RemoteOperatorWithFactories\RemoteOperatorWithFactories.csproj", "{00B7CA2D-D42E-45BA-AA9F-0E0BA18C863E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server3", "Server3\Server3.csproj", "{911C4755-0D5D-4565-9FC5-85056D55EB6A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteApiMapPure", "RemoteApiMapPure\RemoteApiMapPure.csproj", "{747AF060-7A70-425E-AF65-BCB139EDE57E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,18 +50,6 @@ Global
 		{CF5EC974-FCE7-4D41-8B7D-C76D3465BFED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF5EC974-FCE7-4D41-8B7D-C76D3465BFED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF5EC974-FCE7-4D41-8B7D-C76D3465BFED}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5D35E56A-3132-4A94-9576-676751383E74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5D35E56A-3132-4A94-9576-676751383E74}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5D35E56A-3132-4A94-9576-676751383E74}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5D35E56A-3132-4A94-9576-676751383E74}.Release|Any CPU.Build.0 = Release|Any CPU
-		{488C2DE4-2FBB-47FD-9AC4-9837B8605488}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{488C2DE4-2FBB-47FD-9AC4-9837B8605488}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{488C2DE4-2FBB-47FD-9AC4-9837B8605488}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{488C2DE4-2FBB-47FD-9AC4-9837B8605488}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CD82D207-F49E-4155-B190-54F2384EC4EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CD82D207-F49E-4155-B190-54F2384EC4EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CD82D207-F49E-4155-B190-54F2384EC4EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CD82D207-F49E-4155-B190-54F2384EC4EA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7C59F6D3-FC8F-4F85-A9E1-97CA439C85CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7C59F6D3-FC8F-4F85-A9E1-97CA439C85CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C59F6D3-FC8F-4F85-A9E1-97CA439C85CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -86,6 +70,10 @@ Global
 		{911C4755-0D5D-4565-9FC5-85056D55EB6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{911C4755-0D5D-4565-9FC5-85056D55EB6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{911C4755-0D5D-4565-9FC5-85056D55EB6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{747AF060-7A70-425E-AF65-BCB139EDE57E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{747AF060-7A70-425E-AF65-BCB139EDE57E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{747AF060-7A70-425E-AF65-BCB139EDE57E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{747AF060-7A70-425E-AF65-BCB139EDE57E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6678655B-E8D1-4CCC-A3B1-4149ECE4FBBD} = {E356AF65-3D92-40D9-AC87-8AABEBD25D0D}

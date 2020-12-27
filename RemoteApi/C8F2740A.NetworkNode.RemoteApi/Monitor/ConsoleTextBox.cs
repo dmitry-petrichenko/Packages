@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using RemoteApi.Trace;
 
-namespace RemoteApi
+namespace RemoteApi.Monitor
 {
     public interface IConsoleTextBox
     {

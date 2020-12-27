@@ -7,6 +7,7 @@ using C8F2740A.NetworkNode.RemoteApi.Nuget.Trace;
 using C8F2740A.NetworkNode.SessionTCP;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
 using RemoteApi;
+using RemoteApi.Monitor;
 using RemoteApi.Trace;
 
 namespace RemoteOperator

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace RemoteApi.Trace
+namespace RemoteApi.Monitor
 {
     public interface ILineReaderWithPrompt
     {

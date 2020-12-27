@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
 using RemoteApi;
+using RemoteApi.Monitor;
 using RemoteApi.Trace;
 
 namespace RemoteOperatorWithFactories
@@ -15,7 +16,7 @@ namespace RemoteOperatorWithFactories
         static async Task Main(string[] args)
         {
             var consoleAbstraction = new ConsoleAbstraction();
-            _remoteTraceMonitor = new RemoteTraceMonitor(consoleAbstraction, 4);
+            _remoteTraceMonitor = new RemoteTraceMonitorToConsole();//new RemoteTraceMonitor(consoleAbstraction, 4);
             _remoteTraceMonitor.Start();
             
             var recorder = new ApplicationRecorder(new SystemRecorder(), new MessagesCache(10));
@@ -30,7 +31,7 @@ namespace RemoteOperatorWithFactories
 
             var instructionSenderHolder = new InstructionSenderHolder(recorder);
             var remoteApiOperator = new RemoteApiOperator(
-                instructionSenderHolder, 
+                instructionSenderHolder,
                 new DefaultInstructionSenderFactory(recorder),
                 recorder);
             
@@ -66,48 +67,6 @@ namespace RemoteOperatorWithFactories
             {
                 _remoteTraceMonitor.DisplayDebugMessage(message);
             }
-        }
-        
-        private class RemoteTraceMonitorMock : IRemoteTraceMonitor
-        {
-            public void Start()
-            {
-                Task.Run(() =>
-                {
-                    while (true)
-                    {
-                        var line = Console.ReadLine();
-                        TextEntered?.Invoke(line);
-                    }
-                });
-            }
-
-            public void Stop()
-            {
-                
-            }
-
-            public void DisplayNextMessage(string message)
-            {
-                Console.WriteLine($"(rmt):{message}");
-            }
-
-            public void DisplayDebugMessage(string message)
-            {
-                Console.WriteLine($"(dbg):{message}");
-            }
-
-            public void ClearTextBox()
-            {
-
-            }
-
-            public void SetPrompt(string value)
-            {
-                
-            }
-
-            public event Action<string> TextEntered;
         }
     }
 }
