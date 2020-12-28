@@ -44,7 +44,7 @@ namespace C8F2740A.Common.ExecutionStrategies
             successHandler?.Invoke();
         }
         
-        public static async Task<T> TryCatchWithResultAsync<T>(Func<Task<T>> action, Action<Exception> exceptionHandler)
+        public static async Task<T> TryCatchWithResultAsync<T>(Func<Task<T>> action, Action<Exception> exceptionHandler, T defaultResult = default)
         {
             T result = default;
             try
@@ -55,7 +55,7 @@ namespace C8F2740A.Common.ExecutionStrategies
             catch (Exception exception)
             {
                 exceptionHandler(exception);
-                return default;
+                return defaultResult;
             }
 
             return result;

@@ -15,7 +15,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\C8F2740A.Common.ExecutionStrategies\C8F2740A.Common.ExecutionStrategies.csproj" />
-      <ProjectReference Include="..\C8F2740A_Common_ExecutionStrategies\C8F2740A.Common.ExecutionStrategies.csproj" />
     </ItemGroup>
 
 </Project>

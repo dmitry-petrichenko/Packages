@@ -22,6 +22,21 @@ namespace C8F2740A.Common.ExecutionStrategies.Tests
         }
         
         [Fact]
+        public void TryCatchWithResultAsync_OnException_ShouldReturnDefault()
+        {
+            var wasCatched = false;
+            async Task<int> TestMethod()
+            {
+                throw new Exception("test exception");
+            }
+
+            var task = SafeExecution.TryCatchWithResultAsync(() => TestMethod(), exception => wasCatched = true, 6);
+            
+            Assert.True(wasCatched);
+            Assert.Equal(6, task.Result);
+        }
+        
+        [Fact]
         public void TryCatchWithResultAsync_OnExceptionAndNotAsyncSignature_ShouldCatch()
         {
             var wasCatched = false;
@@ -50,7 +65,7 @@ namespace C8F2740A.Common.ExecutionStrategies.Tests
             Assert.False(wasCatched);
             Assert.True(task.Result);
         }
-        
+
         [Fact]
         public void TryCatchWithResult_OnSuccess_ShouldReturnResult()
         {

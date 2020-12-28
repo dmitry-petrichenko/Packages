@@ -40,6 +40,7 @@ namespace RemoteApi.Trace
             if (string.IsNullOrEmpty(value))
             {
                 _recorder.RecordError(GetType().Name, "Text value cannot be empty");
+                return;
             }
             
             TextReceived?.Invoke(value);

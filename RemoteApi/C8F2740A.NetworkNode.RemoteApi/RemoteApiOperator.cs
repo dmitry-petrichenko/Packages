@@ -17,7 +17,7 @@ namespace RemoteApi
         event Action<string> InstructionReceived;
     }
     
-    public class RemoteApiOperator : IRemoteApiOperator
+    public class RemoteApiOperator : IRemoteApiOperator, IDisposable
     {
         public event Action<string> InstructionReceived;
         
@@ -51,6 +51,8 @@ namespace RemoteApi
             {
                 return await TrySendInstructionInternal(command);
             }
+            
+            _recorder.RecordError(GetType().Name, "Trying to send instruction without sender");
 
             return false;
         }
@@ -93,6 +95,10 @@ namespace RemoteApi
             {
                 _instructionSenderHolder.Clear();
             }
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

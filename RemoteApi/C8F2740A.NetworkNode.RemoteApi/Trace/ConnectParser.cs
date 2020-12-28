@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using C8F2740A.Common.ExecutionStrategies;
 using C8F2740A.Common.Records;
 
 namespace RemoteApi
@@ -36,17 +37,35 @@ namespace RemoteApi
 
         public Task<bool> ExecuteCommand(string command)
         {
+            return SafeExecution.TryCatchWithResultAsync(() => ExecuteCommandInternal(command),
+                exception => _recorder.DefaultException(this, exception));
+        }
+        
+        public Task<bool> ExecuteCommandInternal(string command)
+        {
             var commandData = command.ParseToTextCommand();
             return commandData.Command switch
             {
-                "connect" => Connect(commandData.Parameters.First()),
+                "connect" => Connect(commandData.Parameters.FirstOrDefault()),
                 "disconnect" => Disconnect(),
                 _ => _remoteApiOperator.ExecuteCommand(command)
             };
         }
 
-        private async Task<bool> Connect(string address)
+        private Task<bool> Connect(string address)
         {
+            return SafeExecution.TryCatchWithResultAsync(() => ConnectInternal(address),
+                exception => _recorder.DefaultException(this, exception));
+        }
+        
+        private async Task<bool> ConnectInternal(string address)
+        {
+            if (address == default)
+            {
+                _recorder.DefaultException(this, new Exception("Address cannot be null"));
+                return false;
+            }
+            
             var connected = await _remoteApiOperator.Connect(address);
             if (connected)
             {

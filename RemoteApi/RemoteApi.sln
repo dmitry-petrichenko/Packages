@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server3", "Server3\Server3.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteApiMapPure", "RemoteApiMapPure\RemoteApiMapPure.csproj", "{747AF060-7A70-425E-AF65-BCB139EDE57E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.Common.ExecutionStrategies.Tests", "..\ExecutionStrategies\C8F2740A.Common.ExecutionStrategies.Tests\C8F2740A.Common.ExecutionStrategies.Tests.csproj", "{7F0B3BA5-8617-4058-9098-013335252ECD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,10 @@ Global
 		{747AF060-7A70-425E-AF65-BCB139EDE57E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{747AF060-7A70-425E-AF65-BCB139EDE57E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{747AF060-7A70-425E-AF65-BCB139EDE57E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F0B3BA5-8617-4058-9098-013335252ECD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F0B3BA5-8617-4058-9098-013335252ECD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F0B3BA5-8617-4058-9098-013335252ECD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F0B3BA5-8617-4058-9098-013335252ECD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6678655B-E8D1-4CCC-A3B1-4149ECE4FBBD} = {E356AF65-3D92-40D9-AC87-8AABEBD25D0D}
