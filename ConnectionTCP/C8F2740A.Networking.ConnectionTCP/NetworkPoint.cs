@@ -37,7 +37,7 @@ namespace C8F2740A.Networking.ConnectionTCP
         
         private void Open()
         {
-            SafeExecution.TryCatchAsync(OpenInternal(), ExceptionHandler);
+            SafeExecution.TryCatchAsync(() => OpenInternal(), ExceptionHandler);
         }
 
         public void Dispose()

@@ -35,7 +35,7 @@ namespace RemoteApi.Trace
         
         private void StartProducing()
         {
-            SafeExecution.TryCatchAsync(StartProducingInternal(),
+            SafeExecution.TryCatchAsync(() => StartProducingInternal(),
                 exception => _recorder.DefaultException(this, exception));
         }
 

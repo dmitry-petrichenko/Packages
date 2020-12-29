@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using C8F2740A.Common.ExecutionStrategies;
 using C8F2740A.Common.Records;
 
 namespace C8F2740A.NetworkNode.SessionTCP
@@ -58,8 +58,6 @@ namespace C8F2740A.NetworkNode.SessionTCP
             }
             
             _currentSession.Close();
-            _currentSession.Dispose();
-            _currentSession = default;
         }
 
         public async Task<(bool, IEnumerable<byte>)> SendInstruction(IEnumerable<byte> instruction)

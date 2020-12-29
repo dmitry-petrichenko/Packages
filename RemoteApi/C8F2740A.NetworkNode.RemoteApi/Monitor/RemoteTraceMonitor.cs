@@ -40,7 +40,7 @@ namespace RemoteApi.Monitor
 
         public void Start()
         {
-            SafeExecution.TryCatchAsync(StartInternal(), exception => 
+            SafeExecution.TryCatchAsync(() => StartInternal(), exception => 
                 Console.WriteLine(exception.Message));
         }
 
@@ -89,5 +89,4 @@ namespace RemoteApi.Monitor
             _lineReaderWithPrompt.SetCursorAfterPrompt();
         }
     }
-
 }

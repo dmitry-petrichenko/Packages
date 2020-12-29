@@ -17,10 +17,11 @@ namespace C8F2740A.Common.ExecutionStrategies
             }
         }
         
-        public static async Task TryCatchAsync(Task task, Action<Exception> exceptionHandler)
+        public static async Task TryCatchAsync(Func<Task> action, Action<Exception> exceptionHandler)
         {
             try
             {
+                var task = action();
                 await task;
             }
             catch (Exception exception)

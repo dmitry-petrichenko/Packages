@@ -38,7 +38,7 @@ namespace RemoteOperatorWithFactories
             var connectParser = new ConnectParser(remoteApiOperator, recorder);
             var autoLocalConnector = new AutoLocalConnector(connectParser, recorder);
             
-            var application = new Application(autoLocalConnector, _remoteTraceMonitor);
+            var application = new MonitoredRemoteOperator(autoLocalConnector, _remoteTraceMonitor, recorder);
             
             var traceableRemoteApiMap = new TraceableRemoteApiMap(remoteApiMap, remoteRecorderSender);
             traceableRemoteApiMap.RegisterCommand("sayhello", SayHelloHandler);
