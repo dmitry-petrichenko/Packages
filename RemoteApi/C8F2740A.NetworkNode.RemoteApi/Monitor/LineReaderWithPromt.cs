@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RemoteApi.Monitor
@@ -52,7 +53,10 @@ namespace RemoteApi.Monitor
 
         public void SetCursorAfterPrompt()
         {
-            _consoleAbstraction.SetCursorPosition( Prompt.Length, _height);
+            lock (_consoleAbstraction)
+            {
+                _consoleAbstraction.SetCursorPosition( Prompt.Length, _height);
+            }
         }
 
         public void Start()

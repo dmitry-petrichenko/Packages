@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using C8F2740A.Common.Records;
-using C8F2740A.NetworkNode.SessionTCP.Factories;
 using RemoteApi;
-using RemoteApi.Trace;
+using RemoteApi.Monitor;
 
 namespace Server3
 {
@@ -13,17 +9,64 @@ namespace Server3
     {
         static async Task Main(string[] args)
         {
-            var source = new TaskCompletionSource<bool>();
+            var consoleAbstraction = new ConsoleAbstraction();
+            var rtm = new RemoteTraceMonitor(consoleAbstraction, 5);
+            rtm.Start();
 
-            var cms = new СonsistentMessageSender(new TextToRemoteSender(source), new DefaultRecorder(new DefaultRecorderSettings()));
-            Console.WriteLine($"before send {Thread.CurrentThread.ManagedThreadId}");
-            cms.SendRemote("text");
+            var first = true;
+            rtm.TextEntered += s =>
+            {
+                if (first)
+                {
+                    rtm.DisplayNextMessage(s);
+                }
+                else
+                {
+                    rtm.SetPrompt(s);
+                }
 
-            await Task.Delay(4000);
-            Console.WriteLine($"before SetResult {Thread.CurrentThread.ManagedThreadId}");
-            source.SetResult(true);
-            Console.WriteLine("released");
+                first = !first;
+
+            };
+
+            /*
+            async void DisplayMessages(int i1, int i2)
+            {
+                for (int i = i1; i < i2; i++)
+                {
+                    await Task.Delay(1100);
+                    rtm.DisplayNextMessage(i.ToString());
+                }
+            }
             
+            async void DisplayDebugMessages(int i1, int i2)
+            {
+                for (int i = i1; i < i2; i++)
+                {
+                    await Task.Delay(900);
+                    rtm.DisplayDebugMessage(i.ToString());
+                }
+            }
+            
+            async void SetPrompts(int i1, int i2)
+            {
+                for (int i = i1; i < i2; i++)
+                {
+                    await Task.Delay(800);
+                    rtm.SetPrompt(i.ToString());
+                }
+            }
+
+            /*
+            SetPrompts(10000, 10100);
+            DisplayDebugMessages(20000, 20100);
+            DisplayMessages(33000, 33100);
+            */
+            /*
+            Task.Run(() => SetPrompts(10000, 10100));
+            Task.Run(() => DisplayDebugMessages(20000, 20100));
+            Task.Run(() => DisplayMessages(33000, 33100)); 
+            */
             await new TaskCompletionSource<bool>().Task;
         }
 

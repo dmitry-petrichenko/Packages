@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using C8F2740A.Common.ExecutionStrategies;
 
 namespace Experiments
 {
@@ -11,26 +9,37 @@ namespace Experiments
     {
         static async Task Main(string[] args)
         {
-            var resutl = SendInstruction(Enumerable.Empty<byte>());
+            var s = new SemaphoreSlim(1);
+            async void Print()
+            {
+                await s.WaitAsync();
+                Console.WriteLine($"1 {Thread.CurrentThread.ManagedThreadId}");
+                Console.WriteLine($"2 {Thread.CurrentThread.ManagedThreadId}");
+                Console.WriteLine($"3 {Thread.CurrentThread.ManagedThreadId}");
+                Console.WriteLine($"4 {Thread.CurrentThread.ManagedThreadId}");
+                Console.WriteLine($"5 {Thread.CurrentThread.ManagedThreadId}");
+                s.Release();
+            }
+
+            Task.Run(async () =>
+            {
+                Print();
+                await Task.Delay(800);
+            });
+            
+            Task.Run(async () =>
+            {
+                Print();
+                await Task.Delay(700);
+            });
+            
+            Task.Run(async () =>
+            {
+                Print();
+                await Task.Delay(600);
+            });
 
             Console.ReadLine();
-        }
-
-        public static async Task SendImitation(string element)
-        {
-            Console.WriteLine($"send {element}");
-            await Task.Delay(1000);
-        }
-        
-        public static Task<(bool, IEnumerable<byte>)> SendInstruction(IEnumerable<byte> instruction)
-        {
-            return SafeExecution.TryCatchWithResultAsync(() => SendInstructionInternal(instruction),
-                exception => Console.WriteLine("ex"));
-        }
-        
-        public static Task<(bool, IEnumerable<byte>)> SendInstructionInternal(IEnumerable<byte> instruction)
-        {
-            throw new Exception();
         }
     }
 }

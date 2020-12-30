@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using C8F2740A.Common.ExecutionStrategies;
 
@@ -19,6 +20,8 @@ namespace RemoteApi.Monitor
     
     public class RemoteTraceMonitor : IRemoteTraceMonitor
     {
+        private SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
+        
         private bool _isStarted;
         
         public event Action<string> TextEntered;
@@ -35,7 +38,7 @@ namespace RemoteApi.Monitor
             _consoleAbstraction = consoleAbstraction;
             _lineReaderWithPrompt = new LineReaderWithPrompt(new AsyncLineReader(_consoleAbstraction), _consoleAbstraction, _numberOfLines + 1);
             _remoteTextBox = new ConsoleTextBox(_consoleAbstraction, 0, _numberOfLines);
-            _debugTextBox = new ConsoleTextBox(_consoleAbstraction, _numberOfLines + 2, 7);
+            _debugTextBox = new ConsoleTextBox(_consoleAbstraction, _numberOfLines + 3, 7);
         }
 
         public void Start()
@@ -65,28 +68,44 @@ namespace RemoteApi.Monitor
             _consoleAbstraction.SetCursorPosition(0, 0);
         }
 
-        public void ClearTextBox()
+        public async void ClearTextBox()
         {
+            await semaphoreSlim.WaitAsync();
+            
             _remoteTextBox.Clear();
             _lineReaderWithPrompt.SetCursorAfterPrompt();
+
+            semaphoreSlim.Release();
         }
 
-        public void SetPrompt(string value)
+        public async void SetPrompt(string value)
         {
-            _lineReaderWithPrompt.SetPrompt(value);
+            await semaphoreSlim.WaitAsync();
+            
+            _lineReaderWithPrompt.SetPrompt(value); 
             _lineReaderWithPrompt.SetCursorAfterPrompt();
+            
+            semaphoreSlim.Release();
         }
 
-        public void DisplayNextMessage(string message)
+        public async void DisplayNextMessage(string message)
         {
+            await semaphoreSlim.WaitAsync();
+            
             _remoteTextBox.DisplayNextMessage(message);
             _lineReaderWithPrompt.SetCursorAfterPrompt();
+            
+            semaphoreSlim.Release();
         }
         
-        public void DisplayDebugMessage(string message)
+        public async void DisplayDebugMessage(string message)
         {
-            _debugTextBox.DisplayNextMessage(message);
+            await semaphoreSlim.WaitAsync();
+            
+            _debugTextBox.DisplayNextMessage(message); 
             _lineReaderWithPrompt.SetCursorAfterPrompt();
+            
+            semaphoreSlim.Release();
         }
     }
 }
