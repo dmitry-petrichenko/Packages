@@ -38,7 +38,7 @@ namespace RemoteApiMapPure
 
         private class SystemRecorder : ISystemRecorder
         {
-            public void Record(string message)
+            public void RecordInfo(string message)
             {
                 Console.WriteLine(message);
             }

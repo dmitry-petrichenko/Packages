@@ -11,20 +11,24 @@ namespace RemoteOperatorWithFactories
     {
         private static IApplicationRecorder _recorder;
         private static IRemoteTraceMonitor _remoteTraceMonitor;
-        private static ITextToRemoteSender _textToRemoteSender; 
+        private static IMonitoredRemoteOperator _monitoredRemoteOperator;
+
+        private static TaskCompletionSource<bool> _mainApplicationTask;
         
         static async Task Main(string[] args)
         {
+            _mainApplicationTask = new TaskCompletionSource<bool>();
+            var systemRecorder = new SystemRecorder(_monitoredRemoteOperator, _mainApplicationTask);
+            
             var consoleAbstraction = new ConsoleAbstraction();
-            _remoteTraceMonitor = new RemoteTraceMonitor(consoleAbstraction, 4);
+            _remoteTraceMonitor = new RemoteTraceMonitor(consoleAbstraction, 4, systemRecorder);
             _remoteTraceMonitor.Start();
             
-            var recorder = new ApplicationRecorder(new SystemRecorder(), new MessagesCache(10));
+            var recorder = new ApplicationRecorder(systemRecorder, new MessagesCache(10));
             _recorder = recorder;
             var instructionReceiverFactory = new DefaultInstructionReceiverFactory(recorder);
             var instructionReceiver = instructionReceiverFactory.Create("127.0.0.1:10000");
             var remoteApiMap = new RemoteApiMap(instructionReceiver, recorder);
-            _textToRemoteSender = remoteApiMap;
             var consistentMessageSender = new СonsistentMessageSender(remoteApiMap, recorder);
 
             var remoteRecorderSender = new RemoteRecordsSender(consistentMessageSender, recorder, recorder);
@@ -47,7 +51,7 @@ namespace RemoteOperatorWithFactories
             await application.Start();
             //-----------------------------------------------------------------------
             
-            await new TaskCompletionSource<bool>().Task;
+            await _mainApplicationTask.Task;
         }
 
         private static void WrongCommandHandler()
@@ -61,11 +65,34 @@ namespace RemoteOperatorWithFactories
             _recorder.RecordInfo("", "Hello");
         }
 
-        private class SystemRecorder : ISystemRecorder
+        public class SystemRecorder : ISystemRecorder
         {
-            public void Record(string message)
+            private IMonitoredRemoteOperator _monitoredRemoteOperator;
+            private TaskCompletionSource<bool> _mainApplicationTask;
+            
+            public SystemRecorder(
+                IMonitoredRemoteOperator monitoredRemoteOperator,
+                TaskCompletionSource<bool> mainApplicationTask)
+            {
+                _monitoredRemoteOperator = monitoredRemoteOperator;
+                _mainApplicationTask = mainApplicationTask;
+            }
+
+            public void RecordInfo(string message)
             {
                 _remoteTraceMonitor.DisplayDebugMessage(message);
+            }
+
+            public void InterruptWithMessage(string message)
+            {
+                _monitoredRemoteOperator?.Dispose();
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(message);
+                Console.ResetColor();
+
+                Console.ReadKey();
+                _mainApplicationTask.SetResult(false);
             }
         }
     }

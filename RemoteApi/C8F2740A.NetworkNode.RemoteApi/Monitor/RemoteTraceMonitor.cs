@@ -20,21 +20,22 @@ namespace RemoteApi.Monitor
     
     public class RemoteTraceMonitor : IRemoteTraceMonitor
     {
-        private SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
-        
-        private bool _isStarted;
-        
         public event Action<string> TextEntered;
 
+        private readonly ISystemRecorder _systemRecorder;
+
+        private SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
         private IConsoleTextBox _remoteTextBox;
         private IConsoleTextBox _debugTextBox;
         private IConsoleAbstraction _consoleAbstraction;
         private ILineReaderWithPrompt _lineReaderWithPrompt;
         private int _numberOfLines;
+        private bool _isStarted;
 
-        public RemoteTraceMonitor(IConsoleAbstraction consoleAbstraction, int numberOfLines)
+        public RemoteTraceMonitor(IConsoleAbstraction consoleAbstraction, int numberOfLines, ISystemRecorder systemRecorder)
         {
             _numberOfLines = numberOfLines;
+            _systemRecorder = systemRecorder;
             _consoleAbstraction = consoleAbstraction;
             _lineReaderWithPrompt = new LineReaderWithPrompt(new AsyncLineReader(_consoleAbstraction), _consoleAbstraction, _numberOfLines + 1);
             _remoteTextBox = new ConsoleTextBox(_consoleAbstraction, 0, _numberOfLines);
@@ -43,8 +44,8 @@ namespace RemoteApi.Monitor
 
         public void Start()
         {
-            SafeExecution.TryCatchAsync(() => StartInternal(), exception => 
-                Console.WriteLine(exception.Message));
+            SafeExecution.TryCatchAsync(() => StartInternal(),
+                exception => _systemRecorder.InterruptWithMessage(exception.Message));
         }
 
         private async Task StartInternal()
@@ -53,7 +54,7 @@ namespace RemoteApi.Monitor
             _consoleAbstraction.Clear();
             _lineReaderWithPrompt.Start();
             _consoleAbstraction.DrawSeparatorOnLine(_numberOfLines, ".");
-            
+
             while (_isStarted)
             {
                 var text = await _lineReaderWithPrompt.ReadLineAsync();
@@ -64,6 +65,8 @@ namespace RemoteApi.Monitor
         public void Stop()
         {
             _isStarted = false;
+            _debugTextBox.Clear();
+            _remoteTextBox.Clear();
             _consoleAbstraction.Clear();
             _consoleAbstraction.SetCursorPosition(0, 0);
         }
@@ -78,30 +81,48 @@ namespace RemoteApi.Monitor
             semaphoreSlim.Release();
         }
 
-        public async void SetPrompt(string value)
+        public void SetPrompt(string value)
+        {
+            SafeExecution.TryCatchAsync(() => SetPromptInternal(value),
+                exception => _systemRecorder.InterruptWithMessage(exception.Message));
+        }
+
+        public void DisplayNextMessage(string message)
+        {
+            SafeExecution.TryCatchAsync(() => DisplayNextMessageInternal(message),
+                exception => _systemRecorder.InterruptWithMessage(exception.Message));
+        }
+
+        public void DisplayDebugMessage(string message)
+        {
+            SafeExecution.TryCatchAsync(() => DisplayDebugMessageInternal(message),
+                exception => _systemRecorder.InterruptWithMessage(exception.Message));
+        }
+        
+        private async Task SetPromptInternal(string value)
         {
             await semaphoreSlim.WaitAsync();
-            
+
             _lineReaderWithPrompt.SetPrompt(value); 
             _lineReaderWithPrompt.SetCursorAfterPrompt();
             
             semaphoreSlim.Release();
         }
-
-        public async void DisplayNextMessage(string message)
+        
+        public async Task DisplayNextMessageInternal(string message)
         {
             await semaphoreSlim.WaitAsync();
-            
+
             _remoteTextBox.DisplayNextMessage(message);
             _lineReaderWithPrompt.SetCursorAfterPrompt();
             
             semaphoreSlim.Release();
         }
         
-        public async void DisplayDebugMessage(string message)
+        public async Task DisplayDebugMessageInternal(string message)
         {
             await semaphoreSlim.WaitAsync();
-            
+
             _debugTextBox.DisplayNextMessage(message); 
             _lineReaderWithPrompt.SetCursorAfterPrompt();
             

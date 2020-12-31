@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using C8F2740A.Common.ExecutionStrategies;
 using C8F2740A.Common.Records;
 using RemoteApi.Monitor;
@@ -6,7 +7,7 @@ using RemoteApi.Trace;
 
 namespace RemoteApi
 {
-    public interface IMonitoredRemoteOperator
+    public interface IMonitoredRemoteOperator : IDisposable
     {
         Task Start();
     }
@@ -53,6 +54,14 @@ namespace RemoteApi
         {
             return SafeExecution.TryCatchAsync(() => _autoLocalConnector.Start(),
                 exception => _recorder.DefaultException(this, exception));
+        }
+
+        public void Dispose()
+        {
+            _autoLocalConnector.TextReceived -= TextReceivedHandler;
+            _autoLocalConnector.Connected -= ConnectedHandler;
+            _remoteTraceMonitor.TextEntered -= TextEnteredHandler;
+            _remoteTraceMonitor.Stop();
         }
     }
 }

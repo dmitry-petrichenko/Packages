@@ -7,67 +7,53 @@ namespace Server3
 {
     class Program
     {
-        static async Task Main(string[] args)
+        static void Main(string[] args)
         {
             var consoleAbstraction = new ConsoleAbstraction();
             var rtm = new RemoteTraceMonitor(consoleAbstraction, 5);
             rtm.Start();
-
-            var first = true;
-            rtm.TextEntered += s =>
-            {
-                if (first)
-                {
-                    rtm.DisplayNextMessage(s);
-                }
-                else
-                {
-                    rtm.SetPrompt(s);
-                }
-
-                first = !first;
-
-            };
-
-            /*
-            async void DisplayMessages(int i1, int i2)
-            {
-                for (int i = i1; i < i2; i++)
-                {
-                    await Task.Delay(1100);
-                    rtm.DisplayNextMessage(i.ToString());
-                }
-            }
             
-            async void DisplayDebugMessages(int i1, int i2)
-            {
-                for (int i = i1; i < i2; i++)
-                {
-                    await Task.Delay(900);
-                    rtm.DisplayDebugMessage(i.ToString());
-                }
-            }
-            
-            async void SetPrompts(int i1, int i2)
-            {
-                for (int i = i1; i < i2; i++)
-                {
-                    await Task.Delay(800);
-                    rtm.SetPrompt(i.ToString());
-                }
-            }
+            rtm.SetPrompt("ff");
 
-            /*
-            SetPrompts(10000, 10100);
-            DisplayDebugMessages(20000, 20100);
-            DisplayMessages(33000, 33100);
-            */
+                /*
+                async void DisplayMessages(int i1, int i2)
+                {
+                    for (int i = i1; i < i2; i++)
+                    {
+                        await Task.Delay(1100);
+                        rtm.DisplayNextMessage(i.ToString());
+                    }
+                }
+                
+                async void DisplayDebugMessages(int i1, int i2)
+                {
+                    for (int i = i1; i < i2; i++)
+                    {
+                        await Task.Delay(900);
+                        rtm.DisplayDebugMessage(i.ToString());
+                    }
+                }
+                
+                async void SetPrompts(int i1, int i2)
+                {
+                    for (int i = i1; i < i2; i++)
+                    {
+                        await Task.Delay(800);
+                        rtm.SetPrompt(i.ToString());
+                    }
+                }
+    
+                /*
+                SetPrompts(10000, 10100);
+                DisplayDebugMessages(20000, 20100);
+                DisplayMessages(33000, 33100);
+                */
             /*
             Task.Run(() => SetPrompts(10000, 10100));
             Task.Run(() => DisplayDebugMessages(20000, 20100));
             Task.Run(() => DisplayMessages(33000, 33100)); 
             */
-            await new TaskCompletionSource<bool>().Task;
+            //await new TaskCompletionSource<bool>().Task;
         }
 
         private class TextToRemoteSender : ITextToRemoteSender
@@ -97,7 +83,7 @@ namespace Server3
 
     internal class SystemRecorder : ISystemRecorder
     {
-        public void Record(string message)
+        public void RecordInfo(string message)
         {
             Console.WriteLine(message);
         }

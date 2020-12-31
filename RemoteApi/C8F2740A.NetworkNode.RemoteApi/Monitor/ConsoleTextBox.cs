@@ -32,7 +32,8 @@ namespace RemoteApi.Monitor
 
         public void Clear()
         {
-            ClearInternal();
+            ClearBox();
+            _textBuffer.Clear();
         }
         
         private void DrawText(string value)
@@ -41,7 +42,7 @@ namespace RemoteApi.Monitor
             
             var result = _textBuffer.Strings.TakeLast(_height);
 
-            ClearInternal();
+            ClearBox();
             
             _consoleAbstraction.SetCursorPosition(0, _top);
 
@@ -51,7 +52,7 @@ namespace RemoteApi.Monitor
             }
         }
 
-        private void ClearInternal()
+        private void ClearBox()
         {
             for (int i = _top; i < _top + _height; i++)
             {
@@ -86,6 +87,11 @@ namespace RemoteApi.Monitor
                 {
                     _allStrings.Dequeue();
                 }
+            }
+
+            public void Clear()
+            {
+                _allStrings.Clear();
             }
         }
     }

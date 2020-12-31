@@ -6,7 +6,8 @@ namespace RemoteApi
 {
     public interface ISystemRecorder
     {
-        void Record(string message);
+        void RecordInfo(string message);
+        void InterruptWithMessage(string message);
     }
     
     public interface IApplicationRecorder
@@ -35,7 +36,7 @@ namespace RemoteApi
         
         public void DefaultException(object source, Exception exception)
         {
-            _systemRecorder.Record(FormatErrorRecord(source.GetType().Name, exception.Message));
+            _systemRecorder.InterruptWithMessage(FormatErrorRecord(source.GetType().Name, exception.Message));
         }
 
         // --- IApplicationRecorder ---------------------------------------------//
@@ -61,17 +62,17 @@ namespace RemoteApi
 
         void IRecorder.RecordError(string tag, string message)
         {
-            _systemRecorder.Record(FormatErrorRecord(tag, message));
+            _systemRecorder.InterruptWithMessage(FormatErrorRecord(tag, message));
         }
         
         void IRecorder.RecordInfo(string tag, string message)
         {
-            _systemRecorder.Record(FormatInfoRecord(tag, message));
+            _systemRecorder.RecordInfo(FormatInfoRecord(tag, message));
         }
         
         private string FormatInfoRecord(string tag, string message)
         {
-            return $"(i){tag}:{message}";
+            return $"{DateTime.Now.ToShortTimeFormat()} {tag}:{message}";
         }
         
         private string FormatErrorRecord(string tag, string message)

@@ -1,21 +1,8 @@
 ﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Experiments
+namespace RemoteApi
 {
-    class Program
-    {
-        static async Task Main(string[] args)
-        {
-            Console.WriteLine(DateTime.Now.ToShortTimeFormat());
-            
-            Console.ReadLine();
-        }
-    }
-
-    public static class E
+    public static class TimeExtensions
     {
         public static string ToShortTimeFormat(this DateTime dateTime)
         {
