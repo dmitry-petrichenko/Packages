@@ -48,7 +48,7 @@ namespace RemoteOperatorWithFactories
             traceableRemoteApiMap.RegisterCommand("sayhello", SayHelloHandler);
             traceableRemoteApiMap.RegisterWrongCommandHandler(WrongCommandHandler);
             
-            await application.Start();
+            application.Start();
             //-----------------------------------------------------------------------
             
             await _mainApplicationTask.Task;

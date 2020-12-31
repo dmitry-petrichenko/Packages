@@ -9,7 +9,7 @@ namespace RemoteApi
 {
     public interface IMonitoredRemoteOperator : IDisposable
     {
-        Task Start();
+        void Start();
     }
     
     public class MonitoredRemoteOperator : IMonitoredRemoteOperator
@@ -50,9 +50,9 @@ namespace RemoteApi
                 exception => _recorder.DefaultException(this, exception));
         }
 
-        public Task Start()
+        public void Start()
         {
-            return SafeExecution.TryCatchAsync(() => _autoLocalConnector.Start(),
+            SafeExecution.TryCatch(() => _autoLocalConnector.Start(),
                 exception => _recorder.DefaultException(this, exception));
         }
 

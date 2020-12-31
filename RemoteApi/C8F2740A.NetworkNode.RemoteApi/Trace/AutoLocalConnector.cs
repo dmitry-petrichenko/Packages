@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
+using C8F2740A.Common.ExecutionStrategies;
 using C8F2740A.Common.Records;
 
 namespace RemoteApi.Trace
 {
     public interface IAutoLocalConnector
     {
-        Task<bool> Start();
+        void Start();
         Task<bool> ExecuteCommand(string command);
         
         event Action<string> TextReceived;
@@ -33,6 +34,23 @@ namespace RemoteApi.Trace
             _recorder = recorder;
             
             _connectParser.InstructionReceived += InstructionReceivedHandler;
+            _connectParser.Disconnected += DisconnectedHandler;
+        }
+
+        private void DisconnectedHandler()
+        {
+            SafeExecution.TryCatchAsync(() => ConnectToSelfInternal(),
+                exception => _recorder.DefaultException(this, exception));
+        }
+
+        public void Start()
+        {
+            ConnectToSelf();
+        }
+
+        public Task<bool> ExecuteCommand(string command)
+        {
+            return _connectParser.ExecuteCommand(command);
         }
 
         private void InstructionReceivedHandler(string value)
@@ -45,8 +63,14 @@ namespace RemoteApi.Trace
             
             TextReceived?.Invoke(value);
         }
-
-        public async Task<bool> Start()
+        
+        private void ConnectToSelf()
+        {
+            SafeExecution.TryCatchAsync(() => ConnectToSelfInternal(),
+                exception => _recorder.DefaultException(this, exception));
+        }
+        
+        private async Task ConnectToSelfInternal()
         {
             var isConnected = await _connectParser.ExecuteCommand("connect 127.0.0.1:10000");
 
@@ -54,13 +78,6 @@ namespace RemoteApi.Trace
             {
                 _recorder.RecordError(GetType().Name, "Fail to connect local");
             }
-
-            return isConnected;
-        }
-
-        public Task<bool> ExecuteCommand(string command)
-        {
-            return _connectParser.ExecuteCommand(command);
         }
     }
 }

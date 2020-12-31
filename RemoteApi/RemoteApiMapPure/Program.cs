@@ -42,6 +42,11 @@ namespace RemoteApiMapPure
             {
                 Console.WriteLine(message);
             }
+
+            public void InterruptWithMessage(string message)
+            {
+                Console.WriteLine(message);
+            }
         }
     }
 }

@@ -12,6 +12,7 @@ namespace RemoteApi
 
         event Action<string> InstructionReceived;
         event Action<string> Connected;
+        event Action Disconnected;
     }
     
     public class ConnectParser : IConnectParser
@@ -23,6 +24,7 @@ namespace RemoteApi
         }
 
         public event Action<string> Connected;
+        public event Action Disconnected;
         
         private readonly IRemoteApiOperator _remoteApiOperator;
         private readonly IRecorder _recorder;
@@ -79,6 +81,7 @@ namespace RemoteApi
         private Task<bool> Disconnect()
         {
             _remoteApiOperator.Disconnect();
+            Disconnected?.Invoke();
             return Task.FromResult(true);
         }
     }
