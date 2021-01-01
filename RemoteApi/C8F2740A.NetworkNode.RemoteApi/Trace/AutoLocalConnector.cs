@@ -55,7 +55,7 @@ namespace RemoteApi.Trace
 
         private void InstructionReceivedHandler(string value)
         {
-            if (string.IsNullOrEmpty(value))
+            if (value == null) //if (string.IsNullOrEmpty(value)) //TODO
             {
                 _recorder.RecordError(GetType().Name, "Text value cannot be empty");
                 return;

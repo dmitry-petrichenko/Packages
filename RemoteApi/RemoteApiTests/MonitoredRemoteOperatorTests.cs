@@ -110,12 +110,12 @@ namespace RemoteApi
         }
         
         [Fact]
-        public async void Start_WhenThrows_ShouldCatch()
+        public void Start_WhenThrows_ShouldCatch()
         {
             Mock.Arrange(() => _autoLocalConnector.Start()).Throws<Exception>();
             _sut = new MonitoredRemoteOperator(_autoLocalConnector, _remoteTraceMonitor, _recorder);
 
-            await _sut.Start();
+            _sut.Start();
 
             Mock.Assert(() => _recorder.DefaultException(Arg.IsAny<Object>(), Arg.IsAny<Exception>()), Occurs.Exactly(1));
         }

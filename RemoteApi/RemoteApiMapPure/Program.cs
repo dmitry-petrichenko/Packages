@@ -19,7 +19,7 @@ namespace RemoteApiMapPure
             var remoteApiMap = new RemoteApiMap(instructionReceiver, recorder);
             var consistentMessageSender = new СonsistentMessageSender(remoteApiMap, recorder);
             var remoteRecorderSender = new RemoteRecordsSender(consistentMessageSender, recorder, recorder);
-            var traceableRemoteApiMap = new TraceableRemoteApiMap(remoteApiMap, remoteRecorderSender);
+            var traceableRemoteApiMap = new TraceableRemoteApiMap(remoteApiMap, remoteRecorderSender, recorder);
             traceableRemoteApiMap.RegisterWrongCommandHandler(WrongCommandHandler);
             traceableRemoteApiMap.RegisterCommand("command", CommandHandler);
             

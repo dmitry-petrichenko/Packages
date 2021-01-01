@@ -50,19 +50,7 @@ namespace RemoteApi
 
             Mock.Assert(() => _connectParser.ExecuteCommand("connect 127.0.0.1:10000"), Occurs.Once());
         }
-        
-        [Fact]
-        public async void Start_WhenCalledConnectTrue_ShouldReturnTrue()
-        {
-            Mock.Arrange(() => _connectParser.ExecuteCommand(Arg.AnyString))
-                .IgnoreArguments()
-                .Returns(Task.FromResult<bool>(true));
-                
-            var result = await _sut.Start();
 
-            Assert.True(result);
-        }
-        
         [Fact]
         public async void Start_WhenCalledConnectFalse_ShouldReturnFalse()
         {
@@ -70,9 +58,8 @@ namespace RemoteApi
                 .IgnoreArguments()
                 .Returns(Task.FromResult<bool>(false));
                 
-            var result = await _sut.Start();
-
-            Assert.False(result);
+            _sut.Start();
+            
             Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Once());
         }
         

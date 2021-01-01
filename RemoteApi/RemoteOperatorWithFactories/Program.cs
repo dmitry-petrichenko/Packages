@@ -44,7 +44,7 @@ namespace RemoteOperatorWithFactories
             
             var application = new MonitoredRemoteOperator(autoLocalConnector, _remoteTraceMonitor, recorder);
             
-            var traceableRemoteApiMap = new TraceableRemoteApiMap(remoteApiMap, remoteRecorderSender);
+            var traceableRemoteApiMap = new TraceableRemoteApiMap(remoteApiMap, remoteRecorderSender, recorder);
             traceableRemoteApiMap.RegisterCommand("sayhello", SayHelloHandler);
             traceableRemoteApiMap.RegisterWrongCommandHandler(WrongCommandHandler);
             

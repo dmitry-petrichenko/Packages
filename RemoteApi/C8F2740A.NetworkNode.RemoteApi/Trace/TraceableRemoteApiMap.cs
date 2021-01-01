@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using C8F2740A.Common.ExecutionStrategies;
+using C8F2740A.Common.Records;
 
 namespace RemoteApi.Trace
 {
@@ -14,15 +16,18 @@ namespace RemoteApi.Trace
     {
         private readonly IRemoteApiMap _remoteApiMap;
         private readonly IRemoteRecordsSender _remoteRecordsSender;
+        private readonly IRecorder _recorder;
         
         public TraceableRemoteApiMap(
             IRemoteApiMap remoteApiMap,
-            IRemoteRecordsSender remoteRecordsSender)
+            IRemoteRecordsSender remoteRecordsSender,
+            IRecorder recorder)
         {
             _remoteApiMap = remoteApiMap;
             _remoteRecordsSender = remoteRecordsSender;
+            _recorder = recorder;
             
-            _remoteApiMap.RegisterCommand(RemoteApiCommands.TRACE, TraceHandler);
+            RegisterCommand(RemoteApiCommands.TRACE, TraceHandler);
         }
 
         private void TraceHandler()
@@ -34,17 +39,20 @@ namespace RemoteApi.Trace
 
         public void RegisterWrongCommandHandler(Action action)
         {
-            _remoteApiMap.RegisterWrongCommandHandler(action);
+            SafeExecution.TryCatch(() => _remoteApiMap.RegisterWrongCommandHandler(action),
+                exception => _recorder.DefaultException(this, exception));
         }
 
         public void RegisterCommand(string name, Action handler, string description = "")
         {
-            _remoteApiMap.RegisterCommand(name, handler, description);
+            SafeExecution.TryCatch(() => _remoteApiMap.RegisterCommand(name, handler, description),
+                exception => _recorder.DefaultException(this, exception));
         }
 
         public void RegisterCommandWithParameters(string name, Action<IEnumerable<string>> handler, string description = "")
         {
-            _remoteApiMap.RegisterCommandWithParameters(name, handler, description);
+            SafeExecution.TryCatch(() => _remoteApiMap.RegisterCommandWithParameters(name, handler, description),
+                exception => _recorder.DefaultException(this, exception));
         }
     }
 }

@@ -40,7 +40,11 @@ namespace RemoteApi
 
         private void ConnectedHandler(string address)
         {
-            SafeExecution.TryCatch(() => _remoteTraceMonitor.SetPrompt(address),
+            SafeExecution.TryCatch(() =>
+                {
+                    _remoteTraceMonitor.SetPrompt(address);
+                    _remoteTraceMonitor.ClearTextBox();
+                },
                 exception => _recorder.DefaultException(this, exception));
         }
 
