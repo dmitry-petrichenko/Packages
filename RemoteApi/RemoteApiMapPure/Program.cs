@@ -12,10 +12,11 @@ namespace RemoteApiMapPure
         
         static async Task Main(string[] args)
         {
+            var port = Console.ReadLine();
             var recorder = new ApplicationRecorder(new SystemRecorder(), new MessagesCache(10));
             _applicationRecorder = recorder;
             var instructionReceiverFactory = new DefaultInstructionReceiverFactory(recorder);
-            var instructionReceiver = instructionReceiverFactory.Create("127.0.0.1:11111");
+            var instructionReceiver = instructionReceiverFactory.Create($"127.0.0.1:{port}");
             var remoteApiMap = new RemoteApiMap(instructionReceiver, recorder);
             var consistentMessageSender = new СonsistentMessageSender(remoteApiMap, recorder);
             var remoteRecorderSender = new RemoteRecordsSender(consistentMessageSender, recorder, recorder);

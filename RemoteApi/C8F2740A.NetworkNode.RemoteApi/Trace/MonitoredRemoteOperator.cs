@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using C8F2740A.Common.ExecutionStrategies;
 using C8F2740A.Common.Records;
 using RemoteApi.Monitor;
@@ -35,7 +34,7 @@ namespace RemoteApi
         private void TextEnteredHandler(string value)
         {
             SafeExecution.TryCatch(() => _autoLocalConnector.ExecuteCommand(value),
-                exception => _recorder.DefaultException(this, exception));
+                exception => _recorder.DefaultException(this, exception)); 
         }
 
         private void ConnectedHandler(string address)

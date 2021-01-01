@@ -1,4 +1,5 @@
-﻿using C8F2740A.Common.Records;
+﻿using System.Net.Sockets;
+using C8F2740A.Common.Records;
 using C8F2740A.Networking.ConnectionTCP;
 using C8F2740A.Networking.ConnectionTCP.Network;
 
@@ -21,12 +22,11 @@ namespace C8F2740A.NetworkNode.SessionTCP.Factories
         public IInstructionReceiver Create(string address)
         {
             var networkAddress = new NetworkAddress(address);
-            var socketFactory = new SocketFactory();
-            
+
             var networkPoint = new NetworkPoint(
                 networkAddress, 
                 NetworkTunnelFactory, 
-                socketFactory, 
+                SocketFactory, 
                 _recorder);
             
             var nodeGateWay = new NodeGateway(
@@ -40,6 +40,11 @@ namespace C8F2740A.NetworkNode.SessionTCP.Factories
                 _recorder);
 
             return instructionReceiver;
+        }
+        
+        public ISocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
+        {
+            return new SocketAbstraction(addressFamily, socketType, protocolType);
         }
         
         private ISession SessionFactory(INetworkTunnel networkTunnel)

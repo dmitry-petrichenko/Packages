@@ -1,4 +1,5 @@
-﻿using C8F2740A.Common.Records;
+﻿using System.Net.Sockets;
+using C8F2740A.Common.Records;
 using C8F2740A.Networking.ConnectionTCP;
 using C8F2740A.Networking.ConnectionTCP.Network;
 
@@ -20,11 +21,10 @@ namespace C8F2740A.NetworkNode.SessionTCP.Factories
 
         public IInstructionSender Create(string address)
         {
-            var socketFactory = new SocketFactory();
             var networkAddress = new NetworkAddress(address);
             var networkConnector = new NetworkConnector(
                 NetworkTunnelFactory,
-                socketFactory);
+                SocketFactory);
             
             var nodeVisitor = new NodeVisitor(networkConnector, SessionFactory, _recorder);
             
@@ -36,6 +36,11 @@ namespace C8F2740A.NetworkNode.SessionTCP.Factories
 
             return instructionSender;
         }
+        
+        public ISocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
+        {
+            return new SocketAbstraction(addressFamily, socketType, protocolType);
+        }
 
         private ISession SessionFactory(INetworkTunnel tunnel)
         {
@@ -45,18 +50,6 @@ namespace C8F2740A.NetworkNode.SessionTCP.Factories
         private INetworkTunnel NetworkTunnelFactory(ISocket socket)
         {
             return new NetworkTunnel(socket, _recorder);
-        }
-        
-        private class RecorderSettings : IRecorderSettings
-        {
-            public RecorderSettings()
-            {
-                ShowErrors = true;
-                ShowInfo = true;
-            }
-
-            public bool ShowErrors { get; }
-            public bool ShowInfo { get; }
         }
     }
 }

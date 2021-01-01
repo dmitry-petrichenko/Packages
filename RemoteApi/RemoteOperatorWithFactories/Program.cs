@@ -56,7 +56,6 @@ namespace RemoteOperatorWithFactories
 
         private static void WrongCommandHandler()
         {
-            //var r = await _textToRemoteSender.TrySendText("Wrong");
             _recorder.RecordInfo("", "Wrong");
         }
 
