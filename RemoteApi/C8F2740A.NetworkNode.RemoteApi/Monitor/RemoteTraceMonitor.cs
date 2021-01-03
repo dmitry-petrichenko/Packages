@@ -22,7 +22,8 @@ namespace RemoteApi.Monitor
     {
         public event Action<string> TextEntered;
 
-        private readonly ISystemRecorder _systemRecorder;
+        private readonly ISystemInterrupter _systemInterrupter;
+        private readonly ISystemInfoMessageDispatcher _systemInfoMessageDispatcher;
 
         private SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
         private IConsoleTextBox _remoteTextBox;
@@ -32,20 +33,28 @@ namespace RemoteApi.Monitor
         private int _numberOfLines;
         private bool _isStarted;
 
-        public RemoteTraceMonitor(IConsoleAbstraction consoleAbstraction, int numberOfLines, ISystemRecorder systemRecorder)
+        public RemoteTraceMonitor(
+            IConsoleAbstraction consoleAbstraction, 
+            int numberOfLines, 
+            ISystemInterrupter systemInterrupter,
+            ISystemInfoMessageDispatcher systemInfoMessageDispatcher
+            )
         {
             _numberOfLines = numberOfLines;
-            _systemRecorder = systemRecorder;
+            _systemInterrupter = systemInterrupter;
             _consoleAbstraction = consoleAbstraction;
+            _systemInfoMessageDispatcher = systemInfoMessageDispatcher;
             _lineReaderWithPrompt = new LineReaderWithPrompt(new AsyncLineReader(_consoleAbstraction), _consoleAbstraction, _numberOfLines + 1);
             _remoteTextBox = new ConsoleTextBox(_consoleAbstraction, 0, _numberOfLines);
             _debugTextBox = new ConsoleTextBox(_consoleAbstraction, _numberOfLines + 3, 7);
+
+            _systemInfoMessageDispatcher.InfoMessageReceived += InfoMessageReceivedHandler;
         }
 
         public void Start()
         {
             SafeExecution.TryCatchAsync(() => StartInternal(),
-                exception => _systemRecorder.InterruptWithMessage(exception.Message));
+                exception => _systemInterrupter.InterruptWithMessage(exception.Message));
         }
 
         private async Task StartInternal()
@@ -84,19 +93,19 @@ namespace RemoteApi.Monitor
         public void SetPrompt(string value)
         {
             SafeExecution.TryCatchAsync(() => SetPromptInternal(value),
-                exception => _systemRecorder.InterruptWithMessage(exception.Message));
+                exception => _systemInterrupter.InterruptWithMessage(exception.Message));
         }
 
         public void DisplayNextMessage(string message)
         {
             SafeExecution.TryCatchAsync(() => DisplayNextMessageInternal(message),
-                exception => _systemRecorder.InterruptWithMessage(exception.Message));
+                exception => _systemInterrupter.InterruptWithMessage(exception.Message));
         }
 
         public void DisplayDebugMessage(string message)
         {
             SafeExecution.TryCatchAsync(() => DisplayDebugMessageInternal(message),
-                exception => _systemRecorder.InterruptWithMessage(exception.Message));
+                exception => _systemInterrupter.InterruptWithMessage(exception.Message));
         }
         
         private async Task SetPromptInternal(string value)
@@ -127,6 +136,11 @@ namespace RemoteApi.Monitor
             _lineReaderWithPrompt.SetCursorAfterPrompt();
             
             semaphoreSlim.Release();
+        }
+        
+        private void InfoMessageReceivedHandler(string message)
+        {
+            DisplayDebugMessage(message);
         }
     }
 }

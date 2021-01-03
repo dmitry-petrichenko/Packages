@@ -4,13 +4,7 @@ using C8F2740A.Common.Records;
 
 namespace RemoteApi
 {
-    public interface ISystemRecorder
-    {
-        void RecordInfo(string message);
-        void InterruptWithMessage(string message);
-    }
-    
-    public interface IApplicationRecorder
+    public interface IApplicationRecorder : IRecorder
     {
         event Action<string> RecordReceived;
 
@@ -19,7 +13,7 @@ namespace RemoteApi
         void RecordError(string tag, string message);
     }
     
-    public class ApplicationRecorder : IApplicationRecorder, IRecorder
+    public class ApplicationRecorder : IApplicationRecorder
     {
         private ISystemRecorder _systemRecorder;
         private IMessagesCache _messagesCache;

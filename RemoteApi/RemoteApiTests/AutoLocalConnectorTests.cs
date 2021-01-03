@@ -17,7 +17,7 @@ namespace RemoteApi
             _connectParser = Mock.Create<IConnectParser>();
             _recorder = Mock.Create<IRecorder>();
             
-            _sut = new AutoLocalConnector(_connectParser, _recorder);
+            _sut = new AutoLocalConnector(_connectParser, _recorder, "127.0.0.1:10000");
         }
         
         [Fact]

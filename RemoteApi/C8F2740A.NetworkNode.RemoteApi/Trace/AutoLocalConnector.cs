@@ -25,13 +25,16 @@ namespace RemoteApi.Trace
 
         private readonly IConnectParser _connectParser;
         private readonly IRecorder _recorder;
+        private readonly string _address;
         
         public AutoLocalConnector(
             IConnectParser connectParser,
-            IRecorder recorder)
+            IRecorder recorder,
+            string address)
         {
             _connectParser = connectParser;
             _recorder = recorder;
+            _address = address;
             
             _connectParser.InstructionReceived += InstructionReceivedHandler;
             _connectParser.Disconnected += DisconnectedHandler;
@@ -55,7 +58,7 @@ namespace RemoteApi.Trace
 
         private void InstructionReceivedHandler(string value)
         {
-            if (value == null) //if (string.IsNullOrEmpty(value)) //TODO
+            if (string.IsNullOrEmpty(value))
             {
                 _recorder.RecordError(GetType().Name, "Text value cannot be empty");
                 return;
@@ -72,7 +75,7 @@ namespace RemoteApi.Trace
         
         private async Task ConnectToSelfInternal()
         {
-            var isConnected = await _connectParser.ExecuteCommand("connect 127.0.0.1:10000");
+            var isConnected = await _connectParser.ExecuteCommand($"connect {_address}");
 
             if (!isConnected)
             {

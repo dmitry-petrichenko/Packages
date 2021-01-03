@@ -15,9 +15,10 @@ namespace RemoteApi.Integration
             //_tram = new TraceableRemoteApiMap(remoteApiMap, remoteRecorderSender, recorder);
         }
 
+        /*
         private IInstructionSenderFactory CreateInstructionSender(ISocketFactory socketFactory)
         {
-            
         }
+        */
     }
 }
