@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
 using RemoteApi;
-using RemoteApi.Trace;
+using RemoteApi.Factories;
 
 namespace RemoteApiMapPure
 {
@@ -13,16 +13,13 @@ namespace RemoteApiMapPure
         static async Task Main(string[] args)
         {
             var port = Console.ReadLine();
-            var recorder = new ApplicationRecorder(new SystemRecorder(), new MessagesCache(10));
-            _applicationRecorder = recorder;
-            var instructionReceiverFactory = new DefaultInstructionReceiverFactory(recorder);
-            var instructionReceiver = instructionReceiverFactory.Create($"127.0.0.1:{port}");
-            var remoteApiMap = new RemoteApiMap(instructionReceiver, recorder);
-            var consistentMessageSender = new СonsistentMessageSender(remoteApiMap, recorder);
-            var remoteRecorderSender = new RemoteRecordsSender(consistentMessageSender, recorder, recorder);
-            var traceableRemoteApiMap = new TraceableRemoteApiMap(remoteApiMap, remoteRecorderSender, recorder);
-            traceableRemoteApiMap.RegisterWrongCommandHandler(WrongCommandHandler);
-            traceableRemoteApiMap.RegisterCommand("command", CommandHandler);
+            _applicationRecorder = new ApplicationRecorder(new SystemRecorder(), new MessagesCache(10));
+
+            // Remote api
+            var apiMapFactory = new BaseTraceableRemoteApiMapFactory(new DefaultInstructionReceiverFactory(_applicationRecorder), _applicationRecorder);
+            var remoteApiMap2 = apiMapFactory.Create($"127.0.0.1:{port}");
+            remoteApiMap2.RegisterWrongCommandHandler(WrongCommandHandler);
+            remoteApiMap2.RegisterCommand("command", CommandHandler);
             
             await new TaskCompletionSource<bool>().Task;
         }
@@ -48,6 +45,9 @@ namespace RemoteApiMapPure
             {
                 Console.WriteLine(message);
             }
+
+            public event Action<string> InfoMessageReceived;
+            public event Action<string> InterruptedWithMessage;
         }
     }
 }
