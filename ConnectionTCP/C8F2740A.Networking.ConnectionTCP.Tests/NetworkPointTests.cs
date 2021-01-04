@@ -46,7 +46,7 @@ namespace C8F2740A.Networking.ConnectionTCP.Tests
             
             _sut = CreateNetworkPoint(networkAddress, networkTunnelFactory, socketFactory, _recorder);
 
-            Mock.Assert(() => socketFactory.Create(Arg.IsAny<AddressFamily>(), Arg.IsAny<SocketType>(), Arg.IsAny<ProtocolType>()), Occurs.Exactly(1));
+            Mock.Assert(() => socketFactory.Invoke(Arg.IsAny<AddressFamily>(), Arg.IsAny<SocketType>(), Arg.IsAny<ProtocolType>()), Occurs.Exactly(1));
         }
         
         [Fact]
@@ -86,7 +86,7 @@ namespace C8F2740A.Networking.ConnectionTCP.Tests
             return CreateNetworkPoint(networkAddress, networkTunnelFactory, socketFactory, _recorder);
         }
 
-        private ISocketFactory ArrangeSocketFactory(ISocket socketMock = default, bool returnTask = true)
+        private Func<AddressFamily, SocketType, ProtocolType, ISocket> ArrangeSocketFactory(ISocket socketMock = default, bool returnTask = true)
         {
             if (socketMock == default)
             {
@@ -99,8 +99,10 @@ namespace C8F2740A.Networking.ConnectionTCP.Tests
                 Mock.Arrange(() => socketMock.AcceptAsync()).Returns(tcs.Task);
             }
 
-            var factory = Mock.Create<ISocketFactory>();
-            Mock.Arrange(() => factory.Create(default, default, default)).IgnoreArguments().Returns(socketMock);
+            var factory = Mock.Create<Func<AddressFamily, SocketType, ProtocolType, ISocket>>();
+            Mock.Arrange(() => factory.Invoke(default, default, default))
+                .IgnoreArguments()
+                .Returns(socketMock);
 
             return factory;
         }
@@ -132,7 +134,7 @@ namespace C8F2740A.Networking.ConnectionTCP.Tests
         private INetworkPoint CreateNetworkPoint(
             INetworkAddress networkAddress, 
             Func<ISocket, INetworkTunnel> networkTunnelFactory,
-            ISocketFactory socketFactory,
+            Func<AddressFamily, SocketType, ProtocolType, ISocket> socketFactory,
             IRecorder recorder)
         {
             var networkPoint = new NetworkPoint(networkAddress, networkTunnelFactory, socketFactory, recorder);

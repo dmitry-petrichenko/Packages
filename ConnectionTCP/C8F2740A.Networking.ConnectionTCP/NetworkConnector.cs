@@ -52,7 +52,8 @@ namespace C8F2740A.Networking.ConnectionTCP
                 () => socket.Connect(networkAddress.IP, networkAddress.Port),
                 e =>
                 {
-                    socket.Dispose();
+                    SafeExecution.TryCatch(() => socket.Dispose(),
+                        e => ExceptionHandler(e));
                     isFail = true;
                 });
 

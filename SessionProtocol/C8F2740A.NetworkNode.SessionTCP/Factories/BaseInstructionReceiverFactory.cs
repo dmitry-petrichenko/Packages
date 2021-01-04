@@ -10,11 +10,11 @@ namespace C8F2740A.NetworkNode.SessionTCP.Factories
         IInstructionReceiver Create(string address);
     }
     
-    public class DefaultInstructionReceiverFactory : IInstructionReceiverFactory
+    public class BaseInstructionReceiverFactory : IInstructionReceiverFactory
     {
         private readonly IRecorder _recorder;
         
-        public DefaultInstructionReceiverFactory(IRecorder recorder)
+        public BaseInstructionReceiverFactory(IRecorder recorder)
         {
             _recorder = recorder;
         }
@@ -42,17 +42,17 @@ namespace C8F2740A.NetworkNode.SessionTCP.Factories
             return instructionReceiver;
         }
         
-        public ISocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
+        protected virtual ISocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
         {
             return new SocketAbstraction(addressFamily, socketType, protocolType);
         }
         
-        private ISession SessionFactory(INetworkTunnel networkTunnel)
+        protected virtual ISession SessionFactory(INetworkTunnel networkTunnel)
         {
             return new Session(networkTunnel, _recorder);
         }
 
-        private INetworkTunnel NetworkTunnelFactory(ISocket socket)
+        protected virtual INetworkTunnel NetworkTunnelFactory(ISocket socket)
         {
             return new NetworkTunnel(socket, _recorder);
         }

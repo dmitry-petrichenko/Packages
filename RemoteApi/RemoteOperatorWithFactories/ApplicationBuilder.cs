@@ -48,11 +48,11 @@ namespace RemoteOperatorWithFactories
             _applicationRecorder = new ApplicationRecorder(systemRecorder, new MessagesCache(10));
             
             // Remote operator 
-            var remoteOperatorFactory = new BaseMonitoredRemoteOperatorFactory(new DefaultInstructionSenderFactory(_applicationRecorder), remoteTraceMonitor, _applicationRecorder);
+            var remoteOperatorFactory = new BaseMonitoredRemoteOperatorFactory(new BaseInstructionSenderFactory(_applicationRecorder), remoteTraceMonitor, _applicationRecorder);
             var remoteOperator = remoteOperatorFactory.Create("127.0.0.1:10000");
             
             // Remote api
-            var apiMapFactory = new BaseTraceableRemoteApiMapFactory(new DefaultInstructionReceiverFactory(_applicationRecorder), _applicationRecorder);
+            var apiMapFactory = new BaseTraceableRemoteApiMapFactory(new BaseInstructionReceiverFactory(_applicationRecorder), _applicationRecorder);
             var remoteApiMap = apiMapFactory.Create("127.0.0.1:10000");
             remoteApiMap.RegisterWrongCommandHandler(WrongCommandHandler);
             

@@ -16,10 +16,12 @@ namespace RemoteApiMapPure
             _applicationRecorder = new ApplicationRecorder(new SystemRecorder(), new MessagesCache(10));
 
             // Remote api
-            var apiMapFactory = new BaseTraceableRemoteApiMapFactory(new DefaultInstructionReceiverFactory(_applicationRecorder), _applicationRecorder);
+            var apiMapFactory = new BaseTraceableRemoteApiMapFactory(new BaseInstructionReceiverFactory(_applicationRecorder), _applicationRecorder);
             var remoteApiMap2 = apiMapFactory.Create($"127.0.0.1:{port}");
             remoteApiMap2.RegisterWrongCommandHandler(WrongCommandHandler);
             remoteApiMap2.RegisterCommand("command", CommandHandler);
+            
+            _applicationRecorder.RecordInfo("", "Created");
             
             await new TaskCompletionSource<bool>().Task;
         }

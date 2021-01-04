@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using C8F2740A.Common.ExecutionStrategies;
@@ -31,21 +32,28 @@ namespace C8F2740A.Networking.ConnectionTCP
             _recorder = recorder;
             _networkTunnelFactory = networkTunnelFactory;
             _sListener = socketFactory.Invoke(networkAddress.IP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            _sListener.Bind(networkAddress.IP, networkAddress.Port);
+
+            Bind(networkAddress.IP, networkAddress.Port);
             Open();
         }
         
-        private void Open()
-        {
-            SafeExecution.TryCatchAsync(() => OpenInternal(), ExceptionHandler);
-        }
-
         public void Dispose()
         {
             Close();
             _sListener.Dispose();
         }
 
+        private void Bind(IPAddress ipAddress, int port)
+        {
+            SafeExecution.TryCatch(() => _sListener.Bind(ipAddress, port),
+                ExceptionHandler);
+        }
+
+        private void Open()
+        {
+            SafeExecution.TryCatchAsync(() => OpenInternal(), ExceptionHandler);
+        }
+        
         private async Task OpenInternal()
         {
             _isOpened = true;
