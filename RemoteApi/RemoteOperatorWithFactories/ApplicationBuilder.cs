@@ -37,35 +37,25 @@ namespace RemoteOperatorWithFactories
             _systemMessageDispatcher = systemRecorder;
             _systemMessageDispatcher.InterruptedWithMessage += SystemInterruptedHandler;
             
+            // Application recorder
+            _applicationRecorder = new ApplicationRecorder(systemRecorder, new MessagesCache(10));
+            
             // Remote trace monitor
             var remoteTraceMonitor = new RemoteTraceMonitor(new ConsoleAbstraction()
                 , 4, 
                 systemRecorder, 
                 systemRecorder);
             remoteTraceMonitor.Start();
-
-            // Application recorder
-            _applicationRecorder = new ApplicationRecorder(systemRecorder, new MessagesCache(10));
             
-            // Remote operator 
             var remoteOperatorFactory = new BaseMonitoredRemoteOperatorFactory(new BaseInstructionSenderFactory(_applicationRecorder), remoteTraceMonitor, _applicationRecorder);
-            var remoteOperator = remoteOperatorFactory.Create("127.0.0.1:10000");
+            var traceableRemoteApiMapFactory = new BaseTraceableRemoteApiMapFactory(new BaseInstructionReceiverFactory(_applicationRecorder), _applicationRecorder);
+
+            var apiOperatorFactory = new ApiOperatorFactory(systemRecorder, remoteOperatorFactory, traceableRemoteApiMapFactory, _applicationRecorder);
+            apiOperatorFactory.Create("127.0.0.1:8081");
             
-            // Remote api
-            var apiMapFactory = new BaseTraceableRemoteApiMapFactory(new BaseInstructionReceiverFactory(_applicationRecorder), _applicationRecorder);
-            var remoteApiMap = apiMapFactory.Create("127.0.0.1:10000");
-            remoteApiMap.RegisterWrongCommandHandler(WrongCommandHandler);
-            
-            remoteOperator.Start();
-                
             return _mainApplicationTask.Task;
         }
 
-        private void WrongCommandHandler()
-        {
-            _applicationRecorder.RecordInfo("App", "Wrong command");
-        }
-        
         private void SystemInterruptedHandler(string message)
         {
             //.Dispose();

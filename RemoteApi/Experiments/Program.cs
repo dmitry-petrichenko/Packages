@@ -9,9 +9,27 @@ namespace Experiments
     {
         static async Task Main(string[] args)
         {
+            int[] arr = {1, 2, 3};
+            byte[] bytes = { 0b0000_0000 };
+            ChangeArray(arr);
+            ChangeArray2(bytes);
             Console.WriteLine(DateTime.Now.ToShortTimeFormat());
             
             Console.ReadLine();
+        }
+
+        public static void ChangeArray(int[] arr)
+        {
+            int[] b = new int[1];
+            b[0] = 7;
+            Buffer.BlockCopy(b, 0, arr, 0, 1);
+        }
+        
+        public static void ChangeArray2(byte[] bytes)
+        {
+            byte[] b = new byte[1];
+            b[0] = 7;
+            bytes = b;
         }
     }
 

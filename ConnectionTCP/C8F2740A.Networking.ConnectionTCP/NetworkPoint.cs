@@ -70,6 +70,7 @@ namespace C8F2740A.Networking.ConnectionTCP
 
         private void ExceptionHandler(Exception exception)
         {
+            Close();
             _recorder.RecordError(nameof(NetworkPoint), exception.Message);
         }
 

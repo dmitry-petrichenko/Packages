@@ -60,9 +60,9 @@ namespace C8F2740A.Networking.ConnectionTCP
             CloseInternal();
         }
 
-        public async Task Listen()
+        public Task Listen()
         {
-            SafeExecution.TryCatchAsync(()  => Task.Run(ListenInternal), ExceptionHandler);
+            return SafeExecution.TryCatchAsync(()  => Task.Run(ListenInternal), ExceptionHandler);
         }
         
         private void ListenInternal()
