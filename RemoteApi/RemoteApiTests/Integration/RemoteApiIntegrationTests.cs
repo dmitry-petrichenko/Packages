@@ -4,8 +4,10 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using C8F2740A.Common.Records;
+using C8F2740A.Networking.ConnectionTCP;
 using C8F2740A.Networking.ConnectionTCP.Network;
 using RemoteApi.Factories;
+using RemoteApi.Integration.Helpers;
 using RemoteApi.Monitor;
 using RemoteApi.Trace;
 using Telerik.JustMock;
@@ -113,6 +115,72 @@ namespace RemoteApi.Integration
             CreateLocalOperator(SocketFactory);
             
             Assert.Equal(2, socketCreated);
+        }
+        
+        [Fact]
+        public void OperatorConstructor_WhenCalled_ShouldListenFirstSocket()
+        {
+            var socketTesterFactory = Mock.Create<ISocketTesterFactory>();
+            var socketTester1 = new SocketTester();
+            var socketTester2 = new SocketTester();
+            
+            Mock.Arrange(() => socketTesterFactory.Create()).Returns(socketTester1)
+                .InSequence(); 
+            Mock.Arrange(() => socketTesterFactory.Create()).Returns(socketTester2)
+                .InSequence();
+            ISocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
+            {
+                return socketTesterFactory.Create();
+            }
+            
+            CreateLocalOperator(SocketFactory);
+            
+            Assert.Equal(1, socketTester1.ListenCalledTimes);
+            Assert.Equal(0, socketTester2.ListenCalledTimes);
+            Assert.Equal(1, socketTester2.ConnectCalledTimes);
+        }
+        
+        [Fact]
+        public async void OperatorConstructor_WhenCalled_ShouldCallReceiveInAcceptedSocket()
+        {
+            var socketTester1 = new SocketTester("connector");
+            var socketTester2 = new SocketTester("listener");
+            var socketTester3 = new SocketTester("accepted");
+            var socketFactory = ArrangeConnection(socketTester1, socketTester2, socketTester3);
+            
+            CreateLocalOperator(socketFactory);
+
+            await Task.Delay(3000);
+            Assert.Equal(1, socketTester3.ReceiveCalledTimes);
+            Mock.Assert(() => _recorder.DefaultException(Arg.IsAny<Object>(), Arg.IsAny<Exception>()), 
+                Occurs.Never());
+            Mock.Assert(() => _recorder.RecordError(Arg.IsAny<string>(), Arg.IsAny<string>()), 
+                Occurs.Never());
+        }
+
+        private Func<AddressFamily, SocketType, ProtocolType, ISocket> ArrangeConnection(SocketTester socketConnecter, SocketTester socketListener, SocketTester socketAccepted)
+        {
+            socketAccepted.Connected = true;
+            
+            new NetworkImitator(socketConnecter, socketAccepted);
+            
+            var socketTesterFactory = Mock.Create<ISocketTesterFactory>();
+            Mock.Arrange(() => socketTesterFactory.Create()).Returns(socketListener)
+                .InSequence();
+            Mock.Arrange(() => socketTesterFactory.Create()).Returns(socketConnecter)
+                .InSequence();
+
+            socketConnecter.ConnectCalled += () =>
+            {
+                socketListener.RaiseSocketAccepted(socketAccepted);
+            };
+            
+            ISocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
+            {
+                return socketTesterFactory.Create();
+            }
+            
+            return SocketFactory;
         }
         
         private ISocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)

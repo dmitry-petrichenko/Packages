@@ -1,15 +1,33 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using C8F2740A.Networking.ConnectionTCP.Network;
 
-namespace RemoteApi.Integration
+namespace RemoteApi.Integration.Helpers
 {
     public class SocketTester : ISocket
     {
-        public event Action<byte[]> SendCalled;
+        public string Tag { get; }
+        public int ListenCalledTimes { get; private set; }
+        public int ConnectCalledTimes { get; private set; }
+        public int ReceiveCalledTimes { get; private set; }
 
-        private TaskCompletionSource<byte[]> _source;
+        public event Action<byte[]> SendCalled;
+        public event Action ConnectCalled;
+        
+        private TaskCompletionSource<ISocket> _socketAcceptedTask;
+        private BlockingCollection<byte[]> _messageQueue;
+        
+        public SocketTester(string tag = "")
+        {
+            Tag = tag;
+            
+            _messageQueue = new BlockingCollection<byte[]>();
+        }
 
         public void Dispose()
         {
@@ -17,7 +35,7 @@ namespace RemoteApi.Integration
 
         public IPEndPoint LocalEndPoint => new IPEndPoint(0, 0);
         public IPEndPoint RemoteEndPoint => new IPEndPoint(0, 0);
-        public bool Connected { get; private set; }
+        public bool Connected { get; set; }
         
         public void Bind(IPAddress ipAddress, int port)
         {
@@ -26,22 +44,24 @@ namespace RemoteApi.Integration
         public void Connect(IPAddress ipAddress, int port)
         {
             Connected = true;
+            ConnectCalledTimes++;
+            ConnectCalled?.Invoke();
         }
 
         public void Listen(int backlog)
         {
+            ListenCalledTimes++;
         }
 
         public void Send(byte[] data)
         {
             SendCalled?.Invoke(data);
         }
-
+        
         public int Receive(byte[] bytes)
         {
-            _source = new TaskCompletionSource<byte[]>();
-            _source.Task.Wait();
-            var received = _source.Task.Result;
+            ReceiveCalledTimes++;
+            var received = _messageQueue.Take();
 
             if (received.Length > bytes.Length)
             {
@@ -52,21 +72,26 @@ namespace RemoteApi.Integration
             
             return received.Length;
         }
-
+        
         public void RaiseReceived(byte[] bytes)
         {
-            _source?.SetResult(bytes);
+            _messageQueue.Add(bytes);
         }
         
         public void RaiseDisconnected()
         {
             Connected = false;
-            _source?.SetResult(Array.Empty<byte>());
         }
 
         public Task<ISocket> AcceptAsync()
         {
-            return new TaskCompletionSource<ISocket>().Task;
+            _socketAcceptedTask = new TaskCompletionSource<ISocket>();
+            return _socketAcceptedTask.Task;
+        }
+
+        public void RaiseSocketAccepted(ISocket socket)
+        {
+            _socketAcceptedTask.SetResult(socket);
         }
 
         public void Close()

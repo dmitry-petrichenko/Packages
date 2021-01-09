@@ -1,112 +1,66 @@
-﻿using System;
+﻿using System;  
+using System.Net;  
+using System.Net.Sockets;  
+using System.Text;
 using System.Threading.Tasks;
-using RemoteApi;
-using RemoteApi.Monitor;
 
-namespace Server3
-{
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            var consoleAbstraction = new ConsoleAbstraction();
-            var rtm = new RemoteTraceMonitor(consoleAbstraction, 5);
-            rtm.Start();
-            
-            rtm.SetPrompt("ff");
+// Socket Listener acts as a server and listens to the incoming   
+// messages on the specified port and protocol.  
+public class SocketListener  
+{  
+    public static int Main(String[] args)  
+    {  
+        StartServer();  
+        Console.ReadLine();
+        return 0;  
+    }  
+  
+     
+    public static async void StartServer()  
+    {  
+        // Get Host IP Address that is used to establish a connection  
+        // In this case, we get one IP address of localhost that is IP : 127.0.0.1  
+        // If a host has multiple addresses, you will get a list of addresses  
+        IPHostEntry host = Dns.GetHostEntry("localhost");  
+        IPAddress ipAddress = host.AddressList[0];  
+        IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);    
+        
+  
+        try {   
+  
+            // Create a Socket that will use Tcp protocol      
+            Socket listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);  
+            // A Socket must be associated with an endpoint using the Bind method  
+            listener.Bind(localEndPoint);  
+            // Specify how many requests a Socket can listen before it gives Server busy response.  
+            // We will listen 10 requests at a time  
+            listener.Listen(10);  
+  
+            Console.WriteLine("Waiting for a connection...");  
+            Socket handler = await listener.AcceptAsync();  
+  
+             // Incoming data from the client.    
+             string data = null;  
+             byte[] bytes = null;  
+  
+            while (true)  
+            {  
+                bytes = new byte[1024];  
+                int bytesRec = handler.Receive(bytes);  
+                data += Encoding.ASCII.GetString(bytes, 0, bytesRec);
 
-                /*
-                async void DisplayMessages(int i1, int i2)
-                {
-                    for (int i = i1; i < i2; i++)
-                    {
-                        await Task.Delay(1100);
-                        rtm.DisplayNextMessage(i.ToString());
-                    }
-                }
-                
-                async void DisplayDebugMessages(int i1, int i2)
-                {
-                    for (int i = i1; i < i2; i++)
-                    {
-                        await Task.Delay(900);
-                        rtm.DisplayDebugMessage(i.ToString());
-                    }
-                }
-                
-                async void SetPrompts(int i1, int i2)
-                {
-                    for (int i = i1; i < i2; i++)
-                    {
-                        await Task.Delay(800);
-                        rtm.SetPrompt(i.ToString());
-                    }
-                }
-    
-                /*
-                SetPrompts(10000, 10100);
-                DisplayDebugMessages(20000, 20100);
-                DisplayMessages(33000, 33100);
-                */
-            /*
-            Task.Run(() => SetPrompts(10000, 10100));
-            Task.Run(() => DisplayDebugMessages(20000, 20100));
-            Task.Run(() => DisplayMessages(33000, 33100)); 
-            */
-            //await new TaskCompletionSource<bool>().Task;
-        }
+                Console.WriteLine($"Bytes received {bytesRec}");
+                Console.WriteLine($"received {data}");
 
-        private class TextToRemoteSender : ITextToRemoteSender
-        {
-            private readonly TaskCompletionSource<bool> _source;
-            
-            public TextToRemoteSender(TaskCompletionSource<bool> source)
-            {
-                _source = source;
+                await Task.Delay(2000);
             }
-
-            public async Task<bool> TrySendText(string instruction)
-            {
-                await _source.Task;
-                return true;
-            }
-        }
-
-        public static async Task Method(TaskCompletionSource<bool> source)
-        {
-            await Task.Run(async () =>
-            {
-                await source.Task;
-            });
-        }
-    }
-
-    internal class SystemRecorder : ISystemRecorder
-    {
-        public void RecordInfo(string message)
-        {
-            Console.WriteLine(message);
-        }
-    }
-
-    /*
-            var recorder = new DefaultRecorder(new DefaultRecorderSettings());
-            var sf = new DefaultInstructionSenderFactory(recorder);
-            var rf = new DefaultInstructionReceiverFactory(recorder);
-
-            var sender = sf.Create("127.0.0.1:10000");
-            var receiver = rf.Create("127.0.0.1:10000");
-            receiver.InstructionReceived += bytes =>
-            {
-                receiver.TrySendInstruction("(i):Wrong".ToEnumerableByte());
-                return Enumerable.Empty<byte>();
-            };
-
-            while (true)
-            {
-                var line = Console.ReadLine();
-                await sender.TrySendInstruction("u".ToEnumerableByte());
-                //await receiver.TrySendInstruction("(i):Wrong".ToEnumerableByte());
-            }
-     */
-}
+        }  
+        catch (Exception e)  
+        {  
+            Console.WriteLine(e.ToString());  
+        }  
+  
+        Console.WriteLine("\n Press any key to continue...");  
+        Console.ReadKey();  
+    }          
+}  

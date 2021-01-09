@@ -26,6 +26,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteApiMapPure", "RemoteA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.Common.ExecutionStrategies.Tests", "..\ExecutionStrategies\C8F2740A.Common.ExecutionStrategies.Tests\C8F2740A.Common.ExecutionStrategies.Tests.csproj", "{7F0B3BA5-8617-4058-9098-013335252ECD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{F5BDD697-DA0E-45D3-B77B-232312D4C4C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client22", "Client22\Client22.csproj", "{EF6180C9-5D31-439A-877B-0794362039EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +84,14 @@ Global
 		{7F0B3BA5-8617-4058-9098-013335252ECD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F0B3BA5-8617-4058-9098-013335252ECD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F0B3BA5-8617-4058-9098-013335252ECD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5BDD697-DA0E-45D3-B77B-232312D4C4C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5BDD697-DA0E-45D3-B77B-232312D4C4C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5BDD697-DA0E-45D3-B77B-232312D4C4C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5BDD697-DA0E-45D3-B77B-232312D4C4C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF6180C9-5D31-439A-877B-0794362039EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF6180C9-5D31-439A-877B-0794362039EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF6180C9-5D31-439A-877B-0794362039EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF6180C9-5D31-439A-877B-0794362039EC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6678655B-E8D1-4CCC-A3B1-4149ECE4FBBD} = {E356AF65-3D92-40D9-AC87-8AABEBD25D0D}
