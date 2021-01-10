@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace RemoteApi.Integration.Helpers
 {
@@ -6,30 +7,66 @@ namespace RemoteApi.Integration.Helpers
     {
         private readonly SocketTester _socketConnecter;
         private readonly SocketTester _socketAccepted;
+
+        private Task _connecterRaiseTask;
+        private Task _acceptedRaiseTask;
         
         public NetworkImitator(SocketTester socketConnecter, SocketTester socketAccepted)
         {
             _socketConnecter = socketConnecter;
             _socketAccepted = socketAccepted;
+            
+            _connecterRaiseTask = Task.CompletedTask;
+            _acceptedRaiseTask = Task.CompletedTask;
 
             _socketConnecter.SendCalled += SocketConnecterCalledHandler;
             _socketAccepted.SendCalled += SocketAcceptedCalledHandler;
         }
 
-        private void SocketConnecterCalledHandler(byte[] bytes)
+        public void SocketConnecterCalledHandler(byte[] bytes)
         {
-            Task.Run(async () =>
+            if (_connecterRaiseTask == default)
             {
-                _socketAccepted.RaiseReceived(bytes);
-            });
+                throw new Exception("");
+            }
+            
+            if (_connecterRaiseTask.Status != TaskStatus.RanToCompletion)
+            {
+                _connecterRaiseTask = _connecterRaiseTask.ContinueWith( t =>
+                {
+                    _socketAccepted.RaiseReceived(bytes);
+                });
+            }
+            else
+            {
+                _connecterRaiseTask = Task.Run(() =>
+                {
+                    _socketAccepted.RaiseReceived(bytes);
+                });
+            }
         }
         
         private void SocketAcceptedCalledHandler(byte[] bytes)
         {
-            Task.Run(async () =>
+            if (_acceptedRaiseTask == default)
             {
-                _socketConnecter.RaiseReceived(bytes);
-            });
+                throw new Exception("");
+            }
+            
+            if (_acceptedRaiseTask.Status != TaskStatus.RanToCompletion)
+            {
+                _acceptedRaiseTask = _acceptedRaiseTask.ContinueWith( t =>
+                {
+                    _socketConnecter.RaiseReceived(bytes);
+                });
+            }
+            else
+            {
+                _acceptedRaiseTask = Task.Run(() =>
+                {
+                    _socketConnecter.RaiseReceived(bytes);
+                });
+            }
         }
     }
 }

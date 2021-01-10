@@ -4,7 +4,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using C8F2740A.Common.Records;
-using C8F2740A.Networking.ConnectionTCP;
 using C8F2740A.Networking.ConnectionTCP.Network;
 using RemoteApi.Factories;
 using RemoteApi.Integration.Helpers;
@@ -12,35 +11,43 @@ using RemoteApi.Monitor;
 using RemoteApi.Trace;
 using Telerik.JustMock;
 using Xunit;
+using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace RemoteApi.Integration
 {
     public class RemoteApiIntegrationTests
     {
         private readonly IRecorder _recorder;
+        private readonly IRecorder _originalRecorder;
+        private readonly CacheRecorder _cacheRecorder;
         private readonly IApplicationRecorder _applicationRecorder;
         private readonly ISystemRecorder _systemRecorder;
+        private readonly ITestOutputHelper _output;
         
         private readonly IMonitoredRemoteOperator _mro;
         private readonly ITraceableRemoteApiMap _tram;
 
-        public RemoteApiIntegrationTests()
+        public RemoteApiIntegrationTests(ITestOutputHelper testOutputHelper)
         {
+            _output = testOutputHelper;
+            _originalRecorder = new DefaultRecorder(new DefaultRecorderSettings());
+            _cacheRecorder = new CacheRecorder();
             _recorder = Mock.Create<IRecorder>();
             _applicationRecorder = Mock.Create<IApplicationRecorder>();
             _systemRecorder = Mock.Create<ISystemRecorder>();
         }
 
-        private void CreateLocalOperator(Func<AddressFamily, SocketType, ProtocolType, ISocket> socketFactory)
+        private void CreateLocalOperator(Func<AddressFamily, SocketType, ProtocolType, ISocket> socketFactory, IRecorder recorder)
         {
             // MonitoredRemoteOperator
-            var instructionSenderFactory = new TestInstructionSenderFactory(socketFactory, _recorder);
+            var instructionSenderFactory = new TestInstructionSenderFactory(socketFactory, recorder);
             var monitoredRemoteOperatorFactory = new BaseMonitoredRemoteOperatorFactory(
                 instructionSenderFactory, 
-                Mock.Create<IRemoteTraceMonitor>(), _recorder);
+                Mock.Create<IRemoteTraceMonitor>(), recorder);
 
             // RemoteApiMap
-            var instructionReceiverFactory = new TestInstructionReceiverFactory(socketFactory, _recorder);
+            var instructionReceiverFactory = new TestInstructionReceiverFactory(socketFactory, recorder);
             var traceableRemoteApiMapFactory = new BaseTraceableRemoteApiMapFactory(
                 instructionReceiverFactory,
                 _applicationRecorder);
@@ -112,7 +119,7 @@ namespace RemoteApi.Integration
                 return new SocketTester();
             }
             
-            CreateLocalOperator(SocketFactory);
+            CreateLocalOperator(SocketFactory, _recorder);
             
             Assert.Equal(2, socketCreated);
         }
@@ -133,7 +140,7 @@ namespace RemoteApi.Integration
                 return socketTesterFactory.Create();
             }
             
-            CreateLocalOperator(SocketFactory);
+            CreateLocalOperator(SocketFactory, _recorder);
             
             Assert.Equal(1, socketTester1.ListenCalledTimes);
             Assert.Equal(0, socketTester2.ListenCalledTimes);
@@ -148,10 +155,15 @@ namespace RemoteApi.Integration
             var socketTester3 = new SocketTester("accepted");
             var socketFactory = ArrangeConnection(socketTester1, socketTester2, socketTester3);
             
-            CreateLocalOperator(socketFactory);
+            CreateLocalOperator(socketFactory, _cacheRecorder);
 
-            await Task.Delay(3000);
-            Assert.Equal(1, socketTester3.ReceiveCalledTimes);
+            await Task.Delay(500);
+            
+            _output.WriteLine("Errors:");
+            _output.WriteLine(_cacheRecorder.ErrorCache);
+            _output.WriteLine("Info:");
+            _output.WriteLine(_cacheRecorder.InfoCache);
+            Assert.Equal(3, socketTester3.ReceiveCalledTimes);
             Mock.Assert(() => _recorder.DefaultException(Arg.IsAny<Object>(), Arg.IsAny<Exception>()), 
                 Occurs.Never());
             Mock.Assert(() => _recorder.RecordError(Arg.IsAny<string>(), Arg.IsAny<string>()), 
