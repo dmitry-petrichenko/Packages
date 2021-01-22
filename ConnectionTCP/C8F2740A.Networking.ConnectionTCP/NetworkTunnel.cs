@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using C8F2740A.Common.ExecutionStrategies;
 using C8F2740A.Common.Records;
@@ -72,6 +73,7 @@ namespace C8F2740A.Networking.ConnectionTCP
             while (_socket.Connected)
             {
                 var bytes = _socket.Receive(data);
+                var threadId = Thread.CurrentThread.ManagedThreadId;
                 RecordReceivedInfo($"Bytes received {bytes}");
                 
                 if (bytes == 0) 

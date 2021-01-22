@@ -12,11 +12,10 @@ using RemoteApi.Trace;
 using Telerik.JustMock;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace RemoteApi.Integration
 {
-    public class RemoteApiIntegrationTests
+    public partial class RemoteApiIntegrationTests
     {
         private readonly IRecorder _recorder;
         private readonly IRecorder _originalRecorder;
@@ -38,13 +37,21 @@ namespace RemoteApi.Integration
             _systemRecorder = Mock.Create<ISystemRecorder>();
         }
 
-        private void CreateLocalOperator(Func<AddressFamily, SocketType, ProtocolType, ISocket> socketFactory, IRecorder recorder)
+        private IApiOperator CreateLocalOperator(
+            Func<AddressFamily, SocketType, ProtocolType, ISocket> socketFactory,
+            IRecorder recorder,
+            IRemoteTraceMonitorСonsistent remoteTraceMonitor = default)
         {
+            if (remoteTraceMonitor == default)
+            {
+                remoteTraceMonitor = Mock.Create<IRemoteTraceMonitorСonsistent>();
+            }
+            
             // MonitoredRemoteOperator
             var instructionSenderFactory = new TestInstructionSenderFactory(socketFactory, recorder);
             var monitoredRemoteOperatorFactory = new BaseMonitoredRemoteOperatorFactory(
                 instructionSenderFactory, 
-                Mock.Create<IRemoteTraceMonitor>(), recorder);
+                remoteTraceMonitor, recorder);
 
             // RemoteApiMap
             var instructionReceiverFactory = new TestInstructionReceiverFactory(socketFactory, recorder);
@@ -53,7 +60,7 @@ namespace RemoteApi.Integration
                 _applicationRecorder);
             
             var apiOperatorFactory = new ApiOperatorFactory(_systemRecorder, monitoredRemoteOperatorFactory, traceableRemoteApiMapFactory, _applicationRecorder);
-            apiOperatorFactory.Create("216.58.215.78:8080");
+            return apiOperatorFactory.Create("216.58.215.78:8080");
         }
 
         [Fact]
@@ -194,16 +201,5 @@ namespace RemoteApi.Integration
             
             return SocketFactory;
         }
-        
-        private ISocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
-        {
-            return new SocketTester();
-        }
-
-        /*
-        private IInstructionSenderFactory CreateInstructionSender(ISocketFactory socketFactory)
-        {
-        }
-        */
     }
 }

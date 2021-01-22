@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 using C8F2740A.Networking.ConnectionTCP.Network;
 
@@ -26,6 +24,9 @@ namespace RemoteApi.Integration.Helpers
         {
             Tag = tag;
             
+            LocalEndPoint = new IPEndPoint(0, 0);
+            RemoteEndPoint = new IPEndPoint(0, 0);
+            
             _messageQueue = new BlockingCollection<byte[]>();
         }
 
@@ -33,17 +34,19 @@ namespace RemoteApi.Integration.Helpers
         {
         }
 
-        public IPEndPoint LocalEndPoint => new IPEndPoint(0, 0);
-        public IPEndPoint RemoteEndPoint => new IPEndPoint(0, 0);
+        public IPEndPoint LocalEndPoint { get; private set; }
+        public IPEndPoint RemoteEndPoint { get; private set; }
         public bool Connected { get; set; }
         
         public void Bind(IPAddress ipAddress, int port)
         {
+            LocalEndPoint = new IPEndPoint(ipAddress, port);
         }
 
         public void Connect(IPAddress ipAddress, int port)
         {
             Connected = true;
+            RemoteEndPoint = new IPEndPoint(ipAddress, port);
             ConnectCalledTimes++;
             ConnectCalled?.Invoke();
         }
@@ -81,6 +84,7 @@ namespace RemoteApi.Integration.Helpers
         public void RaiseDisconnected()
         {
             Connected = false;
+            _messageQueue.Add(Array.Empty<byte>());
         }
 
         public Task<ISocket> AcceptAsync()

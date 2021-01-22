@@ -7,7 +7,8 @@ namespace RemoteApi.Integration.Helpers
     {
         public string InfoCache { get; private set; }
         public string ErrorCache { get; private set; }
-        
+        public int RecordErrorCalledTimes { get; private set; }
+
         public CacheRecorder()
         {
             InfoCache = string.Empty;
@@ -21,6 +22,7 @@ namespace RemoteApi.Integration.Helpers
 
         public void RecordError(string tag, string message)
         {
+            RecordErrorCalledTimes++;
             ErrorCache += $"{tag}:{message}{Environment.NewLine}";
         }
 

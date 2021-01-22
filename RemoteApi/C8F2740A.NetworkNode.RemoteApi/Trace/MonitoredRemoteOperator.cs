@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using C8F2740A.Common.ExecutionStrategies;
 using C8F2740A.Common.Records;
 using RemoteApi.Monitor;
@@ -14,42 +15,44 @@ namespace RemoteApi
     public class MonitoredRemoteOperator : IMonitoredRemoteOperator
     {
         private readonly IAutoLocalConnector _autoLocalConnector;
-        private readonly IRemoteTraceMonitor _remoteTraceMonitor;
+        private readonly IRemoteTraceMonitorСonsistent _remoteTraceMonitorСonsistent;
         private readonly IRecorder _recorder;
+
+        public event Action CommandCompleted;
         
         public MonitoredRemoteOperator(
             IAutoLocalConnector autoLocalConnector,
-            IRemoteTraceMonitor remoteTraceMonitor,
+            IRemoteTraceMonitorСonsistent remoteTraceMonitorСonsistent,
             IRecorder recorder)
         {
             _autoLocalConnector = autoLocalConnector;
-            _remoteTraceMonitor = remoteTraceMonitor;
+            _remoteTraceMonitorСonsistent = remoteTraceMonitorСonsistent;
             _recorder = recorder;
 
             _autoLocalConnector.TextReceived += TextReceivedHandler;
             _autoLocalConnector.Connected += ConnectedHandler;
-            _remoteTraceMonitor.TextEntered += TextEnteredHandler;
+            _remoteTraceMonitorСonsistent.CommandReceived += TextEnteredHandler;
         }
 
-        private void TextEnteredHandler(string value)
+        private Task<bool> TextEnteredHandler(string value)
         {
-            SafeExecution.TryCatch(() => _autoLocalConnector.ExecuteCommand(value),
-                exception => _recorder.DefaultException(this, exception)); 
+            return SafeExecution.TryCatchWithResultAsync(() => _autoLocalConnector.ExecuteCommand(value),
+                exception => _recorder.DefaultException(this, exception));;
         }
 
         private void ConnectedHandler(string address)
         {
             SafeExecution.TryCatch(() =>
                 {
-                    _remoteTraceMonitor.SetPrompt(address);
-                    _remoteTraceMonitor.ClearTextBox();
+                    _remoteTraceMonitorСonsistent.SetPrompt(address);
+                    _remoteTraceMonitorСonsistent.ClearTextBox();
                 },
                 exception => _recorder.DefaultException(this, exception));
         }
 
         private void TextReceivedHandler(string value)
         {
-            SafeExecution.TryCatch(() => _remoteTraceMonitor.DisplayNextMessage(value),
+            SafeExecution.TryCatch(() => _remoteTraceMonitorСonsistent.DisplayNextMessage(value),
                 exception => _recorder.DefaultException(this, exception));
         }
 
@@ -63,8 +66,8 @@ namespace RemoteApi
         {
             _autoLocalConnector.TextReceived -= TextReceivedHandler;
             _autoLocalConnector.Connected -= ConnectedHandler;
-            _remoteTraceMonitor.TextEntered -= TextEnteredHandler;
-            _remoteTraceMonitor.Stop();
+            _remoteTraceMonitorСonsistent.CommandReceived -= TextEnteredHandler;
+            _remoteTraceMonitorСonsistent.Stop();
         }
     }
 }

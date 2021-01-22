@@ -12,13 +12,13 @@ namespace RemoteApi
     {
         private IMonitoredRemoteOperator _sut;
         private IAutoLocalConnector _autoLocalConnector;
-        private IRemoteTraceMonitor _remoteTraceMonitor;
+        private IRemoteTraceMonitorСonsistent _remoteTraceMonitor;
         private IRecorder _recorder;
 
         public MonitoredRemoteOperatorTests()
         {
             _autoLocalConnector = Mock.Create<IAutoLocalConnector>();
-            _remoteTraceMonitor = Mock.Create<IRemoteTraceMonitor>();
+            _remoteTraceMonitor = Mock.Create<IRemoteTraceMonitorСonsistent>();
             _recorder = Mock.Create<IRecorder>();
         }
         
@@ -27,9 +27,9 @@ namespace RemoteApi
         {
             _autoLocalConnector.ArrangeSet(x => x.TextReceived += null).IgnoreArguments().Occurs(1);
             _autoLocalConnector.ArrangeSet(x => x.Connected += null).IgnoreArguments().Occurs(1);
-            _remoteTraceMonitor.ArrangeSet(x => x.TextEntered += null).IgnoreArguments().Occurs(1);
+            _remoteTraceMonitor.ArrangeSet(x => x.CommandReceived += null).IgnoreArguments().Occurs(1);
             
-            _sut = new MonitoredRemoteOperator(_autoLocalConnector,_remoteTraceMonitor, _recorder);
+            _sut = new MonitoredRemoteOperator(_autoLocalConnector, _remoteTraceMonitor, _recorder);
             
             _autoLocalConnector.AssertAll();
             _remoteTraceMonitor.AssertAll();
@@ -40,7 +40,7 @@ namespace RemoteApi
         {
             _sut = new MonitoredRemoteOperator(_autoLocalConnector, _remoteTraceMonitor, _recorder);
             
-            Mock.Raise(() => _remoteTraceMonitor.TextEntered += null, "text");
+            Mock.Raise(() => _remoteTraceMonitor.CommandReceived += null, "text");
 
             Mock.Assert(() => _autoLocalConnector.ExecuteCommand("text"), Occurs.Exactly(1));
         }
@@ -82,7 +82,7 @@ namespace RemoteApi
             Mock.Arrange(() => _autoLocalConnector.ExecuteCommand(Arg.AnyString)).Throws<Exception>();
             _sut = new MonitoredRemoteOperator(_autoLocalConnector, _remoteTraceMonitor, _recorder);
             
-            Mock.Raise(() => _remoteTraceMonitor.TextEntered += null, "text");
+            Mock.Raise(() => _remoteTraceMonitor.CommandReceived += null, "text");
 
             Mock.Assert(() => _recorder.DefaultException(Arg.IsAny<Object>(), Arg.IsAny<Exception>()), Occurs.Exactly(1));
         }

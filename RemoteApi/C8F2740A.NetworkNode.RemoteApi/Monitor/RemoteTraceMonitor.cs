@@ -5,16 +5,18 @@ using C8F2740A.Common.ExecutionStrategies;
 
 namespace RemoteApi.Monitor
 {
-    public interface IRemoteTraceMonitor
+    public interface IMutableRemoteTraceMonitor
     {
         void Start();
         void Stop();
         void DisplayNextMessage(string message);
         void DisplayDebugMessage(string message);
         void ClearTextBox();
-
-        public void SetPrompt(string value);
-
+        void SetPrompt(string value);
+    }
+    
+    public interface IRemoteTraceMonitor : IMutableRemoteTraceMonitor
+    {
         event Action<string> TextEntered;
     }
     

@@ -13,12 +13,12 @@ namespace RemoteApi.Factories
     public class BaseMonitoredRemoteOperatorFactory : IMonitoredRemoteOperatorFactory
     {
         private IInstructionSenderFactory _instructionSenderFactory;
-        private IRemoteTraceMonitor _remoteTraceMonitor;
+        private IRemoteTraceMonitorСonsistent _remoteTraceMonitor;
         private IRecorder _recorder;
         
         public BaseMonitoredRemoteOperatorFactory(
             IInstructionSenderFactory instructionSenderFactory,
-            IRemoteTraceMonitor remoteTraceMonitor,
+            IRemoteTraceMonitorСonsistent remoteTraceMonitor,
             IRecorder recorder)
         {
             _instructionSenderFactory = instructionSenderFactory;
