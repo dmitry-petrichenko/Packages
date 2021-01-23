@@ -9,13 +9,15 @@ namespace RemoteApi.Integration.Helpers
 {
     public class SocketTester : ISocket
     {
+        public Action<IPAddress, int> ConnectAction { get; set; }
+
         public string Tag { get; }
         public int ListenCalledTimes { get; private set; }
         public int ConnectCalledTimes { get; private set; }
         public int ReceiveCalledTimes { get; private set; }
 
         public event Action<byte[]> SendCalled;
-        public event Action ConnectCalled;
+        public event Action<IPAddress, int> ConnectCalled;
         
         private TaskCompletionSource<ISocket> _socketAcceptedTask;
         private BlockingCollection<byte[]> _messageQueue;
@@ -28,6 +30,16 @@ namespace RemoteApi.Integration.Helpers
             RemoteEndPoint = new IPEndPoint(0, 0);
             
             _messageQueue = new BlockingCollection<byte[]>();
+        }
+
+        public void SetRemoteEndPoint(IPAddress ipAddress, int port)
+        {
+            RemoteEndPoint = new IPEndPoint(ipAddress, port);
+        }
+        
+        public void SetLocalEndPoint(IPAddress ipAddress, int port)
+        {
+            LocalEndPoint = new IPEndPoint(ipAddress, port);
         }
 
         public void Dispose()
@@ -45,10 +57,16 @@ namespace RemoteApi.Integration.Helpers
 
         public void Connect(IPAddress ipAddress, int port)
         {
+            ConnectCalledTimes++;
+            if (ConnectAction != null)
+            {
+                ConnectAction.Invoke(ipAddress, port);
+                return;
+            }
+            
             Connected = true;
             RemoteEndPoint = new IPEndPoint(ipAddress, port);
-            ConnectCalledTimes++;
-            ConnectCalled?.Invoke();
+            ConnectCalled?.Invoke(ipAddress, port);
         }
 
         public void Listen(int backlog)

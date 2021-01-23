@@ -30,5 +30,12 @@ namespace RemoteApi.Integration.Helpers
         {
             RecordError(source.GetType().Name, exception.Message);
         }
+
+        public void ClearCache()
+        {
+            InfoCache = string.Empty;
+            ErrorCache = string.Empty;
+            RecordErrorCalledTimes = 0;
+        }
     }
 }

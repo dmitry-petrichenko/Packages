@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -160,11 +161,12 @@ namespace RemoteApi.Integration
             var socketTester1 = new SocketTester("connector");
             var socketTester2 = new SocketTester("listener");
             var socketTester3 = new SocketTester("accepted");
-            var socketFactory = ArrangeConnection(socketTester1, socketTester2, socketTester3);
+            var socketFactory = ArrangeSocketFactoryLocal(socketTester1, socketTester2, socketTester3);
             
-            CreateLocalOperator(socketFactory, _cacheRecorder);
+            var remoteTraceMonitorСonsistent = new RemoteTraceMonitorСonsistentTester();
+            CreateLocalOperator(socketFactory, _cacheRecorder, remoteTraceMonitorСonsistent);
 
-            await Task.Delay(500);
+            await remoteTraceMonitorСonsistent.Initialized;
             
             _output.WriteLine("Errors:");
             _output.WriteLine(_cacheRecorder.ErrorCache);
@@ -177,7 +179,10 @@ namespace RemoteApi.Integration
                 Occurs.Never());
         }
 
-        private Func<AddressFamily, SocketType, ProtocolType, ISocket> ArrangeConnection(SocketTester socketConnecter, SocketTester socketListener, SocketTester socketAccepted)
+        private Func<AddressFamily, SocketType, ProtocolType, ISocket> ArrangeSocketFactoryLocal(
+            SocketTester socketConnecter, 
+            SocketTester socketListener, 
+            SocketTester socketAccepted, IEnumerable<SocketTester> otherSockets = default)
         {
             socketAccepted.Connected = true;
             
@@ -189,7 +194,16 @@ namespace RemoteApi.Integration
             Mock.Arrange(() => socketTesterFactory.Create()).Returns(socketConnecter)
                 .InSequence();
 
-            socketConnecter.ConnectCalled += () =>
+            if (otherSockets != default)
+            {
+                foreach (var socket in otherSockets)
+                {
+                    Mock.Arrange(() => socketTesterFactory.Create()).Returns(socket)
+                        .InSequence();
+                }
+            }
+
+            socketConnecter.ConnectCalled += (ip, port) =>
             {
                 socketListener.RaiseSocketAccepted(socketAccepted);
             };

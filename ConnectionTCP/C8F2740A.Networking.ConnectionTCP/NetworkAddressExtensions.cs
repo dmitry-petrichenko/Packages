@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 
 namespace C8F2740A.Networking.ConnectionTCP
 {
@@ -8,7 +9,30 @@ namespace C8F2740A.Networking.ConnectionTCP
         
         public static bool IsCorrectIPv4Address(this string value)
         {
-            return _addressPattern.IsMatch(value);
+            if (!_addressPattern.IsMatch(value))
+            {
+                return false;
+            }
+            
+            string[] addressAndPort= value.Split(":");
+            var octets = addressAndPort[0].Split(".");
+
+            foreach (var octet in octets)
+            {
+                if (!IsValueLessThanByte(octet))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool IsValueLessThanByte(string value)
+        {
+            var intValue = Convert.ToInt32(value);
+
+            return intValue < 256;
         }
     }
 }

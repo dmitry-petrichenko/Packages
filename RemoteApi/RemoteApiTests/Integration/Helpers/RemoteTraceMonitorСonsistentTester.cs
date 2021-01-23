@@ -6,6 +6,8 @@ namespace RemoteApi.Integration.Helpers
 {
     public class RemoteTraceMonitorСonsistentTester : IRemoteTraceMonitorСonsistent
     {
+        public int SetPromptCalledTimes { get; private set; }
+        
         private TaskCompletionSource<bool> _initializationTask;
         
         public RemoteTraceMonitorСonsistentTester()
@@ -25,7 +27,10 @@ namespace RemoteApi.Integration.Helpers
 
         public void SetPrompt(string value)
         {
-            _initializationTask.SetResult(true);
+            if (SetPromptCalledTimes < 1)
+                _initializationTask.SetResult(true);
+            
+            SetPromptCalledTimes++;
         }
 
         public event Func<string, Task<bool>> CommandReceived;
