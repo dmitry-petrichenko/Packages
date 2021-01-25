@@ -73,7 +73,6 @@ namespace C8F2740A.Networking.ConnectionTCP
             while (_socket.Connected)
             {
                 var bytes = _socket.Receive(data);
-                var threadId = Thread.CurrentThread.ManagedThreadId;
                 RecordReceivedInfo($"Bytes received {bytes}");
                 
                 if (bytes == 0) 

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using C8F2740A.Common.Records;
 using C8F2740A.Networking.ConnectionTCP.Network;
 using RemoteApi.Factories;
@@ -16,27 +18,25 @@ namespace RemoteApi.Integration
         [Fact]
         public async void Operator_WhenCalledConnectWithotParameters_ShouldCatchError()
         {
-            var remoteTraceMonitorСonsistent = new RemoteTraceMonitorСonsistentTester();
-            var local = ArrangeLocalOperatorWithSocketsAndRecorder(remoteTraceMonitorСonsistent);
-            await remoteTraceMonitorСonsistent.Initialized;
+            var local = ArrangeLocalOperatorTestWrapper();
+            await local.Initialized;
 
-            await remoteTraceMonitorСonsistent.RaiseCommandReceived("connect");
+            await local.RaiseCommandReceived("connect");
             
-            LogCacheRecorderTestInfo(local.Item3);
-            Assert.Equal(1, local.Item3.SystemErrorCalledTimes);
+            LogCacheRecorderTestInfo(local.Recorder);
+            Assert.Equal(1, local.Recorder.SystemErrorCalledTimes);
         }
         
         [Fact]
         public async void Operator_WhenCalledConnectWithIncorrectParameters_ShouldCatchError()
         {
-            var remoteTraceMonitorСonsistent = new RemoteTraceMonitorСonsistentTester();
-            var local = ArrangeLocalOperatorWithSocketsAndRecorder(remoteTraceMonitorСonsistent);
-            await remoteTraceMonitorСonsistent.Initialized;
+            var local = ArrangeLocalOperatorTestWrapper();
+            await local.Initialized;
 
-            await remoteTraceMonitorСonsistent.RaiseCommandReceived("connect 123.3324234");
+            await local.RaiseCommandReceived("connect 123.3324234");
             
-            LogCacheRecorderTestInfo(local.Item3);
-            Assert.Equal(1, local.Item3.SystemErrorCalledTimes);
+            LogCacheRecorderTestInfo(local.Recorder);
+            Assert.Equal(1, local.Recorder.SystemErrorCalledTimes);
         }
         
         [Fact]
@@ -44,32 +44,113 @@ namespace RemoteApi.Integration
         {
             var socket = new SocketTester();
             socket.ConnectAction = (address, i) => throw new Exception("Connect exception");
-            var remoteTraceMonitorСonsistent = new RemoteTraceMonitorСonsistentTester();
-            var local = ArrangeLocalOperatorWithSocketsAndRecorder(remoteTraceMonitorСonsistent, new [] { socket });
-            await remoteTraceMonitorСonsistent.Initialized;
+            var local = ArrangeLocalOperatorTestWrapper(new [] { socket });
+            await local.Initialized;
 
-            await remoteTraceMonitorСonsistent.RaiseCommandReceived("connect 123.0.0.2:2334");
+            await local.RaiseCommandReceived("connect 123.0.0.2:2334");
             
-            LogCacheRecorderTestInfo(local.Item3);
+            LogCacheRecorderTestInfo(local.Recorder);
             Assert.Equal(1, socket.ConnectCalledTimes);
         }
         
         [Fact]
         public async void Operator_WhenCalledConnectWithExistingAddress_ShouldConnect()
         {
-            var socket = new SocketTester();
-            var remote = ArrangeRemoteApiMapWithSocketsAndRecorders(socket, "222.222.222.222:1001");
-            var remoteTraceMonitorСonsistent = new RemoteTraceMonitorСonsistentTester();
-            var local = ArrangeLocalOperatorWithSocketsAndRecorder(remoteTraceMonitorСonsistent, new [] { socket });
-            await remoteTraceMonitorСonsistent.Initialized;
-            local.Item3.ClearCache();
-
-            await remoteTraceMonitorСonsistent.RaiseCommandReceived("connect 222.222.222.222:1001");
+            var socket = new SocketTester("remote");
+            var operatorApi = ArrangeLocalOperatorTestWrapper(
+                new [] { socket },
+                "111.111.111.111:11111");
             
-            LogCacheRecorderTestInfo(local.Item3);
+            var remote = ArrangeRemoteApiMapWithSocketsAndRecorders(socket, "222.222.222.222:2222");
+            await operatorApi.Initialized;
+            operatorApi.Recorder.ClearCache();
+
+            await operatorApi.RaiseCommandReceived("connect 222.222.222.222:2222");
+            
+            LogCacheRecorderTestInfo(operatorApi.Recorder);
             _output.WriteLine("-----------------------------");
             LogCacheRecorderTestInfo(remote.Item3);
             Assert.Equal(1, socket.ConnectCalledTimes);
+        }
+        
+        [Fact]
+        public async void Operator_WhenSendWrongCommandToRemote_ShouldCallWrongCommand()
+        {
+            bool wrongCommandWasCalled = false;
+            var socket = new SocketTester("remote");
+            socket.SetLocalEndPoint(IPAddress.Parse("111.111.111.111"), 11111);
+            var local = ArrangeLocalOperatorTestWrapper(
+                new [] { socket },
+                "111.111.111.111:11111");
+            
+            var remote = ArrangeRemoteApiMapWithSocketsAndRecorders(socket, "222.222.222.222:2222");
+            remote.Item1.RegisterWrongCommandHandler(() => wrongCommandWasCalled = true);
+            await local.Initialized;
+            await local.RaiseCommandReceived("connect 222.222.222.222:2222");
+            local.Recorder.ClearCache();
+            remote.Item3.ClearCache();
+
+            await local.RaiseCommandReceived("hello");
+            
+            LogCacheRecorderTestInfo(local.Recorder);
+            _output.WriteLine("-----------------------------");
+            LogCacheRecorderTestInfo(remote.Item3);
+            Assert.True(wrongCommandWasCalled);
+        }
+        
+        [Fact]
+        public async void Operator_WhenSendCommandToRemote_ShouldReceiveCommand()
+        {
+            int command1ReceivedTimes = 0;
+            int command2ReceivedTimes = 0;
+            int command3ReceivedTimes = 0;
+            var socket = new SocketTester("remote");
+            var local = ArrangeLocalOperatorTestWrapper(
+                new [] { socket },
+                "111.111.111.111:11111");
+            
+            var remote = ArrangeRemoteApiMapWithSocketsAndRecorders(socket, "222.222.222.222:2222");
+            remote.Item1.RegisterCommand("command1", () => command1ReceivedTimes++);
+            remote.Item1.RegisterCommand("command2", () => command2ReceivedTimes++);
+            remote.Item1.RegisterCommand("command3", () => command3ReceivedTimes++);
+            await local.Initialized;
+            await local.RaiseCommandReceived("connect 222.222.222.222:2222");
+            local.Recorder.ClearCache();
+            remote.Item3.ClearCache();
+
+            await local.RaiseCommandReceived("command1");
+            await local.RaiseCommandReceived("command2");
+            await local.RaiseCommandReceived("command2");
+            await local.RaiseCommandReceived("command3");
+            
+            LogCacheRecorderTestInfo(local.Recorder);
+            _output.WriteLine("-----------------------------");
+            LogCacheRecorderTestInfo(remote.Item3);
+            Assert.Equal(1, command1ReceivedTimes);
+            Assert.Equal(2, command2ReceivedTimes);
+            Assert.Equal(1, command3ReceivedTimes);
+        }
+        
+        [Fact]
+        public async void Operator_WhenRemoteSocketDisconnected_ShouldREconnectToLocal()
+        {
+            var socket = new SocketTester("remote");
+            var local = ArrangeLocalOperatorTestWrapper(
+                new [] { socket },
+                "111.111.111.111:11111");
+            
+            var remote = ArrangeRemoteApiMapWithSocketsAndRecorders(socket, "222.222.222.222:2222");
+            await local.Initialized;
+            await local.RaiseCommandReceived("connect 222.222.222.222:2222");
+            local.Recorder.ClearCache();
+            remote.Item3.ClearCache();
+
+            socket.RaiseDisconnected();
+            
+            LogCacheRecorderTestInfo(local.Recorder);
+            _output.WriteLine("-----------------------------");
+            LogCacheRecorderTestInfo(remote.Item3);
+            Assert.True(true);
         }
 
         private (ITraceableRemoteApiMap, Dictionary<string, SocketTester>, ApplicationCacheRecorder) ArrangeRemoteApiMapWithSocketsAndRecorders(
@@ -91,7 +172,7 @@ namespace RemoteApi.Integration
             var sockets = new Dictionary<string, SocketTester>();
             var socketListener = new SocketTester("listener");
             var socketAccepted = new SocketTester("accepted");
-            var socketFactory = ArrangeSocketFactoryTraceableRemoteApiMap(socketConnecter, socketListener, socketAccepted);
+            var socketFactory = ArrangeSocketFactoryTraceableRemoteApiMap(socketConnecter, socketListener, socketAccepted, isRemote:true);
             
             // RemoteApiMap
             var instructionReceiverFactory = new TestInstructionReceiverFactory(socketFactory, recorder);
@@ -110,7 +191,9 @@ namespace RemoteApi.Integration
         private Func<AddressFamily, SocketType, ProtocolType, ISocket> ArrangeSocketFactoryTraceableRemoteApiMap(
             SocketTester socketConnecter, 
             SocketTester socketListener, 
-            SocketTester socketAccepted, IEnumerable<SocketTester> otherSockets = default)
+            SocketTester socketAccepted, 
+            IEnumerable<SocketTester> otherSockets = default,
+            bool isRemote = false)
         {
             socketAccepted.Connected = true;
             
@@ -131,8 +214,16 @@ namespace RemoteApi.Integration
 
             socketConnecter.ConnectCalled += (ip, address) =>
             {
-                socketAccepted.SetRemoteEndPoint(ip, address);
-                socketAccepted.SetLocalEndPoint(socketConnecter.LocalEndPoint.Address, 6666);
+                if (isRemote)
+                {
+                    socketAccepted.SetRemoteEndPoint(socketConnecter.LocalEndPoint.Address, address);
+                    socketAccepted.SetLocalEndPoint(ip, 6666);
+                }
+                else
+                {
+                    socketAccepted.SetRemoteEndPoint(ip, address);
+                    socketAccepted.SetLocalEndPoint(socketConnecter.LocalEndPoint.Address, 6666);
+                }
                 socketListener.RaiseSocketAccepted(socketAccepted);
             };
             
@@ -144,23 +235,39 @@ namespace RemoteApi.Integration
             return SocketFactory;
         }
 
-        private (IApiOperator, Dictionary<string, SocketTester>, ApplicationCacheRecorder) ArrangeLocalOperatorWithSocketsAndRecorder(
-            RemoteTraceMonitorСonsistentTester remoteTraceMonitorСonsistent,
-            IEnumerable<SocketTester> otherSockets = default)
+        private RemoteOperatorTestWrapper ArrangeLocalOperatorTestWrapper(
+            IEnumerable<SocketTester> otherSockets = default,
+            string address = "111.111.111.111:11111")
         {
+            var remoteTraceMonitorСonsistent = new RemoteTraceMonitorСonsistentTester();
+            var addressAndPort = address.Split(":");
             var recorder = new ApplicationCacheRecorder();
             var sockets = new Dictionary<string, SocketTester>();
             var socketTester1 = new SocketTester("connector");
+            socketTester1.SetLocalEndPoint(IPAddress.Parse(addressAndPort[0]), Convert.ToInt32(addressAndPort[1]));
             var socketTester2 = new SocketTester("listener");
             var socketTester3 = new SocketTester("accepted");
-            var socketFactory = ArrangeSocketFactoryLocal(socketTester1, socketTester2, socketTester3, otherSockets);
-            var apiOperator = CreateLocalOperator(socketFactory, recorder, remoteTraceMonitorСonsistent);
+
+            if (otherSockets != default)
+            {
+                foreach (var socketTester in otherSockets)
+                {
+                    socketTester.SetLocalEndPoint(IPAddress.Parse(addressAndPort[0]), Convert.ToInt32(addressAndPort[1]));
+                }
+            }
+            
+            var socketFactory = ArrangeSocketFactoryLocal(
+                socketTester1, 
+                socketTester2, 
+                socketTester3, 
+                otherSockets);
+            var apiOperator = CreateLocalOperator(socketFactory, recorder, remoteTraceMonitorСonsistent, address);
             
             sockets.Add("connector", socketTester1);
             sockets.Add("listener", socketTester2);
             sockets.Add("accepted", socketTester3);
 
-            return (apiOperator, sockets, recorder);
+            return new RemoteOperatorTestWrapper(sockets, apiOperator, recorder, remoteTraceMonitorСonsistent);
         }
 
         private void LogCacheRecorderTestInfo(ApplicationCacheRecorder recorder)
@@ -173,6 +280,30 @@ namespace RemoteApi.Integration
             _output.WriteLine(recorder.AppErrorCache);
             _output.WriteLine("Application Info:");
             _output.WriteLine(recorder.AppInfoCache);
+        }
+
+        private class RemoteOperatorTestWrapper
+        {
+            public Dictionary<string, SocketTester> Sockets { get; }
+            public IApiOperator Operator { get; }
+            public ApplicationCacheRecorder Recorder { get; }
+
+            private readonly RemoteTraceMonitorСonsistentTester _remoteTraceMonitorСonsistentTester;
+            
+            public RemoteOperatorTestWrapper(Dictionary<string, SocketTester> sockets, IApiOperator @operator, ApplicationCacheRecorder recorder, RemoteTraceMonitorСonsistentTester remoteTraceMonitorСonsistentTester)
+            {
+                Sockets = sockets;
+                Operator = @operator;
+                Recorder = recorder;
+                _remoteTraceMonitorСonsistentTester = remoteTraceMonitorСonsistentTester;
+            }
+
+            public Task<bool> RaiseCommandReceived(string value)
+            {
+                return _remoteTraceMonitorСonsistentTester.RaiseCommandReceived(value);
+            }
+            
+            public Task Initialized => _remoteTraceMonitorСonsistentTester.Initialized;
         }
     }
 }

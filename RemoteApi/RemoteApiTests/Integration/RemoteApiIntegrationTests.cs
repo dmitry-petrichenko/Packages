@@ -41,7 +41,8 @@ namespace RemoteApi.Integration
         private IApiOperator CreateLocalOperator(
             Func<AddressFamily, SocketType, ProtocolType, ISocket> socketFactory,
             IRecorder recorder,
-            IRemoteTraceMonitorСonsistent remoteTraceMonitor = default)
+            IRemoteTraceMonitorСonsistent remoteTraceMonitor = default,
+            string address = "111.111.111.111:11111")
         {
             if (remoteTraceMonitor == default)
             {
@@ -61,7 +62,7 @@ namespace RemoteApi.Integration
                 _applicationRecorder);
             
             var apiOperatorFactory = new ApiOperatorFactory(_systemRecorder, monitoredRemoteOperatorFactory, traceableRemoteApiMapFactory, _applicationRecorder);
-            return apiOperatorFactory.Create("216.58.215.78:8080");
+            return apiOperatorFactory.Create(address);
         }
 
         [Fact]
@@ -182,7 +183,8 @@ namespace RemoteApi.Integration
         private Func<AddressFamily, SocketType, ProtocolType, ISocket> ArrangeSocketFactoryLocal(
             SocketTester socketConnecter, 
             SocketTester socketListener, 
-            SocketTester socketAccepted, IEnumerable<SocketTester> otherSockets = default)
+            SocketTester socketAccepted, 
+            IEnumerable<SocketTester> otherSockets = default)
         {
             socketAccepted.Connected = true;
             
@@ -205,6 +207,8 @@ namespace RemoteApi.Integration
 
             socketConnecter.ConnectCalled += (ip, port) =>
             {
+                socketAccepted.SetRemoteEndPoint(ip, port);
+                socketAccepted.SetLocalEndPoint(socketConnecter.LocalEndPoint.Address, 53691);
                 socketListener.RaiseSocketAccepted(socketAccepted);
             };
             
