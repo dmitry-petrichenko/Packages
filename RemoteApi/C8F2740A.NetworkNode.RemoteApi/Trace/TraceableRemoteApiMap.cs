@@ -17,6 +17,8 @@ namespace RemoteApi.Trace
         private readonly IRemoteApiMap _remoteApiMap;
         private readonly IRemoteRecordsSender _remoteRecordsSender;
         private readonly IRecorder _recorder;
+
+        internal Action TraceStarted;
         
         public TraceableRemoteApiMap(
             IRemoteApiMap remoteApiMap,
@@ -34,7 +36,7 @@ namespace RemoteApi.Trace
         {
             _remoteRecordsSender.ActivateAndSendCache();
             
-            // TODO Trace Started
+            TraceStarted?.Invoke();
         }
 
         public void RegisterWrongCommandHandler(Action action)

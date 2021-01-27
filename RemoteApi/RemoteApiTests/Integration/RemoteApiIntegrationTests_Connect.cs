@@ -309,13 +309,13 @@ namespace RemoteApi.Integration
         
         private class RemoteOperatorTestWrapperRealSockets
         {
-            public IReadOnlyList<ISocket> Sockets { get; }
+            public IReadOnlyList<SocketTesterWrapper> Sockets { get; }
             public IApiOperator Operator { get; }
             public ApplicationCacheRecorder Recorder { get; }
 
             private readonly RemoteTraceMonitorСonsistentTester _remoteTraceMonitorСonsistentTester;
             
-            public RemoteOperatorTestWrapperRealSockets(IReadOnlyList<ISocket> sockets, IApiOperator @operator, ApplicationCacheRecorder recorder, RemoteTraceMonitorСonsistentTester remoteTraceMonitorСonsistentTester)
+            public RemoteOperatorTestWrapperRealSockets(IReadOnlyList<SocketTesterWrapper> sockets, IApiOperator @operator, ApplicationCacheRecorder recorder, RemoteTraceMonitorСonsistentTester remoteTraceMonitorСonsistentTester)
             {
                 Sockets = sockets;
                 Operator = @operator;
@@ -333,15 +333,26 @@ namespace RemoteApi.Integration
         
         private class TraceableRemoteApiMapWrapperRealSockets
         {
-            public IReadOnlyList<ISocket> Sockets { get; }
+            public IReadOnlyList<SocketTesterWrapper> Sockets { get; }
             public ITraceableRemoteApiMap ApiMap { get; }
             public ApplicationCacheRecorder Recorder { get; }
+            public Task Connected => _connectedTask.Task;
 
-            public TraceableRemoteApiMapWrapperRealSockets(IReadOnlyList<ISocket> sockets, ITraceableRemoteApiMap apiMap, ApplicationCacheRecorder recorder)
+            private TaskCompletionSource<bool> _connectedTask;
+
+            public TraceableRemoteApiMapWrapperRealSockets(IReadOnlyList<SocketTesterWrapper> sockets, ITraceableRemoteApiMap apiMap, ApplicationCacheRecorder recorder)
             {
                 Sockets = sockets;
                 ApiMap = apiMap;
                 Recorder = recorder;
+                _connectedTask = new TaskCompletionSource<bool>();
+
+                ((TraceableRemoteApiMap) ApiMap).TraceStarted += TraceStartedHandler;
+            }
+
+            private void TraceStartedHandler()
+            {
+                _connectedTask.SetResult(true);
             }
         }
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 using C8F2740A.Networking.ConnectionTCP.Network;
 using RemoteApi.Factories;
 using RemoteApi.Integration.Helpers;
@@ -19,31 +18,35 @@ namespace RemoteApi.Integration
             await apiOperator.Initialized;
 
             await apiOperator.RaiseCommandReceived("connect 127.0.0.1:22222");
+            
+            await remote.Connected;
 
-            await Task.Delay(1000);
-            
-            remote.Sockets[0].Close();
-            
-            await Task.Delay(1000);
-            
             LogCacheRecorderTestInfo(apiOperator.Recorder);
             _output.WriteLine("-----------------------------");
             LogCacheRecorderTestInfo(remote.Recorder);
-            Assert.Equal(1, 1);
+            Assert.Equal(1, apiOperator.Sockets[1].CloseCalledTimes);
         }
         
         private TraceableRemoteApiMapWrapperRealSockets ArrangeRemoteApiMapTestWrapperWithRealSockets(
             string address)
         {
             var recorder = new ApplicationCacheRecorder();
-            var sockets = new List<ISocket>();
+            var sockets = new List<SocketTesterWrapper>();
+            var socketFactoryCounter = 0;
 
             Func<AddressFamily, SocketType, ProtocolType, ISocket> socketFactory = (family, type, arg3) =>
             {
-                var socket = new SocketAbstraction(family, type, arg3);
+                socketFactoryCounter++;
+                var socket = new SocketTesterWrapper(family, type, arg3, $"{socketFactoryCounter}");
+                socket.Accepted += OnAccepted;
                 sockets.Add(socket);
                 return socket;
             };
+
+            void OnAccepted(SocketTesterWrapper wrapper)
+            {
+                sockets.Add(wrapper);
+            }
             
             // RemoteApiMap
             var instructionReceiverFactory = new TestInstructionReceiverFactory(socketFactory, recorder);
@@ -60,15 +63,23 @@ namespace RemoteApi.Integration
             string address = "127.0.0.1:22222")
         {
             var recorder = new ApplicationCacheRecorder();
-            var sockets = new List<ISocket>();
+            var sockets = new List<SocketTesterWrapper>();
             var remoteTraceMonitorСonsistent = new RemoteTraceMonitorСonsistentTester();
-
+            var socketFactoryCounter = 0;
+            
             Func<AddressFamily, SocketType, ProtocolType, ISocket> socketFactory = (family, type, arg3) =>
             {
-                var socket = new SocketAbstraction(family, type, arg3);
+                socketFactoryCounter++;
+                var socket = new SocketTesterWrapper(family, type, arg3, $"{socketFactoryCounter}");
+                socket.Accepted += OnAccepted;
                 sockets.Add(socket);
                 return socket;
             };
+            
+            void OnAccepted(SocketTesterWrapper wrapper)
+            {
+                sockets.Add(wrapper);
+            }
             
             var apiOperator = CreateLocalOperator(socketFactory, recorder, remoteTraceMonitorСonsistent, address);
 
