@@ -27,9 +27,8 @@ namespace RemoteApi.Integration.Helpers
 
         public void SetPrompt(string value)
         {
-            if (SetPromptCalledTimes < 1)
-                _initializationTask.SetResult(true);
-            
+            _initializationTask.SetResult(true);
+            _initializationTask = new TaskCompletionSource<bool>();
             SetPromptCalledTimes++;
         }
 

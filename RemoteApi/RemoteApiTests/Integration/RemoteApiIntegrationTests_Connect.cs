@@ -69,7 +69,7 @@ namespace RemoteApi.Integration
             
             LogCacheRecorderTestInfo(operatorApi.Recorder);
             _output.WriteLine("-----------------------------");
-            LogCacheRecorderTestInfo(remote.Item3);
+            LogCacheRecorderTestInfo(remote.Recorder);
             Assert.Equal(1, socket.ConnectCalledTimes);
         }
         
@@ -84,17 +84,17 @@ namespace RemoteApi.Integration
                 "111.111.111.111:11111");
             
             var remote = ArrangeRemoteApiMapWithSocketsAndRecorders(socket, "222.222.222.222:2222");
-            remote.Item1.RegisterWrongCommandHandler(() => wrongCommandWasCalled = true);
+            remote.ApiMap.RegisterWrongCommandHandler(() => wrongCommandWasCalled = true);
             await local.Initialized;
             await local.RaiseCommandReceived("connect 222.222.222.222:2222");
             local.Recorder.ClearCache();
-            remote.Item3.ClearCache();
+            remote.Recorder.ClearCache();
 
             await local.RaiseCommandReceived("hello");
             
             LogCacheRecorderTestInfo(local.Recorder);
             _output.WriteLine("-----------------------------");
-            LogCacheRecorderTestInfo(remote.Item3);
+            LogCacheRecorderTestInfo(remote.Recorder);
             Assert.True(wrongCommandWasCalled);
         }
         
@@ -110,13 +110,13 @@ namespace RemoteApi.Integration
                 "111.111.111.111:11111");
             
             var remote = ArrangeRemoteApiMapWithSocketsAndRecorders(socket, "222.222.222.222:2222");
-            remote.Item1.RegisterCommand("command1", () => command1ReceivedTimes++);
-            remote.Item1.RegisterCommand("command2", () => command2ReceivedTimes++);
-            remote.Item1.RegisterCommand("command3", () => command3ReceivedTimes++);
+            remote.ApiMap.RegisterCommand("command1", () => command1ReceivedTimes++);
+            remote.ApiMap.RegisterCommand("command2", () => command2ReceivedTimes++);
+            remote.ApiMap.RegisterCommand("command3", () => command3ReceivedTimes++);
             await local.Initialized;
             await local.RaiseCommandReceived("connect 222.222.222.222:2222");
             local.Recorder.ClearCache();
-            remote.Item3.ClearCache();
+            remote.Recorder.ClearCache();
 
             await local.RaiseCommandReceived("command1");
             await local.RaiseCommandReceived("command2");
@@ -125,14 +125,14 @@ namespace RemoteApi.Integration
             
             LogCacheRecorderTestInfo(local.Recorder);
             _output.WriteLine("-----------------------------");
-            LogCacheRecorderTestInfo(remote.Item3);
+            LogCacheRecorderTestInfo(remote.Recorder);
             Assert.Equal(1, command1ReceivedTimes);
             Assert.Equal(2, command2ReceivedTimes);
             Assert.Equal(1, command3ReceivedTimes);
         }
         
         [Fact]
-        public async void Operator_WhenRemoteSocketDisconnected_ShouldREconnectToLocal()
+        public async void Operator_WhenRemoteSocketDisconnected_ShouldDisposeSocket()
         {
             var socket = new SocketTester("remote");
             var local = ArrangeLocalOperatorTestWrapper(
@@ -142,25 +142,26 @@ namespace RemoteApi.Integration
             var remote = ArrangeRemoteApiMapWithSocketsAndRecorders(socket, "222.222.222.222:2222");
             await local.Initialized;
             await local.RaiseCommandReceived("connect 222.222.222.222:2222");
+            await remote.Connected;
             local.Recorder.ClearCache();
-            remote.Item3.ClearCache();
+            remote.Recorder.ClearCache();
 
             socket.RaiseDisconnected();
-            
+
             LogCacheRecorderTestInfo(local.Recorder);
             _output.WriteLine("-----------------------------");
-            LogCacheRecorderTestInfo(remote.Item3);
-            Assert.True(true);
+            LogCacheRecorderTestInfo(remote.Recorder);
+            Assert.Equal(1, remote.Sockets["connecter"].DisposeCalledTimes);
         }
 
-        private (ITraceableRemoteApiMap, Dictionary<string, SocketTester>, ApplicationCacheRecorder) ArrangeRemoteApiMapWithSocketsAndRecorders(
+        private TraceableRemoteApiMapWrapper ArrangeRemoteApiMapWithSocketsAndRecorders(
             SocketTester socketConnecter,
             string address)
         {
             var recorder = new ApplicationCacheRecorder();
             var result = ArrangeRemoteApiMapWithSockets(recorder, recorder, socketConnecter, address);
 
-            return (result.Item1, result.Item2, recorder);
+            return new TraceableRemoteApiMapWrapper(result.Item2, result.Item1, recorder);
         }
 
         private (ITraceableRemoteApiMap, Dictionary<string, SocketTester>) ArrangeRemoteApiMapWithSockets(
@@ -180,7 +181,7 @@ namespace RemoteApi.Integration
                 instructionReceiverFactory,
                 applicationRecorder);
             
-            sockets.Add("connector", socketConnecter);
+            sockets.Add("connecter", socketConnecter);
             sockets.Add("listener", socketListener);
             sockets.Add("accepted", socketAccepted);
 
@@ -235,7 +236,7 @@ namespace RemoteApi.Integration
             return SocketFactory;
         }
 
-        private RemoteOperatorTestWrapper ArrangeLocalOperatorTestWrapper(
+        private RemoteOperatorTestWrapperFakeSockets ArrangeLocalOperatorTestWrapper(
             IEnumerable<SocketTester> otherSockets = default,
             string address = "111.111.111.111:11111")
         {
@@ -243,7 +244,7 @@ namespace RemoteApi.Integration
             var addressAndPort = address.Split(":");
             var recorder = new ApplicationCacheRecorder();
             var sockets = new Dictionary<string, SocketTester>();
-            var socketTester1 = new SocketTester("connector");
+            var socketTester1 = new SocketTester("connecter");
             socketTester1.SetLocalEndPoint(IPAddress.Parse(addressAndPort[0]), Convert.ToInt32(addressAndPort[1]));
             var socketTester2 = new SocketTester("listener");
             var socketTester3 = new SocketTester("accepted");
@@ -267,7 +268,7 @@ namespace RemoteApi.Integration
             sockets.Add("listener", socketTester2);
             sockets.Add("accepted", socketTester3);
 
-            return new RemoteOperatorTestWrapper(sockets, apiOperator, recorder, remoteTraceMonitorСonsistent);
+            return new RemoteOperatorTestWrapperFakeSockets(sockets, apiOperator, recorder, remoteTraceMonitorСonsistent);
         }
 
         private void LogCacheRecorderTestInfo(ApplicationCacheRecorder recorder)
@@ -282,7 +283,7 @@ namespace RemoteApi.Integration
             _output.WriteLine(recorder.AppInfoCache);
         }
 
-        private class RemoteOperatorTestWrapper
+        private class RemoteOperatorTestWrapperFakeSockets
         {
             public Dictionary<string, SocketTester> Sockets { get; }
             public IApiOperator Operator { get; }
@@ -290,7 +291,7 @@ namespace RemoteApi.Integration
 
             private readonly RemoteTraceMonitorСonsistentTester _remoteTraceMonitorСonsistentTester;
             
-            public RemoteOperatorTestWrapper(Dictionary<string, SocketTester> sockets, IApiOperator @operator, ApplicationCacheRecorder recorder, RemoteTraceMonitorСonsistentTester remoteTraceMonitorСonsistentTester)
+            public RemoteOperatorTestWrapperFakeSockets(Dictionary<string, SocketTester> sockets, IApiOperator @operator, ApplicationCacheRecorder recorder, RemoteTraceMonitorСonsistentTester remoteTraceMonitorСonsistentTester)
             {
                 Sockets = sockets;
                 Operator = @operator;
@@ -304,6 +305,72 @@ namespace RemoteApi.Integration
             }
             
             public Task Initialized => _remoteTraceMonitorСonsistentTester.Initialized;
+        }
+        
+        private class RemoteOperatorTestWrapperRealSockets
+        {
+            public IReadOnlyList<ISocket> Sockets { get; }
+            public IApiOperator Operator { get; }
+            public ApplicationCacheRecorder Recorder { get; }
+
+            private readonly RemoteTraceMonitorСonsistentTester _remoteTraceMonitorСonsistentTester;
+            
+            public RemoteOperatorTestWrapperRealSockets(IReadOnlyList<ISocket> sockets, IApiOperator @operator, ApplicationCacheRecorder recorder, RemoteTraceMonitorСonsistentTester remoteTraceMonitorСonsistentTester)
+            {
+                Sockets = sockets;
+                Operator = @operator;
+                Recorder = recorder;
+                _remoteTraceMonitorСonsistentTester = remoteTraceMonitorСonsistentTester;
+            }
+
+            public Task<bool> RaiseCommandReceived(string value)
+            {
+                return _remoteTraceMonitorСonsistentTester.RaiseCommandReceived(value);
+            }
+            
+            public Task Initialized => _remoteTraceMonitorСonsistentTester.Initialized;
+        }
+        
+        private class TraceableRemoteApiMapWrapperRealSockets
+        {
+            public IReadOnlyList<ISocket> Sockets { get; }
+            public ITraceableRemoteApiMap ApiMap { get; }
+            public ApplicationCacheRecorder Recorder { get; }
+
+            public TraceableRemoteApiMapWrapperRealSockets(IReadOnlyList<ISocket> sockets, ITraceableRemoteApiMap apiMap, ApplicationCacheRecorder recorder)
+            {
+                Sockets = sockets;
+                ApiMap = apiMap;
+                Recorder = recorder;
+            }
+        }
+
+        private class TraceableRemoteApiMapWrapper
+        {
+            public Dictionary<string, SocketTester> Sockets { get; }
+            public ITraceableRemoteApiMap ApiMap { get; }
+            public ApplicationCacheRecorder Recorder { get; }
+            public Task Connected => _connectedTask.Task;
+
+            private TaskCompletionSource<bool> _connectedTask;
+
+            public TraceableRemoteApiMapWrapper(Dictionary<string, SocketTester> sockets, ITraceableRemoteApiMap apiMap, ApplicationCacheRecorder recorder)
+            {
+                Sockets = sockets;
+                ApiMap = apiMap;
+                Recorder = recorder;
+                _connectedTask = new TaskCompletionSource<bool>();
+
+                if (Sockets.TryGetValue("accepted", out SocketTester socket))
+                {
+                    socket.Byte49ReceivedFirstTime += SocketOnByte49ReceivedFirstTime;
+                }
+            }
+
+            private void SocketOnByte49ReceivedFirstTime()
+            {
+                _connectedTask.SetResult(true);
+            }
         }
     }
 }
