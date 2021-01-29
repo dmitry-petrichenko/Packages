@@ -4,7 +4,7 @@ using C8F2740A.Common.Records;
 using C8F2740A.Networking.ConnectionTCP.Network;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
 
-namespace RemoteApi.Integration.Helpers
+namespace RemoteApi.Integration2.Helpers
 {
     public class TestInstructionReceiverFactory : BaseInstructionReceiverFactory
     {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using C8F2740A.Common.Records;
 
@@ -93,18 +92,18 @@ namespace C8F2740A.NetworkNode.SessionTCP
 
         private void ClearAndReset()
         {
-            if (_sendInstructionTask != default && !_sendInstructionTask.Task.IsCompleted)
-            {
-                _sendInstructionTask.SetCanceled();
-                _sendInstructionTask = default;
-            }
-            
             _currentSession.Received -= ReceivedHandler;
             _currentSession.Responded -= RespondedHandler;
             _currentSession.Closed -= ClosedHandler;
 
             _currentSession = default;
             HasActiveSession = false;
+            
+            if (_sendInstructionTask != default && !_sendInstructionTask.Task.IsCompleted)
+            {
+                _sendInstructionTask.SetCanceled();
+                _sendInstructionTask = default;
+            }
         }
 
         private void RespondedHandler(IEnumerable<byte> value)
@@ -117,10 +116,7 @@ namespace C8F2740A.NetworkNode.SessionTCP
             var result = Enumerable.Empty<byte>();
             try
             {
-                if (InstructionReceived != default)
-                {
-                    result = InstructionReceived?.Invoke(value);
-                }
+                result = InstructionReceived?.Invoke(value);
             }
             catch (Exception exception)
             {

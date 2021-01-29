@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using C8F2740A.Common.Records;
 using C8F2740A.Networking.ConnectionTCP.Network;
 using RemoteApi.Factories;
-using RemoteApi.Integration.Helpers;
+using RemoteApi.Integration2.Helpers;
 using RemoteApi.Trace;
 using Telerik.JustMock;
 using Xunit;
 
-namespace RemoteApi.Integration
+namespace RemoteApi.Integration2
 {
     public partial class RemoteApiIntegrationTests
     {
@@ -23,7 +23,7 @@ namespace RemoteApi.Integration
 
             await local.RaiseCommandReceived("connect");
             
-            LogCacheRecorderTestInfo(local.Recorder);
+            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, local.Recorder);
             Assert.Equal(1, local.Recorder.SystemErrorCalledTimes);
         }
         
@@ -35,7 +35,7 @@ namespace RemoteApi.Integration
 
             await local.RaiseCommandReceived("connect 123.3324234");
             
-            LogCacheRecorderTestInfo(local.Recorder);
+            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, local.Recorder);
             Assert.Equal(1, local.Recorder.SystemErrorCalledTimes);
         }
         
@@ -49,7 +49,7 @@ namespace RemoteApi.Integration
 
             await local.RaiseCommandReceived("connect 123.0.0.2:2334");
             
-            LogCacheRecorderTestInfo(local.Recorder);
+            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, local.Recorder);
             Assert.Equal(1, socket.ConnectCalledTimes);
         }
         
@@ -67,9 +67,9 @@ namespace RemoteApi.Integration
 
             await operatorApi.RaiseCommandReceived("connect 222.222.222.222:2222");
             
-            LogCacheRecorderTestInfo(operatorApi.Recorder);
+            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, operatorApi.Recorder);
             _output.WriteLine("-----------------------------");
-            LogCacheRecorderTestInfo(remote.Recorder);
+            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, remote.Recorder);
             Assert.Equal(1, socket.ConnectCalledTimes);
         }
         
@@ -92,9 +92,9 @@ namespace RemoteApi.Integration
 
             await local.RaiseCommandReceived("hello");
             
-            LogCacheRecorderTestInfo(local.Recorder);
+            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, local.Recorder);
             _output.WriteLine("-----------------------------");
-            LogCacheRecorderTestInfo(remote.Recorder);
+            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, remote.Recorder);
             Assert.True(wrongCommandWasCalled);
         }
         
@@ -123,9 +123,9 @@ namespace RemoteApi.Integration
             await local.RaiseCommandReceived("command2");
             await local.RaiseCommandReceived("command3");
             
-            LogCacheRecorderTestInfo(local.Recorder);
+            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, local.Recorder);
             _output.WriteLine("-----------------------------");
-            LogCacheRecorderTestInfo(remote.Recorder);
+            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, remote.Recorder);
             Assert.Equal(1, command1ReceivedTimes);
             Assert.Equal(2, command2ReceivedTimes);
             Assert.Equal(1, command3ReceivedTimes);
@@ -148,9 +148,9 @@ namespace RemoteApi.Integration
 
             socket.RaiseDisconnected();
 
-            LogCacheRecorderTestInfo(local.Recorder);
+            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, local.Recorder);
             _output.WriteLine("-----------------------------");
-            LogCacheRecorderTestInfo(remote.Recorder);
+            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, remote.Recorder);
             Assert.Equal(1, remote.Sockets["connecter"].DisposeCalledTimes);
         }
 
@@ -269,18 +269,6 @@ namespace RemoteApi.Integration
             sockets.Add("accepted", socketTester3);
 
             return new RemoteOperatorTestWrapperFakeSockets(sockets, apiOperator, recorder, remoteTraceMonitorСonsistent);
-        }
-
-        private void LogCacheRecorderTestInfo(ApplicationCacheRecorder recorder)
-        {
-            _output.WriteLine("Sysytem Errors:");
-            _output.WriteLine(recorder.SystemErrorCache);
-            _output.WriteLine("Sysytem Info:");
-            _output.WriteLine(recorder.SystemInfoCache);
-            _output.WriteLine("Application Error:");
-            _output.WriteLine(recorder.AppErrorCache);
-            _output.WriteLine("Application Info:");
-            _output.WriteLine(recorder.AppInfoCache);
         }
 
         private class RemoteOperatorTestWrapperFakeSockets

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace RemoteApi.Integration.Helpers
+namespace RemoteApi.Integration2.Helpers
 {
     public class NetworkImitator
     {

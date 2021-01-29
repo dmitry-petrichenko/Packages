@@ -52,15 +52,15 @@ namespace RemoteApi.Trace
         }
 
         public Task<bool> ExecuteCommand(string command)
-        {
+        { 
             return _connectParser.ExecuteCommand(command);
         }
 
         private void InstructionReceivedHandler(string value)
         {
-            if (string.IsNullOrEmpty(value))
+            if (value == default)
             {
-                _recorder.RecordError(GetType().Name, "Text value cannot be empty");
+                _recorder.RecordError(GetType().Name, "Text value cannot be default");
                 return;
             }
             

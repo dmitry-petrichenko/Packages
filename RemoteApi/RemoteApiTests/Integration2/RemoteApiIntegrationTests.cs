@@ -7,19 +7,18 @@ using System.Threading.Tasks;
 using C8F2740A.Common.Records;
 using C8F2740A.Networking.ConnectionTCP.Network;
 using RemoteApi.Factories;
-using RemoteApi.Integration.Helpers;
+using RemoteApi.Integration2.Helpers;
 using RemoteApi.Monitor;
 using RemoteApi.Trace;
 using Telerik.JustMock;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace RemoteApi.Integration
+namespace RemoteApi.Integration2
 {
     public partial class RemoteApiIntegrationTests
     {
         private readonly IRecorder _recorder;
-        private readonly IRecorder _originalRecorder;
         private readonly CacheRecorder _cacheRecorder;
         private readonly IApplicationRecorder _applicationRecorder;
         private readonly ISystemRecorder _systemRecorder;
@@ -31,7 +30,6 @@ namespace RemoteApi.Integration
         public RemoteApiIntegrationTests(ITestOutputHelper testOutputHelper)
         {
             _output = testOutputHelper;
-            _originalRecorder = new DefaultRecorder(new DefaultRecorderSettings());
             _cacheRecorder = new CacheRecorder();
             _recorder = Mock.Create<IRecorder>();
             _applicationRecorder = Mock.Create<IApplicationRecorder>();

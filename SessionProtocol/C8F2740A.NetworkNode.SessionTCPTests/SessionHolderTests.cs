@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using C8F2740A.Common.Records;
 using C8F2740A.NetworkNode.SessionTCP;
@@ -102,12 +103,28 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
                 Arg.IsAny<Exception>()), Occurs.Exactly(1));
         }
         
+        /*
+        [Fact]
+        public async void SendInstruction_WhenCalledAndSetCalled_ShouldThrow()
+        {
+            var session1 = new SessionMock();
+            var session2 = new SessionMock();
+            _sut.Set(session1);
+            var task = _sut.SendInstruction(Enumerable.Empty<byte>());
+            _sut.Set(session2);
+            var r = await task;
+            Assert.Equal(TaskStatus.RanToCompletion, task.Status);
+            Mock.Assert(() => _recorder.DefaultException(
+                Arg.IsAny<Object>(), 
+                Arg.IsAny<Exception>()), Occurs.Exactly(1));
+        }*/
+        
         [Theory]
         [InlineData(new byte[] { 0b1000_1111 })]
         [InlineData(new byte[] { 0b0100_1111 })]
         [InlineData(new byte[] { 0b0010_1111 })]
         [InlineData(new byte[] { 0b1001_1111 })]
-        public void SendInstruction_WhenCalled_ShouldResponceWithBytes(IEnumerable<byte> dataToReceive)
+        public void SendInstruction_WhenCalled_ShouldResponseWithBytes(IEnumerable<byte> dataToReceive)
         {
             var taskStatus = new TaskStatus();
             var session = new SessionMock();
@@ -258,6 +275,7 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
 
         public void Close()
         {
+            Closed?.Invoke();
         }
 
         public void TriggerReceiveResponse(IEnumerable<byte> data)

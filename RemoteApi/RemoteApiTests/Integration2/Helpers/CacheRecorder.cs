@@ -1,7 +1,7 @@
 ﻿using System;
 using C8F2740A.Common.Records;
 
-namespace RemoteApi.Integration.Helpers
+namespace RemoteApi.Integration2.Helpers
 {
     public class CacheRecorder : IRecorder
     {

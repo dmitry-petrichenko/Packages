@@ -18,8 +18,6 @@ namespace RemoteApi
         private readonly IRemoteTraceMonitorСonsistent _remoteTraceMonitorСonsistent;
         private readonly IRecorder _recorder;
 
-        public event Action CommandCompleted;
-        
         public MonitoredRemoteOperator(
             IAutoLocalConnector autoLocalConnector,
             IRemoteTraceMonitorСonsistent remoteTraceMonitorСonsistent,

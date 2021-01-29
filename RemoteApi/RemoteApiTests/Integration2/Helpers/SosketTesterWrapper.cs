@@ -1,36 +1,42 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using C8F2740A.Networking.ConnectionTCP.Network;
 
-namespace RemoteApi.Integration.Helpers
+namespace RemoteApi.Integration2.Helpers
 {
     public class SocketTesterWrapper : ISocket
     {
         public int CloseCalledTimes { get; private set; }
+        public int DisposeCalledTimes { get; private set; }
         public string Tag { get; }
+        public Task Disposed => _socketDisposeTask.Task;
 
         public event Action<SocketTesterWrapper> Accepted;
 
         private Socket _socket;
+        private TaskCompletionSource<bool> _socketDisposeTask;
 
         public SocketTesterWrapper(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType, string tag)
         {
             Tag = tag;
+            _socketDisposeTask = new TaskCompletionSource<bool>();
             _socket = new Socket(addressFamily, socketType, protocolType);
         }
         
         public SocketTesterWrapper(Socket socket, string tag)
         {
+            _socketDisposeTask = new TaskCompletionSource<bool>();
             Tag = tag;
             _socket = socket;
         }
 
         public void Dispose()
         {
+            DisposeCalledTimes++;
             _socket.Dispose();
+            _socketDisposeTask.SetResult(true);
         }
 
         public IPEndPoint LocalEndPoint => (IPEndPoint)_socket.LocalEndPoint;

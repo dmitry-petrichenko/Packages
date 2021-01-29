@@ -78,15 +78,16 @@ namespace RemoteApi
             }
             
             var instructionsSender = _instructionsSenderFactory.Create(address);
-            var result =  await instructionsSender.TrySendInstruction(RemoteApiCommands.TRACE.ToEnumerableByte());
-            if (result.Item1)
+            _instructionSenderHolder.Set(instructionsSender);
+            
+            var result =  await _instructionSenderHolder.TrySendInstruction(RemoteApiCommands.TRACE.ToEnumerableByte());
+            if (!result.Item1)
             {
-                _instructionSenderHolder.Set(instructionsSender);
-                return true;
+                _recorder.RecordError(GetType().Name, "Fail to connect to remote address");
+                return false;
             }
-
-            _recorder.RecordError(GetType().Name, "Fail to connect to remote address");
-            return false;
+            
+            return true;
         }
 
         public void Disconnect()

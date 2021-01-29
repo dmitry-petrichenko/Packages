@@ -105,10 +105,11 @@ namespace C8F2740A.Networking.ConnectionTCP
 
         private void CloseInternal()
         {
+            _isDisposed = true;
             RecordOpenCloseInfo("Tunnel closed");
-            Closed?.Invoke();
             _socket.Close();
             _socket.Dispose();
+            Closed?.Invoke();
         }
 
         private void RecordError(string message)
@@ -134,6 +135,13 @@ namespace C8F2740A.Networking.ConnectionTCP
         
         private void RecordOpenCloseInfo(string message)
         {
+            if (!_socket.Connected)
+            {
+                _recorder.RecordInfo(GetType().Name, 
+                    $"{message}: Closed socket");
+                return;
+            }
+            
             IPEndPoint local = _socket.LocalEndPoint;
             _recorder.RecordInfo(GetType().Name, 
                 $"{message}: local ({local.Address}:{local.Port})");
