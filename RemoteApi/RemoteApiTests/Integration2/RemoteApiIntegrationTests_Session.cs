@@ -19,11 +19,11 @@ namespace RemoteApi.Integration2
         {
             var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets("127.0.0.1:11111");
             var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets("127.0.0.1:22222");
-            await apiOperator.Initialized;
+            await apiOperator.MessageDisplayed;
 
             await apiOperator.RaiseCommandReceived("connect 127.0.0.1:22222");
             
-            await remote.Connected;
+            await apiOperator.MessageDisplayed;
 
             IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
             _output.WriteLine("-----------------------------");
@@ -51,9 +51,8 @@ namespace RemoteApi.Integration2
             remote.Recorder.ClearCache();
 
             await apiOperator.RaiseCommandReceived("hello");
-            //await apiOperator.MessageDisplayed;
 
-           IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
+            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
             _output.WriteLine("-----------------------------");
             IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, remote.Recorder);
             Assert.Equal(1, apiOperator.Sockets[1].CloseCalledTimes);
@@ -66,9 +65,11 @@ namespace RemoteApi.Integration2
         {
             var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets("127.0.0.1:11111");
             var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets("127.0.0.1:22222");
+            remote.ApiMap.RegisterWrongCommandHandler(() =>
+                ((IApplicationRecorder) remote.Recorder).RecordInfo("wrong", "wrong"));
             await apiOperator.Initialized;
             await apiOperator.RaiseCommandReceived("connect 127.0.0.1:22222");
-            await remote.Connected;
+            await apiOperator.MessageDisplayed;
             remote.Sockets[1].Close();
             remote.Sockets[0].Close();
             await apiOperator.Sockets[2].Disposed;
@@ -76,9 +77,8 @@ namespace RemoteApi.Integration2
             apiOperator.Recorder.ClearCache();
             remote.Recorder.ClearCache();
             
-            apiOperator.RaiseCommandReceived("hello");
-            await Task.Delay(1000);
-            
+            await apiOperator.RaiseCommandReceived("hello");
+
             IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
             _output.WriteLine("-----------------------------");
             IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, remote.Recorder);

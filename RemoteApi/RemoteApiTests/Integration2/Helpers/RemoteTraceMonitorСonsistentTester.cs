@@ -33,7 +33,11 @@ namespace RemoteApi.Integration2.Helpers
             }
 
             await Task.Delay(100);
-            _displayMessageTask.SetResult(true);
+            if (_displayMessageTask.Task.Status != TaskStatus.RanToCompletion)
+            {
+                _displayMessageTask.SetResult(true);
+            }
+
         }
 
         public void DisplayDebugMessage(string message)

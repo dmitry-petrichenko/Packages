@@ -9,19 +9,16 @@ namespace RemoteApi.Factories
     
     public class ApiOperatorFactory : IApiOperatorFactory
     {
-        private readonly ISystemRecorder _systemRecorder;
         private readonly IRemoteTraceMonitor _remoteTraceMonitor;
         private readonly IMonitoredRemoteOperatorFactory _monitoredRemoteOperatorFactory;
         private readonly ITraceableRemoteApiMapFactory _traceableRemoteApiMapFactory;
         private readonly IApplicationRecorder _applicationRecorder;
         
         public ApiOperatorFactory(
-            ISystemRecorder systemRecorder,
             IMonitoredRemoteOperatorFactory monitoredRemoteOperatorFactory,
             ITraceableRemoteApiMapFactory traceableRemoteApiMapFactory,
             IApplicationRecorder applicationRecorder)
         {
-            _systemRecorder = systemRecorder;
             _traceableRemoteApiMapFactory = traceableRemoteApiMapFactory;
             _monitoredRemoteOperatorFactory = monitoredRemoteOperatorFactory;
             _applicationRecorder = applicationRecorder;

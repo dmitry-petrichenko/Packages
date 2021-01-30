@@ -38,20 +38,20 @@ namespace RemoteApi
         public IEnumerable<string> GetCache()
         {
             return _messagesCache.GetCache();
-        }           
+        }
 
-        void IApplicationRecorder.RecordInfo(string tag, string message)         //
-        {               
-            _messagesCache.AddMessage(FormatInfoRecord(tag, message));           //
-            RecordReceived?.Invoke(FormatInfoRecord(tag, message));          //
-        }                                                                        //
-                                                                                 //
-        void IApplicationRecorder.RecordError(string tag, string message)        //
-        {        
-            _messagesCache.AddMessage(FormatInfoRecord(tag, message));           //
-            RecordReceived?.Invoke(FormatErrorRecord(tag, message));         //
-        }                                                                        //
-                                                                                 //
+        void IApplicationRecorder.RecordInfo(string tag, string message)
+        {
+            _messagesCache.AddMessage(FormatInfoRecord(tag, message));
+            RecordReceived?.Invoke(FormatInfoRecord(tag, message));
+        }
+        
+        void IApplicationRecorder.RecordError(string tag, string message)
+        {
+            _messagesCache.AddMessage(FormatInfoRecord(tag, message));
+            RecordReceived?.Invoke(FormatErrorRecord(tag, message));
+        }
+
         // --- IApplicationRecorder ---------------------------------------------//
 
         void IRecorder.RecordError(string tag, string message)

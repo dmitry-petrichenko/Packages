@@ -59,7 +59,7 @@ namespace RemoteApi.Integration2
                 instructionReceiverFactory,
                 _applicationRecorder);
             
-            var apiOperatorFactory = new ApiOperatorFactory(_systemRecorder, monitoredRemoteOperatorFactory, traceableRemoteApiMapFactory, _applicationRecorder);
+            var apiOperatorFactory = new ApiOperatorFactory(monitoredRemoteOperatorFactory, traceableRemoteApiMapFactory, _applicationRecorder);
             return apiOperatorFactory.Create(address);
         }
 

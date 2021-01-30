@@ -95,7 +95,7 @@ namespace RemoteApi.Integration2.Helpers
                 instructionReceiverFactory,
                 recorder);
             
-            var apiOperatorFactory = new ApiOperatorFactory(recorder, monitoredRemoteOperatorFactory, traceableRemoteApiMapFactory, recorder);
+            var apiOperatorFactory = new ApiOperatorFactory(monitoredRemoteOperatorFactory, traceableRemoteApiMapFactory, recorder);
             return apiOperatorFactory.Create(address);
         }
         
@@ -109,8 +109,6 @@ namespace RemoteApi.Integration2.Helpers
             output.WriteLine(recorder.AppErrorCache);
             output.WriteLine("Application Info:");
             output.WriteLine(recorder.AppInfoCache);
-            output.WriteLine("Interrupt messages:");
-            output.WriteLine(recorder.InterruptMessagesCache);
         }
     }
     
