@@ -9,7 +9,7 @@ using RemoteApi.Trace;
 using Telerik.JustMock;
 using Xunit.Abstractions;
 
-namespace RemoteApi.Integration2.Helpers
+namespace RemoteApi.Integration.Helpers
 {
     public class IntegrationTestsHelpers
     {
@@ -18,7 +18,7 @@ namespace RemoteApi.Integration2.Helpers
         {
             var recorder = new ApplicationCacheRecorder();
             var sockets = new List<SocketTesterWrapper>();
-            var remoteTraceMonitorСonsistent = new RemoteTraceMonitorСonsistentTester();
+            var remoteTraceMonitorСonsistent = new RemoteTraceMonitorСonsistentTester(recorder);
             var socketFactoryCounter = 0;
             
             Func<AddressFamily, SocketType, ProtocolType, ISocket> socketFactory = (family, type, arg3) =>
@@ -109,6 +109,8 @@ namespace RemoteApi.Integration2.Helpers
             output.WriteLine(recorder.AppErrorCache);
             output.WriteLine("Application Info:");
             output.WriteLine(recorder.AppInfoCache);
+            output.WriteLine("Messages on display:");
+            output.WriteLine(recorder.DisplayMessagesCache);
         }
     }
     

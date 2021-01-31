@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 using C8F2740A.Common.Records;
 using C8F2740A.Networking.ConnectionTCP.Network;
 using RemoteApi.Factories;
-using RemoteApi.Integration2.Helpers;
+using RemoteApi.Integration.Helpers;
 using RemoteApi.Monitor;
 using RemoteApi.Trace;
 using Telerik.JustMock;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace RemoteApi.Integration2
+namespace RemoteApi.Integration
 {
     public partial class RemoteApiIntegrationTests
     {
@@ -162,7 +162,7 @@ namespace RemoteApi.Integration2
             var socketTester3 = new SocketTester("accepted");
             var socketFactory = ArrangeSocketFactoryLocal(socketTester1, socketTester2, socketTester3);
             
-            var remoteTraceMonitorСonsistent = new RemoteTraceMonitorСonsistentTester();
+            var remoteTraceMonitorСonsistent = new RemoteTraceMonitorСonsistentTester(null);
             CreateLocalOperator(socketFactory, _cacheRecorder, remoteTraceMonitorСonsistent);
 
             await remoteTraceMonitorСonsistent.Initialized;

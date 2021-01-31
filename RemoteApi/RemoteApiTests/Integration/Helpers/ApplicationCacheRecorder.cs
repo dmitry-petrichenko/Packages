@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using C8F2740A.Common.Records;
 
-namespace RemoteApi.Integration2.Helpers
+namespace RemoteApi.Integration.Helpers
 {
     public class ApplicationCacheRecorder : IApplicationRecorder
     {
@@ -10,9 +10,11 @@ namespace RemoteApi.Integration2.Helpers
         public string AppErrorCache { get; private set; }
         public string SystemInfoCache { get; private set; }
         public string SystemErrorCache { get; private set; }
+        public string DisplayMessagesCache { get; private set; }
         public int SystemErrorCalledTimes { get; private set; }
         public int AppErrorCalledTimes { get; private set; }
         public int AppInfoCalledTimes { get; private set; }
+        public int DisplayMessagesCalledTimes { get; private set; }
         
         private IMessagesCache _messageCache;
         
@@ -22,6 +24,7 @@ namespace RemoteApi.Integration2.Helpers
             AppErrorCache = string.Empty;
             SystemInfoCache = string.Empty;
             SystemErrorCache = string.Empty;
+            DisplayMessagesCache = string.Empty;
 
             _messageCache = new MessagesCache(10);
         }
@@ -73,9 +76,17 @@ namespace RemoteApi.Integration2.Helpers
             AppErrorCache = string.Empty;
             SystemInfoCache = string.Empty;
             SystemErrorCache = string.Empty;
+            DisplayMessagesCache = string.Empty;
             SystemErrorCalledTimes = 0;
             AppErrorCalledTimes = 0;
             AppInfoCalledTimes = 0;
+            DisplayMessagesCalledTimes = 0;
+        }
+
+        public void DisplayNextMessage(string message)
+        {
+            DisplayMessagesCalledTimes++;
+            DisplayMessagesCache += message;
         }
     }
 }

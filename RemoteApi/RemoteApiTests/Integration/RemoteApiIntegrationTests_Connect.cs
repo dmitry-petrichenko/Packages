@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using C8F2740A.Common.Records;
 using C8F2740A.Networking.ConnectionTCP.Network;
 using RemoteApi.Factories;
-using RemoteApi.Integration2.Helpers;
+using RemoteApi.Integration.Helpers;
 using RemoteApi.Trace;
 using Telerik.JustMock;
 using Xunit;
 
-namespace RemoteApi.Integration2
+namespace RemoteApi.Integration
 {
     public partial class RemoteApiIntegrationTests
     {
@@ -240,7 +240,7 @@ namespace RemoteApi.Integration2
             IEnumerable<SocketTester> otherSockets = default,
             string address = "111.111.111.111:11111")
         {
-            var remoteTraceMonitorСonsistent = new RemoteTraceMonitorСonsistentTester();
+            var remoteTraceMonitorСonsistent = new RemoteTraceMonitorСonsistentTester(null);
             var addressAndPort = address.Split(":");
             var recorder = new ApplicationCacheRecorder();
             var sockets = new Dictionary<string, SocketTester>();

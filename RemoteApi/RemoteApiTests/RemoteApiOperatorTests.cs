@@ -25,7 +25,7 @@ namespace RemoteApi
             
             _sut = new RemoteApiOperator(_instructionSenderHolder, _instructionSenderFactory, _recorder);
         }
-        
+
         [Fact]
         public void Constructor_WhenCalled_ShouldSubscribe()
         {

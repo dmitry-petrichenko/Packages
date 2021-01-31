@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using RemoteApi.Monitor;
 
-namespace RemoteApi.Integration2.Helpers
+namespace RemoteApi.Integration.Helpers
 {
     public class RemoteTraceMonitorСonsistentTester : IRemoteTraceMonitorСonsistent
     {
@@ -11,12 +11,15 @@ namespace RemoteApi.Integration2.Helpers
         private TaskCompletionSource<bool> _initializationTask;
         private TaskCompletionSource<bool> _displayMessageTask;
 
+        private readonly ApplicationCacheRecorder _applicationCacheRecorder;
+
         public event Func<string, Task<bool>> CommandReceived;
         public Task Initialized => _initializationTask.Task;
         public Task MessageDisplayed => _displayMessageTask.Task;
         
-        public RemoteTraceMonitorСonsistentTester()
+        public RemoteTraceMonitorСonsistentTester(ApplicationCacheRecorder applicationCacheRecorder)
         {
+            _applicationCacheRecorder = applicationCacheRecorder;
             _initializationTask = new TaskCompletionSource<bool>();
             _displayMessageTask = new TaskCompletionSource<bool>();
         }
@@ -27,6 +30,7 @@ namespace RemoteApi.Integration2.Helpers
 
         public async void DisplayNextMessage(string message)
         {
+            _applicationCacheRecorder.DisplayNextMessage(message);
             if (_displayMessageTask == default)
             {
                 throw new Exception("display message task null");
@@ -37,13 +41,9 @@ namespace RemoteApi.Integration2.Helpers
             {
                 _displayMessageTask.SetResult(true);
             }
-
         }
 
-        public void DisplayDebugMessage(string message)
-        {
-            var a = message;
-        }
+        public void DisplayDebugMessage(string message) { }
 
         public void ClearTextBox() { }
 
