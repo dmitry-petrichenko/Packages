@@ -10,26 +10,38 @@ namespace RemoteApi.Integration.Helpers
     {
         public int CloseCalledTimes { get; private set; }
         public int DisposeCalledTimes { get; private set; }
+        public int ReceiveCalledTimes { get; private set; }
         public string Tag { get; }
         public Task Disposed => _socketDisposeTask.Task;
+        public Task ReceivedCalledSecondTime => _socketConnectedTask.Task;
+        public IPEndPoint LocalEndPoint => (IPEndPoint)_socket.LocalEndPoint;
+        public IPEndPoint RemoteEndPoint => (IPEndPoint)_socket.RemoteEndPoint;
+        public bool Connected => _socket.Connected;
 
         public event Action<SocketTesterWrapper> Accepted;
 
         private Socket _socket;
         private TaskCompletionSource<bool> _socketDisposeTask;
+        private TaskCompletionSource<bool> _socketConnectedTask;
 
         public SocketTesterWrapper(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType, string tag)
         {
             Tag = tag;
             _socketDisposeTask = new TaskCompletionSource<bool>();
+            _socketConnectedTask = new TaskCompletionSource<bool>();
             _socket = new Socket(addressFamily, socketType, protocolType);
+
+            ConnectCheck();
         }
-        
+
         public SocketTesterWrapper(Socket socket, string tag)
         {
             _socketDisposeTask = new TaskCompletionSource<bool>();
+            _socketConnectedTask = new TaskCompletionSource<bool>();
             Tag = tag;
             _socket = socket;
+            
+            ConnectCheck();
         }
 
         public void Dispose()
@@ -38,10 +50,6 @@ namespace RemoteApi.Integration.Helpers
             _socket.Dispose();
             _socketDisposeTask.SetResult(true);
         }
-
-        public IPEndPoint LocalEndPoint => (IPEndPoint)_socket.LocalEndPoint;
-        public IPEndPoint RemoteEndPoint => (IPEndPoint)_socket.RemoteEndPoint;
-        public bool Connected => _socket.Connected;
 
         public void Bind(IPAddress ipAddress, int port)
         {
@@ -66,6 +74,7 @@ namespace RemoteApi.Integration.Helpers
         public int Receive(byte[] bytes)
         {
             int receivedValue = _socket.Receive(bytes);
+            ReceiveCalledTimes++;
             return receivedValue;
         }
 
@@ -82,6 +91,22 @@ namespace RemoteApi.Integration.Helpers
         {
             CloseCalledTimes++;
             _socket.Close();
+        }
+        
+        private void ConnectCheck()
+        {
+            Task.Run(async () =>
+            {
+                while (true)
+                {
+                    await Task.Delay(100);
+                    if (ReceiveCalledTimes > 1)
+                    {
+                        _socketConnectedTask.SetResult(true);
+                        break;
+                    }
+                }
+            });
         }
     }
 }

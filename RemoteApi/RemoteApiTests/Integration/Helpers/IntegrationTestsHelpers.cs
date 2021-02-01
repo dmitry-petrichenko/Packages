@@ -46,7 +46,14 @@ namespace RemoteApi.Integration.Helpers
             var recorder = new ApplicationCacheRecorder();
             var sockets = new List<SocketTesterWrapper>();
             var socketFactoryCounter = 0;
-
+            var apiMapWrapper = default(TraceableRemoteApiMapWrapperRealSockets);
+            
+            void OnAccepted(SocketTesterWrapper wrapper)
+            {
+                sockets.Add(wrapper);
+                apiMapWrapper.SocketAcceptedHandler?.Invoke(wrapper);
+            }
+            
             Func<AddressFamily, SocketType, ProtocolType, ISocket> socketFactory = (family, type, arg3) =>
             {
                 socketFactoryCounter++;
@@ -55,11 +62,6 @@ namespace RemoteApi.Integration.Helpers
                 sockets.Add(socket);
                 return socket;
             };
-
-            void OnAccepted(SocketTesterWrapper wrapper)
-            {
-                sockets.Add(wrapper);
-            }
             
             // RemoteApiMap
             var instructionReceiverFactory = new TestInstructionReceiverFactory(socketFactory, recorder);
@@ -69,7 +71,9 @@ namespace RemoteApi.Integration.Helpers
             
             var apiMap = traceableRemoteApiMapFactory.Create(address);
 
-            return new TraceableRemoteApiMapWrapperRealSockets(sockets, apiMap, recorder);
+            apiMapWrapper = new TraceableRemoteApiMapWrapperRealSockets(sockets, apiMap, recorder);
+            
+            return apiMapWrapper;
         }
         
         internal static IApiOperator CreateLocalOperator(
@@ -135,8 +139,6 @@ namespace RemoteApi.Integration.Helpers
         {
             return _remoteTraceMonitorСonsistentTester.RaiseCommandReceived(value);
         }
-            
-        public Task Initialized => _remoteTraceMonitorСonsistentTester.Initialized;
     }
     
     internal class TraceableRemoteApiMapWrapperRealSockets
@@ -144,9 +146,11 @@ namespace RemoteApi.Integration.Helpers
         public IReadOnlyList<SocketTesterWrapper> Sockets { get; }
         public ITraceableRemoteApiMap ApiMap { get; }
         public ApplicationCacheRecorder Recorder { get; }
-        public Task Connected => _connectedTask.Task;
+        public Task ConnectedComplete => _connectedTask.Task;
 
         private TaskCompletionSource<bool> _connectedTask;
+
+        public Action<SocketTesterWrapper> SocketAcceptedHandler { get; }
 
         public TraceableRemoteApiMapWrapperRealSockets(IReadOnlyList<SocketTesterWrapper> sockets, ITraceableRemoteApiMap apiMap, ApplicationCacheRecorder recorder)
         {
@@ -155,11 +159,15 @@ namespace RemoteApi.Integration.Helpers
             Recorder = recorder;
             _connectedTask = new TaskCompletionSource<bool>();
 
-            ((TraceableRemoteApiMap) ApiMap).TraceStarted += TraceStartedHandler;
+            SocketAcceptedHandler = SocketAccepted;
         }
 
-        private void TraceStartedHandler()
+        private async void SocketAccepted(SocketTesterWrapper socket)
         {
+            _connectedTask = new TaskCompletionSource<bool>();
+            
+            await socket.ReceivedCalledSecondTime;
+            
             _connectedTask.SetResult(true);
         }
     }

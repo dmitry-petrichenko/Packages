@@ -1,15 +1,14 @@
-﻿using System;
-using RemoteApi.Integration.Helpers;
+﻿using RemoteApi.Integration.Helpers;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace RemoteApi.Integration
 {
-    public class RemoteApiIntegrationTestsSession : IDisposable
+    public class IntegrationTests_SendCommand
     {
         private ITestOutputHelper _output;
         
-        public RemoteApiIntegrationTestsSession(ITestOutputHelper output)
+        public IntegrationTests_SendCommand(ITestOutputHelper output)
         {
             _output = output;
         }
@@ -17,80 +16,7 @@ namespace RemoteApi.Integration
         public void Dispose()
         {
         }
-        
-        [Fact]
-        public async void Operator_WhenConnectToRemoteSocket_ShouldDisconnectLocal()
-        {
-            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets("127.0.0.1:11113");
-            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets("127.0.0.1:22224");
-            await apiOperator.MessageDisplayed;
 
-            await apiOperator.RaiseCommandReceived("connect 127.0.0.1:22224");
-            
-            await apiOperator.MessageDisplayed;
-
-            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
-            _output.WriteLine("-----------------------------");
-            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, remote.Recorder);
-            Assert.Equal(1, apiOperator.Sockets[1].CloseCalledTimes);
-        }
-        
-        [Fact]
-        public async void Operator_WhenRemoteSocketDisconnected_ShouldConnectAgain()
-        {
-            var wrongCommandCalledTimes = 0;
-            var wrongCommandCalledTimesIntermediateState = 0;
-            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets("127.0.0.1:11112");
-            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets("127.0.0.1:22223");
-            remote.ApiMap.RegisterWrongCommandHandler(() => wrongCommandCalledTimes++);
-            await apiOperator.MessageDisplayed;
-            await apiOperator.RaiseCommandReceived("connect 127.0.0.1:22223");
-            await apiOperator.MessageDisplayed;
-            
-            remote.Sockets[1].Close();
-            wrongCommandCalledTimesIntermediateState = wrongCommandCalledTimes;
-            await apiOperator.Sockets[2].Disposed;
-
-            apiOperator.Recorder.ClearCache();
-            remote.Recorder.ClearCache();
-
-            await apiOperator.RaiseCommandReceived("hello");
-
-            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
-            _output.WriteLine("-----------------------------");
-            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, remote.Recorder);
-            Assert.Equal(1, apiOperator.Sockets[1].CloseCalledTimes);
-            Assert.Equal(1, wrongCommandCalledTimes);
-            Assert.Equal(0, wrongCommandCalledTimesIntermediateState);
-        }
-        
-        [Fact]
-        public async void Operator_WhenRemoteSocketDisconnectedAndLost_ShouldTryConnectAndShowMessage()
-        {
-            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets("127.0.0.1:11111");
-            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets("127.0.0.1:22222");
-            remote.ApiMap.RegisterWrongCommandHandler(() =>
-                ((IApplicationRecorder) remote.Recorder).RecordInfo("wrong", "wrong"));
-            await apiOperator.Initialized;
-            await apiOperator.RaiseCommandReceived("connect 127.0.0.1:22222");
-            await apiOperator.MessageDisplayed;
-            remote.Sockets[1].Close();
-            remote.Sockets[0].Close();
-            await apiOperator.Sockets[2].Disposed;
-
-            apiOperator.Recorder.ClearCache();
-            remote.Recorder.ClearCache();
-            
-            await apiOperator.RaiseCommandReceived("hello");
-
-            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
-            _output.WriteLine("-----------------------------");
-            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, remote.Recorder);
-            Assert.Equal(1, apiOperator.Sockets[1].CloseCalledTimes);
-            Assert.Equal(1, apiOperator.Sockets[1].DisposeCalledTimes);
-            Assert.Equal(2, apiOperator.Recorder.SystemErrorCalledTimes);
-        }
-        
         [Theory]
         [InlineData(1, 1, 1, "11111", "22222")]
         [InlineData(2, 2, 2, "33333", "44444")]
@@ -113,7 +39,7 @@ namespace RemoteApi.Integration
 
             await apiOperator.MessageDisplayed;
             await apiOperator.RaiseCommandReceived($"connect 127.0.0.1:{remotePort}");
-            await apiOperator.MessageDisplayed;
+            await remote.ConnectedComplete;
             
             apiOperator.Recorder.ClearCache();
             remote.Recorder.ClearCache();
@@ -132,10 +58,10 @@ namespace RemoteApi.Integration
         }
         
         [Theory]
-        [InlineData(1, 1, 1, "11111", "22222")]
-        [InlineData(2, 2, 2, "33333", "44444")]
-        [InlineData(3, 3, 3, "55555", "55556")]
-        public async void Operator_WhenCommandSend_ShouldDisplayInMonitor(
+        [InlineData(1, 1, 1, "8111", "8222")]
+        [InlineData(2, 2, 2, "8333", "8444")]
+        [InlineData(3, 3, 3, "8555", "8666")]
+        public async void Operator_WhenCommandSend_ShouldDisplayInMonitor2(
             int expectedMessageDisplays, 
             int sendCommandTimes, 
             int expectedWrongCommandCalled, 
@@ -153,7 +79,7 @@ namespace RemoteApi.Integration
 
             await apiOperator.MessageDisplayed;
             await apiOperator.RaiseCommandReceived($"connect 127.0.0.1:{remotePort}");
-            await apiOperator.MessageDisplayed;
+            await remote.ConnectedComplete;
             
             apiOperator.Recorder.ClearCache();
             remote.Recorder.ClearCache();
@@ -196,7 +122,7 @@ namespace RemoteApi.Integration
 
             await apiOperator.MessageDisplayed;
             await apiOperator.RaiseCommandReceived($"connect 127.0.0.1:{remotePort}");
-            await apiOperator.MessageDisplayed;
+            await remote.ConnectedComplete;
             
             apiOperator.Recorder.ClearCache();
             remote.Recorder.ClearCache();

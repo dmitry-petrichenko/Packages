@@ -45,7 +45,10 @@ namespace RemoteApi.Integration.Helpers
 
         public void DisplayDebugMessage(string message) { }
 
-        public void ClearTextBox() { }
+        public void ClearTextBox()
+        {
+            _applicationCacheRecorder.ClearTextBox();
+        }
 
         public void SetPrompt(string value)
         {

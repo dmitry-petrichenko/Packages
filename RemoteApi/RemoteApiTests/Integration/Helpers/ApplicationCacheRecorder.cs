@@ -86,7 +86,19 @@ namespace RemoteApi.Integration.Helpers
         public void DisplayNextMessage(string message)
         {
             DisplayMessagesCalledTimes++;
-            DisplayMessagesCache += message;
+            if (message.Equals(string.Empty))
+            {
+                DisplayMessagesCache += "empty\n\r";
+            }
+            else
+            {
+                DisplayMessagesCache += message;
+            }
+        }
+        
+        public void ClearTextBox()
+        {
+            DisplayMessagesCache += "-\n\r";
         }
     }
 }
