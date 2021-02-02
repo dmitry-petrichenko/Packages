@@ -1,7 +1,7 @@
 ﻿using System;
 using C8F2740A.Common.Records;
-using RemoteApi.Monitor;
-using RemoteApi.Trace;
+using C8F2740A.NetworkNode.RemoteApi.Monitor;
+using C8F2740A.NetworkNode.RemoteApi.Trace;
 using Telerik.JustMock;
 using Telerik.JustMock.Helpers;
 using Xunit;

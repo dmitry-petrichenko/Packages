@@ -1,4 +1,4 @@
-﻿namespace RemoteApi
+﻿namespace C8F2740A.NetworkNode.RemoteApi
 {
     public class RemoteApiCommands
     {

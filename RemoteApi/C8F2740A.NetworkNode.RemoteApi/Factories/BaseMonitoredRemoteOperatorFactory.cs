@@ -1,9 +1,9 @@
 ﻿using C8F2740A.Common.Records;
+using C8F2740A.NetworkNode.RemoteApi.Monitor;
+using C8F2740A.NetworkNode.RemoteApi.Trace;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
-using RemoteApi.Monitor;
-using RemoteApi.Trace;
 
-namespace RemoteApi.Factories
+namespace C8F2740A.NetworkNode.RemoteApi.Factories
 {
     public interface IMonitoredRemoteOperatorFactory
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RemoteApi
+namespace C8F2740A.NetworkNode.RemoteApi
 {
     public interface ISystemRecorder : ISystemInterrupter,
                                        ISystemMessageDispatcher

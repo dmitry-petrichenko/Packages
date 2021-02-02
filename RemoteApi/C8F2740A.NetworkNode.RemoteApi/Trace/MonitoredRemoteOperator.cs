@@ -2,10 +2,9 @@
 using System.Threading.Tasks;
 using C8F2740A.Common.ExecutionStrategies;
 using C8F2740A.Common.Records;
-using RemoteApi.Monitor;
-using RemoteApi.Trace;
+using C8F2740A.NetworkNode.RemoteApi.Monitor;
 
-namespace RemoteApi
+namespace C8F2740A.NetworkNode.RemoteApi.Trace
 {
     public interface IMonitoredRemoteOperator : IDisposable
     {

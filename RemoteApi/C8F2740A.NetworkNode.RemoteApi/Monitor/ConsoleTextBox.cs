@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RemoteApi.Monitor
+namespace C8F2740A.NetworkNode.RemoteApi.Monitor
 {
     public interface IConsoleTextBox
     {

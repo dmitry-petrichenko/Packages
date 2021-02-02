@@ -1,11 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
+	<PropertyGroup>
+		<PackageId>C8F2740A.NetworkNode.RemoteApi</PackageId>
+		<Authors>Dmitry Petrichenko</Authors>
+		<Version>1.0.0</Version>
+        <RootNamespace>C8F2740A.NetworkNode.RemoteApi</RootNamespace>
+		<Company>C8F2740A</Company>
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="C8F2740A.NetworkNode.SessionTCP" Version="1.1.0" />
+      <PackageReference Include="C8F2740A.NetworkNode.SessionTCP" Version="1.2.0" />
     </ItemGroup>
 
 </Project>

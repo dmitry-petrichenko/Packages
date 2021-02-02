@@ -1,6 +1,8 @@
-﻿using RemoteApi.Monitor;
+﻿using C8F2740A.NetworkNode.RemoteApi.Monitor;
+using C8F2740A.NetworkNode.RemoteApi.Operator;
+using C8F2740A.NetworkNode.RemoteApi.Trace;
 
-namespace RemoteApi.Factories
+namespace C8F2740A.NetworkNode.RemoteApi.Factories
 {
     public interface IApiOperatorFactory
     {

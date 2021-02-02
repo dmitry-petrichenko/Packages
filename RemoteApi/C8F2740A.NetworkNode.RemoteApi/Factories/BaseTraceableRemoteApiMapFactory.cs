@@ -1,7 +1,7 @@
-﻿using C8F2740A.NetworkNode.SessionTCP.Factories;
-using RemoteApi.Trace;
+﻿using C8F2740A.NetworkNode.RemoteApi.Trace;
+using C8F2740A.NetworkNode.SessionTCP.Factories;
 
-namespace RemoteApi.Factories
+namespace C8F2740A.NetworkNode.RemoteApi.Factories
 {
     public interface ITraceableRemoteApiMapFactory
     {

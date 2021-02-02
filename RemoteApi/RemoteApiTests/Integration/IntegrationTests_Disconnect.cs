@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using C8F2740A.NetworkNode.RemoteApi.Trace;
 using RemoteApi.Integration.Helpers;
 using Xunit;
 using Xunit.Abstractions;

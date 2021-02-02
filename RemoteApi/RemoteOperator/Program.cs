@@ -1,6 +1,5 @@
 ﻿using System;
 using C8F2740A.Common.Records;
-using RemoteApi.Trace;
 
 namespace RemoteOperator
 {

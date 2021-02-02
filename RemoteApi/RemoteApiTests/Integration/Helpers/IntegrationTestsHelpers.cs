@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using C8F2740A.Networking.ConnectionTCP.Network;
-using RemoteApi.Factories;
-using RemoteApi.Monitor;
-using RemoteApi.Trace;
+using C8F2740A.NetworkNode.RemoteApi.Factories;
+using C8F2740A.NetworkNode.RemoteApi.Monitor;
+using C8F2740A.NetworkNode.RemoteApi.Operator;
+using C8F2740A.NetworkNode.RemoteApi.Trace;
 using Telerik.JustMock;
 using Xunit.Abstractions;
 

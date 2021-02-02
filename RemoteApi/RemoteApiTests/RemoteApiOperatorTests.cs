@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using C8F2740A.Common.Records;
+using C8F2740A.NetworkNode.RemoteApi;
+using C8F2740A.NetworkNode.RemoteApi.Extensions;
 using C8F2740A.NetworkNode.SessionTCP;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
 using Telerik.JustMock;

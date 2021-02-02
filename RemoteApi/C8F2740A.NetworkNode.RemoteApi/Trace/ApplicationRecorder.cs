@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using C8F2740A.Common.Records;
+using C8F2740A.NetworkNode.RemoteApi.Extensions;
 
-namespace RemoteApi
+namespace C8F2740A.NetworkNode.RemoteApi.Trace
 {
     public interface IApplicationRecorder : IRecorder
     {

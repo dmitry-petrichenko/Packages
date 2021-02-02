@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using C8F2740A.Common.Records;
-using C8F2740A.Networking.ConnectionTCP;
+using C8F2740A.NetworkNode.RemoteApi.Extensions;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
+using C8F2740A.Networking.ConnectionTCP;
 
-namespace RemoteApi
+namespace C8F2740A.NetworkNode.RemoteApi
 {
     public interface IRemoteApiOperator
     {

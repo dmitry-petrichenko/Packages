@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <RootNamespace>RemoteApi</RootNamespace>
+        <RootNamespace>C8F2740A.NetworkNode.RemoteApi</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

@@ -21,10 +21,12 @@ namespace C8F2740A.Networking.ConnectionTCP
     
     public class NetworkTunnel : INetworkTunnel
     {
+        public event Action<byte[]> Received;
+        public event Action Closed;
+        
         private readonly ISocket _socket;
         private readonly IRecorder _recorder;
         
-        private INetworkAddress _networkAddress;
         private bool _isDisposed;
         
         public NetworkTunnel(ISocket socket, IRecorder recorder)
@@ -45,9 +47,6 @@ namespace C8F2740A.Networking.ConnectionTCP
         {
             CloseInternal();
         }
-
-        public event Action<byte[]> Received;
-        public event Action Closed;
 
         public void Dispose()
         {

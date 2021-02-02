@@ -1,6 +1,6 @@
 ﻿using System.Dynamic;
 using System.Threading.Tasks;
-using RemoteApi.Monitor;
+using C8F2740A.NetworkNode.RemoteApi.Monitor;
 using Telerik.JustMock;
 using Xunit;
 

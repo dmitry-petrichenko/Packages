@@ -1,4 +1,5 @@
 ﻿using System;
+using C8F2740A.NetworkNode.RemoteApi;
 using RemoteApi;
 
 namespace RemoteOperatorWithFactories

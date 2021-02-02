@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using C8F2740A.Common.Records;
+using C8F2740A.NetworkNode.RemoteApi;
+using C8F2740A.NetworkNode.RemoteApi.Trace;
 using Telerik.JustMock;
 using Xunit;
 

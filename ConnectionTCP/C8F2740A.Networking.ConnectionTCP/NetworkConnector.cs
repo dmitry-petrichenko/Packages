@@ -19,10 +19,12 @@ namespace C8F2740A.Networking.ConnectionTCP
 
         public NetworkConnector(
             Func<ISocket, INetworkTunnel> networkTunnelFactory, 
-            Func<AddressFamily, SocketType, ProtocolType, ISocket> socketFactory)
+            Func<AddressFamily, SocketType, ProtocolType, ISocket> socketFactory,
+            IRecorder recorder)
         {
             _socketFactory = socketFactory;
             _networkTunnelFactory = networkTunnelFactory;
+            _recorder = recorder;
         }
 
         public bool TryConnect(INetworkAddress networkAddress, out INetworkTunnel networkTunnel)

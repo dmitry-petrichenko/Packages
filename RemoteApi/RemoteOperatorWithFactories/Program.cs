@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
+using C8F2740A.NetworkNode.RemoteApi.Monitor;
+using C8F2740A.NetworkNode.RemoteApi.Trace;
 using RemoteApi;
-using RemoteApi.Monitor;
 
 namespace RemoteOperatorWithFactories
 {

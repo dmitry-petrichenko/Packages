@@ -24,7 +24,8 @@ namespace C8F2740A.NetworkNode.SessionTCP.Factories
             var networkAddress = new NetworkAddress(address);
             var networkConnector = new NetworkConnector(
                 NetworkTunnelFactory,
-                SocketFactory);
+                SocketFactory,
+                _recorder);
             
             var nodeVisitor = new NodeVisitor(networkConnector, SessionFactory, _recorder);
             

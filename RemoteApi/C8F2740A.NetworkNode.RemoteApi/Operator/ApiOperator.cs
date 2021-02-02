@@ -1,6 +1,6 @@
-﻿using RemoteApi.Trace;
+﻿using C8F2740A.NetworkNode.RemoteApi.Trace;
 
-namespace RemoteApi
+namespace C8F2740A.NetworkNode.RemoteApi.Operator
 {
     public interface IApiOperator { }
     

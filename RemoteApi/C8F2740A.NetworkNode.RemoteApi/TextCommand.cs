@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace RemoteApi
+namespace C8F2740A.NetworkNode.RemoteApi
 {
     public interface ITextCommand
     {

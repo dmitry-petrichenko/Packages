@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using C8F2740A.Common.ExecutionStrategies;
 
-namespace RemoteApi.Monitor
+namespace C8F2740A.NetworkNode.RemoteApi.Monitor
 {
     public interface IMutableRemoteTraceMonitor
     {

@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 
-namespace RemoteApi.Monitor
+namespace C8F2740A.NetworkNode.RemoteApi.Monitor
 {
     public interface ILineReaderWithPrompt
     {

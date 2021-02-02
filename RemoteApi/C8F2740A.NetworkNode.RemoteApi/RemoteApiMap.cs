@@ -5,9 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using C8F2740A.Common.ExecutionStrategies;
 using C8F2740A.Common.Records;
+using C8F2740A.NetworkNode.RemoteApi.Extensions;
 using C8F2740A.NetworkNode.SessionTCP;
 
-namespace RemoteApi
+namespace C8F2740A.NetworkNode.RemoteApi
 {
     public interface ITextToRemoteSender
     {

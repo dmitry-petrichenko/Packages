@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using C8F2740A.Common.ExecutionStrategies;
 using C8F2740A.Common.Records;
-using RemoteApi.Trace;
 
-namespace RemoteApi
+namespace C8F2740A.NetworkNode.RemoteApi.Trace
 {
     public interface IRemoteRecordsSender
     {

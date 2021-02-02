@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using RemoteApi.Monitor;
+using C8F2740A.NetworkNode.RemoteApi.Monitor;
 
 namespace RemoteApi.Integration.Helpers
 {
