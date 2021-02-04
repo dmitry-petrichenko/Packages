@@ -8,6 +8,8 @@ namespace C8F2740A.NetworkNode.SessionTCP
 {
     public interface IInstructionReceiver : IDisposable
     {
+        bool HasActiveSession { get; }
+
         Task<(bool, IEnumerable<byte>)> TrySendInstruction(IEnumerable<byte> instruction);
         
         event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived;
@@ -18,6 +20,8 @@ namespace C8F2740A.NetworkNode.SessionTCP
         private readonly IRecorder _recorder;
         private readonly INodeGateway _nodeGateway;
         private readonly ISessionHolder _sessionHolder;
+        
+        public bool HasActiveSession => _sessionHolder.HasActiveSession;
         
         public event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived
         {

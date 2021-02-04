@@ -71,14 +71,9 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
             return tcs.Task;
         }
         
-        private async Task ExecuteSendMessageInternal(string message)
+        private Task ExecuteSendMessageInternal(string message)
         {
-            var isSent = await _textToRemoteSender.TrySendText(message);
-
-            if (!isSent)
-            {
-                _recorder.RecordError(GetType().Name, "Message did not send");
-            }
+            return _textToRemoteSender.TrySendText(message);
         }
     }
 }

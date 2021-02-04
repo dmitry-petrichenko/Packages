@@ -5,7 +5,6 @@ using C8F2740A.NetworkNode.RemoteApi.Factories;
 using C8F2740A.NetworkNode.RemoteApi.Monitor;
 using C8F2740A.NetworkNode.RemoteApi.Trace;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
-using RemoteApi;
 
 namespace RemoteOperatorWithFactories
 {
@@ -44,7 +43,7 @@ namespace RemoteOperatorWithFactories
             
             // Remote trace monitor
             var remoteTraceMonitor = new RemoteTraceMonitor(new ConsoleAbstraction()
-                , 4, 
+                , 6, 
                 systemRecorder, 
                 systemRecorder);
             remoteTraceMonitor.Start();

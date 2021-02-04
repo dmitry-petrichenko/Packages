@@ -102,6 +102,11 @@ namespace C8F2740A.NetworkNode.RemoteApi
 
         public async Task<bool> TrySendText(string instruction)
         {
+            if (!_instructionsReceiver.HasActiveSession)
+            {
+                return false;
+            }
+            
             var result = await _instructionsReceiver.TrySendInstruction(instruction.ToEnumerableByte());
 
             if (!result.Item1)

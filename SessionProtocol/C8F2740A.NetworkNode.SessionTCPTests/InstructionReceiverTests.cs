@@ -111,6 +111,20 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
         }
         #endregion
         
+        #region HasActiveSession
+        [Theory]
+        [InlineData( true, true )]
+        [InlineData( false, false )]
+        public void HasActiveSession_WhenCalled_ShouldReturnFromSessionHolder(bool returnedValue, bool expectedValue)
+        {
+            Mock.Arrange(() => _sessionHolder.HasActiveSession).Returns(returnedValue);
+
+            var actualResult = _sut.HasActiveSession;
+            
+            Assert.Equal(expectedValue, actualResult);
+        }
+        #endregion
+        
         #region Dispose
         [Fact]
         public void Dispose_WhenCalled_ShouldClearAndUnsubscribe()

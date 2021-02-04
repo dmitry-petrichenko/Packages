@@ -10,8 +10,8 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
         event Action<string> RecordReceived;
 
         IEnumerable<string> GetCache();
-        void RecordInfo(string tag, string message);
-        void RecordError(string tag, string message);
+        new void RecordInfo(string tag, string message);
+        new void RecordError(string tag, string message);
     }
     
     public class ApplicationRecorder : IApplicationRecorder
