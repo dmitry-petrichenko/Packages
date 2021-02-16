@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.Remote
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.Networking.ConnectionTCP", "..\..\ConnectionTCP\C8F2740A.Networking.ConnectionTCP\C8F2740A.Networking.ConnectionTCP.csproj", "{930F2B64-D7B1-4C02-8B47-AE92E437A066}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.RemoteApiServerPlugin", "C8F2740A.NetworkNode.RemoteApiServerPlugin\C8F2740A.NetworkNode.RemoteApiServerPlugin.csproj", "{FEB73644-CF7F-4478-9985-258FD5C7904C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{930F2B64-D7B1-4C02-8B47-AE92E437A066}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{930F2B64-D7B1-4C02-8B47-AE92E437A066}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{930F2B64-D7B1-4C02-8B47-AE92E437A066}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEB73644-CF7F-4478-9985-258FD5C7904C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEB73644-CF7F-4478-9985-258FD5C7904C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEB73644-CF7F-4478-9985-258FD5C7904C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEB73644-CF7F-4478-9985-258FD5C7904C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

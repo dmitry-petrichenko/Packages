@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\ConnectionTCP\C8F2740A.Networking.ConnectionTCP\C8F2740A.Networking.ConnectionTCP.csproj" />
+      <ProjectReference Include="..\..\..\RemoteApi\C8F2740A.NetworkNode.RemoteApi\C8F2740A.NetworkNode.RemoteApi.csproj" />
+      <ProjectReference Include="..\Client\Client.csproj" />
+    </ItemGroup>
+
+</Project>

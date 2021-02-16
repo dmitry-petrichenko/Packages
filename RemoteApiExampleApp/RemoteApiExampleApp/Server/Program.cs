@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using C8F2740A.Common.Records;
 using C8F2740A.NetworkNode.RemoteApi.Factories;
 using C8F2740A.NetworkNode.RemoteApi.Trace;
+using C8F2740A.NetworkNode.RemoteApiServerPlugin;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
 using RemoteOperatorWithFactories;
 
@@ -14,28 +15,14 @@ namespace Server
         static void Main(string[] args)
         {
             var port = Console.ReadLine();
-            
-            var systemRecorder = new SystemRecorder();
-            var systemMessageDispatcher = systemRecorder;
-            systemMessageDispatcher.InterruptedWithMessage += SystemInterruptedHandler;
-            
-            // Application recorder
-            var applicationRecorder = new ApplicationRecorder(systemRecorder, new MessagesCache(10));
-            var traceableRemoteApiMapFactory = new BaseTraceableRemoteApiMapFactory(new BaseInstructionReceiverFactory(applicationRecorder), applicationRecorder);
-            var map = traceableRemoteApiMapFactory.Create($"127.0.0.1:{port}");
 
-            applicationRecorder.RecordReceived += s => Console.WriteLine(s);
-            var usefulLogic = new UsefulLogic(applicationRecorder);
-            
-            map.RegisterCommandWithParameters("set", param => usefulLogic.SetValue(Int32.Parse(param.FirstOrDefault())));
-
+            await CreateApplicationBuilder().Build().Run();
             Console.ReadLine();
         }
-
-        private static void SystemInterruptedHandler(string message)
+        
+        public static IApplicationBuilder CreateApplicationBuilder()
         {
-            Console.Clear();
-            Console.WriteLine(message);
+            return new ApplicationSkeleton();
         }
 
         private class UsefulLogic

@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\C8F2740A.NetworkNode.RemoteApiServerPlugin\C8F2740A.NetworkNode.RemoteApiServerPlugin.csproj" />
       <ProjectReference Include="..\Client\Client.csproj" />
     </ItemGroup>
 
