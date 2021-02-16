@@ -1,31 +1,39 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using C8F2740A.Common.Records;
-using C8F2740A.NetworkNode.RemoteApi.Factories;
 using C8F2740A.NetworkNode.RemoteApi.Trace;
 using C8F2740A.NetworkNode.RemoteApiServerPlugin;
-using C8F2740A.NetworkNode.SessionTCP.Factories;
-using RemoteOperatorWithFactories;
 
 namespace Server
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            var port = Console.ReadLine();
+            //var port = Console.ReadLine();
 
-            await CreateApplicationBuilder().Build().Run();
+            await CreateApplicationBuilder().Build(SetupCoreHandler).Run();
             Console.ReadLine();
         }
-        
+
+        private static IRunable SetupCoreHandler(ITraceableRemoteApiMap map, IApplicationRecorder recorder)
+        {
+            var core = new UsefulLogic(recorder);
+            recorder.RecordReceived += s => Console.WriteLine(s);
+            map.RegisterCommandWithParameters("set", parameter =>
+            {
+                core.SetValue(Int32.Parse(parameter.FirstOrDefault()));
+            });
+            
+            return core;
+        }
+
         public static IApplicationBuilder CreateApplicationBuilder()
         {
             return new ApplicationSkeleton();
         }
 
-        private class UsefulLogic
+        private class UsefulLogic : IRunable
         {
             private readonly IApplicationRecorder _recorder;
             private int _currentValue;
@@ -34,7 +42,6 @@ namespace Server
             {
                 _recorder = recorder;
                 _currentValue = 0;
-                StartProcess();
             }
             
             public void SetValue(int value)
@@ -50,6 +57,11 @@ namespace Server
                     _currentValue++;
                     _recorder.RecordInfo("App", $"value: {_currentValue}");
                 }
+            }
+
+            public void Run()
+            {
+                StartProcess();
             }
         }
     }

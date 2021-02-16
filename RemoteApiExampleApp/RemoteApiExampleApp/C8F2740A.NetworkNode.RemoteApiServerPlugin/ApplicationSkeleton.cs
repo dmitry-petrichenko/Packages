@@ -42,15 +42,8 @@ namespace C8F2740A.NetworkNode.RemoteApiServerPlugin
             // Application recorder
             var applicationRecorder = new ApplicationRecorder(systemRecorder, new MessagesCache(10));
             
-            // Remote trace monitor
-            var remoteTraceMonitor = new RemoteTraceMonitor(new ConsoleAbstraction()
-                , 6, 
-                systemRecorder, 
-                systemRecorder);
-            remoteTraceMonitor.Start();
-            
             var traceableRemoteApiMapFactory = new BaseTraceableRemoteApiMapFactory(new BaseInstructionReceiverFactory(applicationRecorder), applicationRecorder);
-            var map = traceableRemoteApiMapFactory.Create($"127.0.0.1:8081");
+            var map = traceableRemoteApiMapFactory.Create($"127.0.0.1:8082");
 
             _core = setupCore?.Invoke(map, applicationRecorder);
             
