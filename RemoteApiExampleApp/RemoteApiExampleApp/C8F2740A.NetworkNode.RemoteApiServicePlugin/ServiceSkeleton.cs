@@ -1,49 +1,40 @@
 ﻿using System;
 using System.Threading.Tasks;
 using C8F2740A.NetworkNode.RemoteApi.Factories;
-using C8F2740A.NetworkNode.RemoteApi.Monitor;
 using C8F2740A.NetworkNode.RemoteApi.Trace;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
+using Microsoft.Extensions.Configuration;
 using RemoteOperatorWithFactories;
 
-namespace C8F2740A.NetworkNode.RemoteApiServerPlugin
+namespace C8F2740A.NetworkNode.RemoteApiServicePlugin
 {
-    public interface IApplicationBuilder
-    {
-        IApplicationRunner Build(Func<ITraceableRemoteApiMap, IApplicationRecorder, IRunable> setupCore);
-    }
-    
-    public interface IApplicationRunner
-    {
-        Task Run();
-    }
-    
-    public interface IRunable
-    {
-        void Run();
-    }
-    
-    public class ApplicationSkeleton : IApplicationBuilder, IApplicationRunner
+    public class ServiceSkeleton : IServiceBuilder, IServiceRunner
     {
         private TaskCompletionSource<bool> _mainApplicationTask;
-        private IRunable _core;
+        private IRunnable _core;
         
-        public ApplicationSkeleton()
+        public ServiceSkeleton()
         {
             _mainApplicationTask = new TaskCompletionSource<bool>();
         }
 
-        public IApplicationRunner Build(Func<ITraceableRemoteApiMap, IApplicationRecorder, IRunable> setupCore)
+        public IServiceRunner Build(Func<ITraceableRemoteApiMap, IApplicationRecorder, IRunnable> setupCore)
         {
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build();
+
             // System recorder
             var systemRecorder = new SystemRecorder();
             systemRecorder.InterruptedWithMessage += SystemInterruptedHandler;
             
             // Application recorder
-            var applicationRecorder = new ApplicationRecorder(systemRecorder, new MessagesCache(10));
+            var applicationRecorder = new ApplicationRecorder(
+                systemRecorder, 
+                new MessagesCache(Int32.Parse(configuration["MESSAGE_CACHE"])));
             
             var traceableRemoteApiMapFactory = new BaseTraceableRemoteApiMapFactory(new BaseInstructionReceiverFactory(applicationRecorder), applicationRecorder);
-            var map = traceableRemoteApiMapFactory.Create($"127.0.0.1:8082");
+            var map = traceableRemoteApiMapFactory.Create(configuration["IP_ADDRESS"]);
 
             _core = setupCore?.Invoke(map, applicationRecorder);
             
