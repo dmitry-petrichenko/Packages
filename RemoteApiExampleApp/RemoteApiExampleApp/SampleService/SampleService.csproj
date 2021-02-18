@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\C8F2740A.NetworkNode.RemoteApiServicePlugin\C8F2740A.NetworkNode.RemoteApiServicePlugin.csproj" />
-      <ProjectReference Include="..\Client\Client.csproj" />
+      <ProjectReference Include="..\C8F2740A.NetworkNode.RAServicePlugin\C8F2740A.NetworkNode.RAServicePlugin.csproj" />
+      <ProjectReference Include="..\Operator\Operator.csproj" />
     </ItemGroup>
 	<ItemGroup>
 		<Content Include="appsettings.json">

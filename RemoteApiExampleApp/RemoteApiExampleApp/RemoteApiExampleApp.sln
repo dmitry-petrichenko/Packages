@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{E9546C51-5529-4E51-ABBE-49690D985A23}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Operator", "Operator\Operator.csproj", "{E9546C51-5529-4E51-ABBE-49690D985A23}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleService", "SampleService\SampleService.csproj", "{7E957907-3229-4C0C-84AA-C98ED7665E79}"
 EndProject
@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.Remote
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.Networking.ConnectionTCP", "..\..\ConnectionTCP\C8F2740A.Networking.ConnectionTCP\C8F2740A.Networking.ConnectionTCP.csproj", "{930F2B64-D7B1-4C02-8B47-AE92E437A066}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.RemoteApiServicePlugin", "C8F2740A.NetworkNode.RemoteApiServicePlugin\C8F2740A.NetworkNode.RemoteApiServicePlugin.csproj", "{FEB73644-CF7F-4478-9985-258FD5C7904C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.RAServicePlugin", "C8F2740A.NetworkNode.RAServicePlugin\C8F2740A.NetworkNode.RAServicePlugin.csproj", "{FEB73644-CF7F-4478-9985-258FD5C7904C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

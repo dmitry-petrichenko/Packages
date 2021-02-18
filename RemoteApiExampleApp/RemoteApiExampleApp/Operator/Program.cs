@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
-using RemoteOperatorWithFactories;
 
-namespace Client
+namespace Operator
 {
     class Program
     {

@@ -5,8 +5,9 @@ using C8F2740A.NetworkNode.RemoteApi.Factories;
 using C8F2740A.NetworkNode.RemoteApi.Monitor;
 using C8F2740A.NetworkNode.RemoteApi.Trace;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
+using Microsoft.Extensions.Configuration;
 
-namespace RemoteOperatorWithFactories
+namespace Operator
 {
     public interface IApplicationBuildable
     {
@@ -33,17 +34,22 @@ namespace RemoteOperatorWithFactories
         {
             _mainApplicationTask = new TaskCompletionSource<bool>();
             
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build();
+            
             // System recorder
             var systemRecorder = new SystemRecorder();
             _systemMessageDispatcher = systemRecorder;
             _systemMessageDispatcher.InterruptedWithMessage += SystemInterruptedHandler;
             
             // Application recorder
-            _applicationRecorder = new ApplicationRecorder(systemRecorder, new MessagesCache(10));
+            _applicationRecorder = new ApplicationRecorder(systemRecorder, 
+                new MessagesCache(Int32.Parse(configuration["MESSAGE_CACHE"])));
             
             // Remote trace monitor
             var remoteTraceMonitor = new RemoteTraceMonitor(new ConsoleAbstraction()
-                , 6, 
+                , Int32.Parse(configuration["MONITOR_LINES"]), 
                 systemRecorder, 
                 systemRecorder);
             remoteTraceMonitor.Start();
@@ -54,7 +60,7 @@ namespace RemoteOperatorWithFactories
             var traceableRemoteApiMapFactory = new BaseTraceableRemoteApiMapFactory(new BaseInstructionReceiverFactory(_applicationRecorder), _applicationRecorder);
 
             var apiOperatorFactory = new ApiOperatorFactory(remoteOperatorFactory, traceableRemoteApiMapFactory, _applicationRecorder);
-            apiOperatorFactory.Create("127.0.0.1:8081");
+            apiOperatorFactory.Create(configuration["IP_ADDRESS"]);
             
             return _mainApplicationTask.Task;
         }

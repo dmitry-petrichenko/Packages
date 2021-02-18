@@ -4,9 +4,9 @@ using C8F2740A.NetworkNode.RemoteApi.Factories;
 using C8F2740A.NetworkNode.RemoteApi.Trace;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
 using Microsoft.Extensions.Configuration;
-using RemoteOperatorWithFactories;
+using Operator;
 
-namespace C8F2740A.NetworkNode.RemoteApiServicePlugin
+namespace C8F2740A.NetworkNode.RAServicePlugin
 {
     public class ServiceSkeleton : IServiceBuilder, IServiceRunner
     {

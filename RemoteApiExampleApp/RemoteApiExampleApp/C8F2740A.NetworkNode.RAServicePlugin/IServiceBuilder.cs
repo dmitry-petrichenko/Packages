@@ -1,7 +1,7 @@
 ﻿using System;
 using C8F2740A.NetworkNode.RemoteApi.Trace;
 
-namespace C8F2740A.NetworkNode.RemoteApiServicePlugin
+namespace C8F2740A.NetworkNode.RAServicePlugin
 {
     public interface IServiceBuilder
     {
