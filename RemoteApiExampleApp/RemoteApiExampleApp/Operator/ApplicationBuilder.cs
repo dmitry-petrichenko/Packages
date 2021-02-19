@@ -49,11 +49,11 @@ namespace Operator
             
             // Remote trace monitor
             var remoteTraceMonitor = new RemoteTraceMonitor(new ConsoleAbstraction()
-                , Int32.Parse(configuration["MONITOR_LINES"]), 
+                ,Int32.Parse(configuration["MONITOR_LINES"]),
+                bool.Parse(configuration["SHOW_DEBUG_MESSAGES"]),
                 systemRecorder, 
                 systemRecorder);
             remoteTraceMonitor.Start();
-
             var remoteTraceMonitorСonsistent = new RemoteTraceMonitorСonsistent(remoteTraceMonitor);
             
             var remoteOperatorFactory = new BaseMonitoredRemoteOperatorFactory(new BaseInstructionSenderFactory(_applicationRecorder), remoteTraceMonitorСonsistent, _applicationRecorder);

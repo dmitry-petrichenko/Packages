@@ -10,6 +10,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.Networking.Connect
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.RAServicePlugin", "C8F2740A.NetworkNode.RAServicePlugin\C8F2740A.NetworkNode.RAServicePlugin.csproj", "{FEB73644-CF7F-4478-9985-258FD5C7904C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.RAServicePlugin.Nuget", "C8F2740A.NetworkNode.RAServicePlugin\C8F2740A.NetworkNode.RAServicePlugin.Nuget.csproj", "{05AEA9EB-B883-4156-8349-548F4316E568}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.RemoteApi.Nuget", "..\..\RemoteApi\C8F2740A.NetworkNode.RemoteApi\C8F2740A.NetworkNode.RemoteApi.Nuget.csproj", "{D8B5F783-A4D2-47E4-A05C-E27255453984}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +40,13 @@ Global
 		{FEB73644-CF7F-4478-9985-258FD5C7904C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEB73644-CF7F-4478-9985-258FD5C7904C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEB73644-CF7F-4478-9985-258FD5C7904C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05AEA9EB-B883-4156-8349-548F4316E568}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05AEA9EB-B883-4156-8349-548F4316E568}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05AEA9EB-B883-4156-8349-548F4316E568}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05AEA9EB-B883-4156-8349-548F4316E568}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8B5F783-A4D2-47E4-A05C-E27255453984}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8B5F783-A4D2-47E4-A05C-E27255453984}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8B5F783-A4D2-47E4-A05C-E27255453984}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8B5F783-A4D2-47E4-A05C-E27255453984}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

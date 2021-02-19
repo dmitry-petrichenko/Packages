@@ -26,6 +26,7 @@ namespace C8F2740A.NetworkNode.RemoteApi.Monitor
 
         private readonly ISystemInterrupter _systemInterrupter;
         private readonly ISystemInfoMessageDispatcher _systemInfoMessageDispatcher;
+        private readonly bool _isShowDebugMessage;
 
         private SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
         private IConsoleTextBox _remoteTextBox;
@@ -38,6 +39,7 @@ namespace C8F2740A.NetworkNode.RemoteApi.Monitor
         public RemoteTraceMonitor(
             IConsoleAbstraction consoleAbstraction, 
             int numberOfLines, 
+            bool isShowDebugMessage, 
             ISystemInterrupter systemInterrupter,
             ISystemInfoMessageDispatcher systemInfoMessageDispatcher
             )
@@ -49,6 +51,7 @@ namespace C8F2740A.NetworkNode.RemoteApi.Monitor
             _lineReaderWithPrompt = new LineReaderWithPrompt(new AsyncLineReader(_consoleAbstraction), _consoleAbstraction, _numberOfLines + 1);
             _remoteTextBox = new ConsoleTextBox(_consoleAbstraction, 0, _numberOfLines);
             _debugTextBox = new ConsoleTextBox(_consoleAbstraction, _numberOfLines + 3, 7);
+            _isShowDebugMessage = isShowDebugMessage;
 
             _systemInfoMessageDispatcher.InfoMessageReceived += InfoMessageReceivedHandler;
         }
@@ -106,8 +109,11 @@ namespace C8F2740A.NetworkNode.RemoteApi.Monitor
 
         public void DisplayDebugMessage(string message)
         {
-            SafeExecution.TryCatchAsync(() => DisplayDebugMessageInternal(message),
-                exception => _systemInterrupter.InterruptWithMessage(exception.Message));
+            if (_isShowDebugMessage)
+            {
+                SafeExecution.TryCatchAsync(() => DisplayDebugMessageInternal(message),
+                    exception => _systemInterrupter.InterruptWithMessage(exception.Message));
+            }
         }
         
         private async Task SetPromptInternal(string value)

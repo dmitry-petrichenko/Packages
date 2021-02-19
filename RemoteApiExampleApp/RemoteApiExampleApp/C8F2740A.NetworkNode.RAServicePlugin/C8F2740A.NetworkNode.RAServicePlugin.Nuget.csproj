@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <RootNamespace>C8F2740A.NetworkNode.RAServicePlugin</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="C8F2740A.NetworkNode.RemoteApi" Version="1.0.4" />
+      <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
+    </ItemGroup>
+
+</Project>

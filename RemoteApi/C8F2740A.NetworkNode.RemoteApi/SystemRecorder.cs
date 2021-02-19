@@ -1,7 +1,6 @@
 ﻿using System;
-using C8F2740A.NetworkNode.RemoteApi;
 
-namespace Operator
+namespace C8F2740A.NetworkNode.RemoteApi
 {
     public class SystemRecorder : ISystemRecorder
     {

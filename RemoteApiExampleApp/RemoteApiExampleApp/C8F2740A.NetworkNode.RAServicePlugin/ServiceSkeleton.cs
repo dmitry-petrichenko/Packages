@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
+using C8F2740A.NetworkNode.RemoteApi;
 using C8F2740A.NetworkNode.RemoteApi.Factories;
 using C8F2740A.NetworkNode.RemoteApi.Trace;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
 using Microsoft.Extensions.Configuration;
-using Operator;
 
 namespace C8F2740A.NetworkNode.RAServicePlugin
 {
