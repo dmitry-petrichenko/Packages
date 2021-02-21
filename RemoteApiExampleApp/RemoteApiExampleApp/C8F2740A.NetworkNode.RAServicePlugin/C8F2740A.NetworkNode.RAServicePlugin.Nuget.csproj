@@ -1,8 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+	<PropertyGroup>
+		<PackageId>C8F2740A.NetworkNode.RAServicePlugin</PackageId>
+		<Authors>Dmitry Petrichenko</Authors>
+		<Version>1.0.0</Version>
         <RootNamespace>C8F2740A.NetworkNode.RAServicePlugin</RootNamespace>
+		<Company>C8F2740A</Company>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>

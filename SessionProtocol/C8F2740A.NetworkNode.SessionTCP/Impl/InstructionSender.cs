@@ -5,15 +5,8 @@ using System.Threading.Tasks;
 using C8F2740A.Common.Records;
 using C8F2740A.Networking.ConnectionTCP;
 
-namespace C8F2740A.NetworkNode.SessionTCP
+namespace C8F2740A.NetworkNode.SessionTCP.Impl
 {
-    public interface IInstructionSender : IDisposable
-    {
-        Task<(bool, IEnumerable<byte>)> TrySendInstruction(IEnumerable<byte> instruction);
-        
-        event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived;
-    }
-    
     public class InstructionSender : IInstructionSender
     {
         public event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived
@@ -70,10 +63,10 @@ namespace C8F2740A.NetworkNode.SessionTCP
                 return _sessionHolder.SendInstruction(instruction);
             }
 
-            var connectResult = _nodeVisitor.TryConnect(_remoteAddress);
-            if (connectResult.Item1)
+            var (isConnected, session) = _nodeVisitor.TryConnect(_remoteAddress);
+            if (isConnected)
             {
-                _sessionHolder.Set(connectResult.Item2);
+                _sessionHolder.Set(session);
                 return _sessionHolder.SendInstruction(instruction);
             }
 

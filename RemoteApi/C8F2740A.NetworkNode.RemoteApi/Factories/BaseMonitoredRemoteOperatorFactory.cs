@@ -14,15 +14,18 @@ namespace C8F2740A.NetworkNode.RemoteApi.Factories
     {
         private IInstructionSenderFactory _instructionSenderFactory;
         private IRemoteTraceMonitorСonsistent _remoteTraceMonitor;
+        private IApplicationRecorder _applicationRecorder;
         private IRecorder _recorder;
         
         public BaseMonitoredRemoteOperatorFactory(
             IInstructionSenderFactory instructionSenderFactory,
             IRemoteTraceMonitorСonsistent remoteTraceMonitor,
+            IApplicationRecorder applicationRecorder,
             IRecorder recorder)
         {
             _instructionSenderFactory = instructionSenderFactory;
             _remoteTraceMonitor = remoteTraceMonitor;
+            _applicationRecorder = applicationRecorder;
             _recorder = recorder;
         }
 
@@ -32,6 +35,7 @@ namespace C8F2740A.NetworkNode.RemoteApi.Factories
             var remoteApiOperator = new RemoteApiOperator(
                 instructionSenderHolder,
                 _instructionSenderFactory,
+                _applicationRecorder,
                 _recorder);
             var connectParser = new ConnectParser(remoteApiOperator, _recorder);
             var autoLocalConnector = new AutoLocalConnector(connectParser, _recorder, address);
