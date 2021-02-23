@@ -11,7 +11,6 @@ namespace C8F2740A.NetworkNode.RemoteApi.Factories
     
     public class ApiOperatorFactory : IApiOperatorFactory
     {
-        private readonly IRemoteTraceMonitor _remoteTraceMonitor;
         private readonly IMonitoredRemoteOperatorFactory _monitoredRemoteOperatorFactory;
         private readonly ITraceableRemoteApiMapFactory _traceableRemoteApiMapFactory;
         private readonly IApplicationRecorder _applicationRecorder;

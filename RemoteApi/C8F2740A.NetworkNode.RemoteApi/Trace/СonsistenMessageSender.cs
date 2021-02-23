@@ -17,7 +17,6 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
         private readonly IRecorder _recorder;
         
         private BlockingCollection<string> _messageQueue;
-        private Task _sendingTask;
 
         public СonsistentMessageSender(ITextToRemoteSender textToRemoteSender, IRecorder recorder)
         {

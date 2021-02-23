@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Operator", "Operator\Operator.csproj", "{D570B289-F64A-44B8-84E3-55C5522C93C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.RAServicePlugin", "C8F2740A.NetworkNode.RAServicePlugin\C8F2740A.NetworkNode.RAServicePlugin.csproj", "{A3E3683F-C358-4AAE-B043-BBFB3B3E42FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.RemoteApi", "..\RemoteApi\C8F2740A.NetworkNode.RemoteApi\C8F2740A.NetworkNode.RemoteApi.csproj", "{7243BC36-EBD2-4875-A72A-9BF8E9386A68}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.Networking.ConnectionTCP", "..\ConnectionTCP\C8F2740A.Networking.ConnectionTCP\C8F2740A.Networking.ConnectionTCP.csproj", "{EBB9DA8B-DCCD-4FF0-BFDC-3A666B419D4D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D570B289-F64A-44B8-84E3-55C5522C93C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D570B289-F64A-44B8-84E3-55C5522C93C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D570B289-F64A-44B8-84E3-55C5522C93C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D570B289-F64A-44B8-84E3-55C5522C93C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3E3683F-C358-4AAE-B043-BBFB3B3E42FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3E3683F-C358-4AAE-B043-BBFB3B3E42FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3E3683F-C358-4AAE-B043-BBFB3B3E42FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3E3683F-C358-4AAE-B043-BBFB3B3E42FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7243BC36-EBD2-4875-A72A-9BF8E9386A68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7243BC36-EBD2-4875-A72A-9BF8E9386A68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7243BC36-EBD2-4875-A72A-9BF8E9386A68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7243BC36-EBD2-4875-A72A-9BF8E9386A68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBB9DA8B-DCCD-4FF0-BFDC-3A666B419D4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBB9DA8B-DCCD-4FF0-BFDC-3A666B419D4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBB9DA8B-DCCD-4FF0-BFDC-3A666B419D4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBB9DA8B-DCCD-4FF0-BFDC-3A666B419D4D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
