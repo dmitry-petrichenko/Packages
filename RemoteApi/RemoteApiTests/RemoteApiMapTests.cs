@@ -77,7 +77,9 @@ namespace RemoteApi
         {
             var instructionsReceiver = Mock.Create<IInstructionReceiver>();
             Mock.Arrange(() => instructionsReceiver.TrySendInstruction(Arg.IsAny<IEnumerable<byte>>())).Returns(Task.FromResult((true, Enumerable.Empty<byte>())));
+            Mock.Arrange(() => instructionsReceiver.HasActiveSession).Returns(true);
             _sutSender = new RemoteApiMap(instructionsReceiver, _recorder);
+            
             _sutSender.TrySendText("Test");
 
             Mock.Assert(() => instructionsReceiver.TrySendInstruction(Arg.IsAny<IEnumerable<byte>>()), Occurs.Once());
@@ -85,15 +87,15 @@ namespace RemoteApi
         }
         
         [Fact]
-        public void TrySendText_WhenCalledWithFace_ShouldLogError()
+        public void TrySendText_WhenCalledWithFalse_ShouldLogError()
         {
             var instructionsReceiver = Mock.Create<IInstructionReceiver>();
             Mock.Arrange(() => instructionsReceiver.TrySendInstruction(Arg.IsAny<IEnumerable<byte>>())).Returns(Task.FromResult((false, Enumerable.Empty<byte>())));
             _sutSender = new RemoteApiMap(instructionsReceiver, _recorder);
+            
             _sutSender.TrySendText("Test");
 
-            Mock.Assert(() => instructionsReceiver.TrySendInstruction(Arg.IsAny<IEnumerable<byte>>()), Occurs.Once());
-            Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Once());
+            Mock.Assert(() => instructionsReceiver.TrySendInstruction(Arg.IsAny<IEnumerable<byte>>()), Occurs.Never());
         }
     }
 
@@ -108,6 +110,8 @@ namespace RemoteApi
         {
             throw new NotImplementedException();
         }
+
+        public bool HasActiveSession { get; }
 
         public Task<(bool, IEnumerable<byte>)> TrySendInstruction(IEnumerable<byte> instruction)
         {

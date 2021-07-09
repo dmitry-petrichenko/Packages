@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using C8F2740A.Common.Records;
 using C8F2740A.NetworkNode.RemoteApi;
 using C8F2740A.NetworkNode.RemoteApi.Extensions;
+using C8F2740A.NetworkNode.RemoteApi.Trace;
 using C8F2740A.NetworkNode.SessionTCP;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
 using Telerik.JustMock;
@@ -17,6 +18,7 @@ namespace RemoteApi
         private IRemoteApiOperator _sut;
         private IInstructionSenderHolder _instructionSenderHolder;
         private IInstructionSenderFactory _instructionSenderFactory;
+        private IApplicationRecorder _applicationRecorder;
         private IRecorder _recorder;
         
         public RemoteApiOperatorTests()
@@ -24,8 +26,9 @@ namespace RemoteApi
             _instructionSenderHolder = Mock.Create<IInstructionSenderHolder>();
             _instructionSenderFactory = Mock.Create<IInstructionSenderFactory>();
             _recorder = Mock.Create<IRecorder>();
+            _applicationRecorder = Mock.Create<IApplicationRecorder>();
             
-            _sut = new RemoteApiOperator(_instructionSenderHolder, _instructionSenderFactory, _recorder);
+            _sut = new RemoteApiOperator(_instructionSenderHolder, _instructionSenderFactory, _applicationRecorder, _recorder);
         }
 
         [Fact]
@@ -34,7 +37,7 @@ namespace RemoteApi
             var instructionSenderHolder = Mock.Create<IInstructionSenderHolder>();
             instructionSenderHolder.ArrangeSet(x => x.InstructionReceived += null).IgnoreArguments().Occurs(1);
 
-            _sut = new RemoteApiOperator(instructionSenderHolder, _instructionSenderFactory, _recorder);
+            _sut = new RemoteApiOperator(instructionSenderHolder, _instructionSenderFactory, _applicationRecorder, _recorder);
 
             instructionSenderHolder.AssertAll();
         }
@@ -79,7 +82,7 @@ namespace RemoteApi
         {
             _sut.Connect("123.3333");
             
-            Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Once());
+            Mock.Assert(() => _applicationRecorder.RecordInfo(Arg.AnyString, Arg.AnyString), Occurs.Once());
         }
         
         [Fact]

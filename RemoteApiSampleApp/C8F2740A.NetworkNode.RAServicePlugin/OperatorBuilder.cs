@@ -1,31 +1,28 @@
 ﻿using System;
 using System.Threading.Tasks;
-using C8F2740A.NetworkNode.RemoteApi;
+using C8F2740A.NetworkNode.RAServicePlugin;
 using C8F2740A.NetworkNode.RemoteApi.Factories;
 using C8F2740A.NetworkNode.RemoteApi.Monitor;
-using C8F2740A.NetworkNode.RemoteApi.Trace;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
 using Microsoft.Extensions.Configuration;
 
 namespace Operator
 {
-    public interface IApplicationBuildable
+    public interface IOperatorBuildable
     {
-        IApplicationRunnable Build();
+        IOperatorRunnable Build();
     }
     
-    public interface IApplicationRunnable
+    public interface IOperatorRunnable
     {
         Task Run();
     }
     
-    public class ApplicationBuilder : IApplicationBuildable, IApplicationRunnable
+    public class OperatorBuilder : IOperatorBuildable, IOperatorRunnable
     {
         private TaskCompletionSource<bool> _mainApplicationTask;
-        private ISystemMessageDispatcher _systemMessageDispatcher;
-        private IApplicationRecorder _applicationRecorder;
-        
-        public IApplicationRunnable Build()
+
+        public IOperatorRunnable Build()
         {
             return this;
         }
@@ -38,14 +35,14 @@ namespace Operator
                 .AddJsonFile("appsettings.json")
                 .Build();
             
-            // System recorder
-            var systemRecorder = new SystemRecorder();
-            _systemMessageDispatcher = systemRecorder;
-            _systemMessageDispatcher.InterruptedWithMessage += SystemInterruptedHandler;
+            // Recorder factory
+            var recorderFactory = new RecorderFactory(configuration, SystemInterruptedHandler);
             
+            // System recorder
+            var systemRecorder = recorderFactory.CreateSystemRecorder();
+
             // Application recorder
-            _applicationRecorder = new ApplicationRecorder(systemRecorder, 
-                new MessagesCache(Int32.Parse(configuration["MESSAGE_CACHE"])));
+            var applicationRecorder = recorderFactory.CreateApplicationRecorder();
             
             // Remote trace monitor
             var remoteTraceMonitor = new RemoteTraceMonitor(new ConsoleAbstraction()
@@ -56,10 +53,10 @@ namespace Operator
             remoteTraceMonitor.Start();
             var remoteTraceMonitorСonsistent = new RemoteTraceMonitorСonsistent(remoteTraceMonitor);
             
-            var remoteOperatorFactory = new BaseMonitoredRemoteOperatorFactory(new BaseInstructionSenderFactory(_applicationRecorder), remoteTraceMonitorСonsistent, _applicationRecorder, _applicationRecorder);
-            var traceableRemoteApiMapFactory = new BaseTraceableRemoteApiMapFactory(new BaseInstructionReceiverFactory(_applicationRecorder), _applicationRecorder);
+            var remoteOperatorFactory = new BaseMonitoredRemoteOperatorFactory(new BaseInstructionSenderFactory(applicationRecorder), remoteTraceMonitorСonsistent, applicationRecorder, applicationRecorder);
+            var traceableRemoteApiMapFactory = new BaseTraceableRemoteApiMapFactory(new BaseInstructionReceiverFactory(applicationRecorder), applicationRecorder);
 
-            var apiOperatorFactory = new ApiOperatorFactory(remoteOperatorFactory, traceableRemoteApiMapFactory, _applicationRecorder);
+            var apiOperatorFactory = new ApiOperatorFactory(remoteOperatorFactory, traceableRemoteApiMapFactory, applicationRecorder);
             apiOperatorFactory.Create(configuration["IP_ADDRESS"]);
             
             return _mainApplicationTask.Task;

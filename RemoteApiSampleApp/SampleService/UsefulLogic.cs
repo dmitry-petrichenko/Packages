@@ -25,7 +25,7 @@ namespace SampleService
         {
             while (_currentValue < Int32.MaxValue)
             {
-                await Task.Delay(800);
+                await Task.Delay(2800);
                 _currentValue++;
                 _recorder.RecordInfo("App", $"value: {_currentValue}");
             }

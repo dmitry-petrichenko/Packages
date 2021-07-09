@@ -53,7 +53,7 @@ namespace RemoteApi.Integration
             var instructionSenderFactory = new TestInstructionSenderFactory(socketFactory, recorder);
             var monitoredRemoteOperatorFactory = new BaseMonitoredRemoteOperatorFactory(
                 instructionSenderFactory, 
-                remoteTraceMonitor, recorder);
+                remoteTraceMonitor, _applicationRecorder, recorder);
 
             // RemoteApiMap
             var instructionReceiverFactory = new TestInstructionReceiverFactory(socketFactory, recorder);

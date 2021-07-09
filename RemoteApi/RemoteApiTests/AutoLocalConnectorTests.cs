@@ -32,12 +32,12 @@ namespace RemoteApi
         }
         
         [Fact]
-        public void InstructionReceived_WhenRaisedWithEmpty_ShouldRecordError()
+        public void InstructionReceived_WhenRaisedWithNull_ShouldRecordError()
         {
             var received = "string.Empty";
             _sut.TextReceived += s => received = s;
             
-            Mock.Raise(() => _connectParser.InstructionReceived += null, "");
+            Mock.Raise(() => _connectParser.InstructionReceived += null, null);
             
             Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Once());
             Assert.Equal("string.Empty", received);

@@ -17,8 +17,13 @@ namespace SampleService
 
         private static IRunnable SetupCoreHandler(ITraceableRemoteApiMap map, IApplicationRecorder recorder)
         {
+            foreach (var message in recorder.GetCache())
+            {
+                Console.WriteLine(message);
+            }
+
             recorder.RecordReceived += s => Console.WriteLine(s);
-            
+
             // Create core logic here
             var core = new UsefulLogic(recorder);
             
@@ -33,7 +38,7 @@ namespace SampleService
 
         public static IServiceBuilder CreateApplicationBuilder()
         {
-            return new ServiceSkeleton();
+            return new ServiceBuilder();
         }
     }
 }

@@ -8,6 +8,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.Remote
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.Networking.ConnectionTCP", "..\ConnectionTCP\C8F2740A.Networking.ConnectionTCP\C8F2740A.Networking.ConnectionTCP.csproj", "{EBB9DA8B-DCCD-4FF0-BFDC-3A666B419D4D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleService", "SampleService\SampleService.csproj", "{C30404D2-77BA-455C-9C34-A28D22828BC1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{207CEFED-7463-411A-A47A-677734A3963A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +34,14 @@ Global
 		{EBB9DA8B-DCCD-4FF0-BFDC-3A666B419D4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBB9DA8B-DCCD-4FF0-BFDC-3A666B419D4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBB9DA8B-DCCD-4FF0-BFDC-3A666B419D4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C30404D2-77BA-455C-9C34-A28D22828BC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C30404D2-77BA-455C-9C34-A28D22828BC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C30404D2-77BA-455C-9C34-A28D22828BC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C30404D2-77BA-455C-9C34-A28D22828BC1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EBB9DA8B-DCCD-4FF0-BFDC-3A666B419D4D} = {207CEFED-7463-411A-A47A-677734A3963A}
+		{A3E3683F-C358-4AAE-B043-BBFB3B3E42FE} = {207CEFED-7463-411A-A47A-677734A3963A}
+		{7243BC36-EBD2-4875-A72A-9BF8E9386A68} = {207CEFED-7463-411A-A47A-677734A3963A}
 	EndGlobalSection
 EndGlobal

@@ -14,6 +14,41 @@ namespace RemoteApi.Integration.Helpers
 {
     public class IntegrationTestsHelpers
     {
+        internal static RemoteOperatorTestWrapperRealSockets2 ArrangeLocalOperatorTestWrapperRealSockets2(
+            string address)
+        {
+            var recorder = new ApplicationCacheRecorder();
+            var sockets = new List<SocketSubstitution>();
+            var remoteTraceMonitorСonsistent = new RemoteTraceMonitorСonsistentTester(recorder);
+            var socketFactoryCounter = 0;
+
+            ISocket SocketRegularFactory(AddressFamily family, SocketType type, ProtocolType protocolType)
+            {
+                var socket = new SocketAbstraction(family, type, protocolType);
+                return socket;
+            }
+
+            ISocket SocketAcceptFactory(ISocket socket, string tag)
+            {
+                var socketSubstitution = new SocketSubstitution(socket, tag);
+                return socketSubstitution;
+            }
+
+            ISocket SocketFactory(AddressFamily family, SocketType type, ProtocolType protocolType)
+            {
+                socketFactoryCounter++;
+                var socket = new SocketSubstitution(SocketRegularFactory, SocketAcceptFactory, family, type, protocolType, $"{socketFactoryCounter}");
+                sockets.Add(socket);
+                return socket;
+            }
+            
+            var apiOperator = CreateLocalOperator(SocketFactory, recorder, remoteTraceMonitorСonsistent, address);
+
+            return new RemoteOperatorTestWrapperRealSockets2(sockets, apiOperator, recorder, remoteTraceMonitorСonsistent);
+        }
+        
+        //-----------------------------------------------------------
+        
         internal static RemoteOperatorTestWrapperRealSockets ArrangeLocalOperatorTestWrapperRealSockets(
             string address = "127.0.0.1:22222")
         {
@@ -92,7 +127,7 @@ namespace RemoteApi.Integration.Helpers
             var instructionSenderFactory = new TestInstructionSenderFactory(socketFactory, recorder);
             var monitoredRemoteOperatorFactory = new BaseMonitoredRemoteOperatorFactory(
                 instructionSenderFactory, 
-                remoteTraceMonitor, recorder);
+                remoteTraceMonitor, recorder, recorder);
 
             // RemoteApiMap
             var instructionReceiverFactory = new TestInstructionReceiverFactory(socketFactory, recorder);
@@ -116,6 +151,29 @@ namespace RemoteApi.Integration.Helpers
             output.WriteLine(recorder.AppInfoCache);
             output.WriteLine("Messages on display:");
             output.WriteLine(recorder.DisplayMessagesCache);
+        }
+    }
+    
+    internal class RemoteOperatorTestWrapperRealSockets2
+    {
+        public IReadOnlyList<SocketSubstitution> Sockets { get; }
+        public IApiOperator Operator { get; }
+        public ApplicationCacheRecorder Recorder { get; }
+        public Task MessageDisplayed => _remoteTraceMonitorСonsistentTester.MessageDisplayed;
+
+        private readonly RemoteTraceMonitorСonsistentTester _remoteTraceMonitorСonsistentTester;
+            
+        public RemoteOperatorTestWrapperRealSockets2(IReadOnlyList<SocketSubstitution> sockets, IApiOperator @operator, ApplicationCacheRecorder recorder, RemoteTraceMonitorСonsistentTester remoteTraceMonitorСonsistentTester)
+        {
+            Sockets = sockets;
+            Operator = @operator;
+            Recorder = recorder;
+            _remoteTraceMonitorСonsistentTester = remoteTraceMonitorСonsistentTester;
+        }
+
+        public Task<bool> RaiseCommandReceived(string value)
+        {
+            return _remoteTraceMonitorСonsistentTester.RaiseCommandReceived(value);
         }
     }
     

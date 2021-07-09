@@ -6,12 +6,12 @@ namespace Operator
     {
         static async Task Main(string[] args)
         {
-            await CreateApplicationBuilder().Build().Run();
+            await CreateOperatorBuilder().Build().Run();
         }
 
-        public static IApplicationBuildable CreateApplicationBuilder()
+        public static IOperatorBuildable CreateOperatorBuilder()
         {
-            return new ApplicationBuilder();
+            return new OperatorBuilder();
         }
     }
 }
