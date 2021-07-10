@@ -113,7 +113,7 @@ namespace RemoteApi.Integration.Helpers
         {
             var socket = await _socket.AcceptAsync();
             AcceptAsyncCalledTimes.Tick();
-            var wrapper = _acceptFactory.Invoke(socket, $"{Tag}_{AcceptAsyncCalledTimes.Value}");
+            var wrapper = _acceptFactory.Invoke(socket, $"{Tag}:accept_{AcceptAsyncCalledTimes.Value}");
             Update();
             
             return wrapper;

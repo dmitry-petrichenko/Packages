@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using C8F2740A.Networking.ConnectionTCP.Network;
@@ -18,33 +20,117 @@ namespace RemoteApi.Integration.Helpers
             string address)
         {
             var recorder = new ApplicationCacheRecorder();
+            ((IApplicationRecorder)recorder).RecordInfo("system", "ready");
             var sockets = new List<SocketSubstitution>();
-            var remoteTraceMonitorСonsistent = new RemoteTraceMonitorСonsistentTester(recorder);
-            var socketFactoryCounter = 0;
+            var remoteTraceMonitorСonsistent = new RemoteTraceMonitorConsistentTester(recorder);
 
-            ISocket SocketRegularFactory(AddressFamily family, SocketType type, ProtocolType protocolType)
-            {
-                var socket = new SocketAbstraction(family, type, protocolType);
-                return socket;
-            }
-
-            ISocket SocketAcceptFactory(ISocket socket, string tag)
-            {
-                var socketSubstitution = new SocketSubstitution(socket, tag);
-                return socketSubstitution;
-            }
-
-            ISocket SocketFactory(AddressFamily family, SocketType type, ProtocolType protocolType)
-            {
-                socketFactoryCounter++;
-                var socket = new SocketSubstitution(SocketRegularFactory, SocketAcceptFactory, family, type, protocolType, $"{socketFactoryCounter}");
-                sockets.Add(socket);
-                return socket;
-            }
+            var factoryOfFactory = new FactoryOfSubstitutedSocketFactory(sockets);
+            var socketFactory = factoryOfFactory.Create();
             
-            var apiOperator = CreateLocalOperator(SocketFactory, recorder, remoteTraceMonitorСonsistent, address);
+            var apiOperator = CreateLocalOperator(socketFactory, recorder, remoteTraceMonitorСonsistent, address);
 
             return new RemoteOperatorTestWrapperRealSockets2(sockets, apiOperator, recorder, remoteTraceMonitorСonsistent);
+        }
+        
+        internal static TraceableRemoteApiMapWrapperRealSockets2 ArrangeRemoteApiMapTestWrapperWithRealSockets2(
+            string address)
+        {
+            var recorder = new ApplicationCacheRecorder();
+            ((IApplicationRecorder)recorder).RecordInfo("system", "ready");
+            var sockets = new List<SocketSubstitution>();
+            var apiMapWrapper = default(TraceableRemoteApiMapWrapperRealSockets2);
+
+            var factoryOfFactory = new FactoryOfSubstitutedSocketFactory(sockets);
+            var socketFactory = factoryOfFactory.Create();
+            
+            // RemoteApiMap
+            var instructionReceiverFactory = new TestInstructionReceiverFactory(socketFactory, recorder);
+            var traceableRemoteApiMapFactory = new BaseTraceableRemoteApiMapFactory(
+                instructionReceiverFactory,
+                recorder);
+            
+            var apiMap = traceableRemoteApiMapFactory.Create(address);
+
+            apiMapWrapper = new TraceableRemoteApiMapWrapperRealSockets2(sockets, apiMap, recorder);
+            
+            return apiMapWrapper;
+        }
+        
+        internal class BaseWrapperRealSockets
+        {
+            public IReadOnlyList<SocketSubstitution> Sockets { get; }
+            public ApplicationCacheRecorder Recorder { get; }
+        
+            public BaseWrapperRealSockets(IReadOnlyList<SocketSubstitution> sockets, ApplicationCacheRecorder recorder)
+            {
+                Sockets = sockets;
+                Recorder = recorder;
+            }
+            
+            public SocketSubstitution GetSocketByTag(string tag)
+            {
+                var tagName = string.Empty;
+                foreach (var socket in Sockets)
+                {
+                    tagName = socket.Tag.Split(":").Last();
+                    if (tagName.Equals(tag))
+                    {
+                        return socket;
+                    }
+                }
+
+                return default;
+            }
+        }
+
+        internal class FactoryOfSubstitutedSocketFactory
+        {
+            private readonly Dictionary<string, int> _tags;
+            private readonly List<SocketSubstitution> _sockets;
+            
+            public FactoryOfSubstitutedSocketFactory(List<SocketSubstitution> sockets)
+            {
+                _tags = new Dictionary<string, int>();
+                _sockets = sockets;
+            }
+
+            public Func<AddressFamily, SocketType, ProtocolType, string, ISocket> Create()
+            {
+                ISocket SocketRegularFactory(AddressFamily family, SocketType type, ProtocolType protocolType)
+                {
+                    var socket = new SocketAbstraction(family, type, protocolType);
+                    return socket;
+                }
+
+                ISocket SocketAcceptFactory(ISocket socket, string tag)
+                {
+                    var socketSubstitution = new SocketSubstitution(socket, tag);
+                    _sockets.Add(socketSubstitution);
+                
+                    return socketSubstitution;
+                }
+            
+                ISocket SocketFactory(AddressFamily family, SocketType type, ProtocolType protocolType, string tag)
+                {
+                    var socketName = String.Empty;
+                    if (_tags.ContainsKey(tag))
+                    {
+                        _tags[tag]++;
+                        socketName = $"{tag}_{_tags[tag]}";
+                    }
+                    else
+                    {
+                        _tags.Add(tag, 1);
+                        socketName = $"{tag}_1";
+                    }
+
+                    var socket = new SocketSubstitution(SocketRegularFactory, SocketAcceptFactory, family, type, protocolType, socketName);
+                    _sockets.Add(socket);
+                    return socket;
+                }
+
+                return SocketFactory;
+            }
         }
         
         //-----------------------------------------------------------
@@ -54,10 +140,10 @@ namespace RemoteApi.Integration.Helpers
         {
             var recorder = new ApplicationCacheRecorder();
             var sockets = new List<SocketTesterWrapper>();
-            var remoteTraceMonitorСonsistent = new RemoteTraceMonitorСonsistentTester(recorder);
+            var remoteTraceMonitorСonsistent = new RemoteTraceMonitorConsistentTester(recorder);
             var socketFactoryCounter = 0;
             
-            Func<AddressFamily, SocketType, ProtocolType, ISocket> socketFactory = (family, type, arg3) =>
+            Func<AddressFamily, SocketType, ProtocolType, string, ISocket> socketFactory = (family, type, arg3, tag) =>
             {
                 socketFactoryCounter++;
                 var socket = new SocketTesterWrapper(family, type, arg3, $"{socketFactoryCounter}");
@@ -90,7 +176,7 @@ namespace RemoteApi.Integration.Helpers
                 apiMapWrapper.SocketAcceptedHandler?.Invoke(wrapper);
             }
             
-            Func<AddressFamily, SocketType, ProtocolType, ISocket> socketFactory = (family, type, arg3) =>
+            Func<AddressFamily, SocketType, ProtocolType, string, ISocket> socketFactory = (family, type, arg3, tag) =>
             {
                 socketFactoryCounter++;
                 var socket = new SocketTesterWrapper(family, type, arg3, $"{socketFactoryCounter}");
@@ -113,7 +199,7 @@ namespace RemoteApi.Integration.Helpers
         }
         
         internal static IApiOperator CreateLocalOperator(
-            Func<AddressFamily, SocketType, ProtocolType, ISocket> socketFactory,
+            Func<AddressFamily, SocketType, ProtocolType, string, ISocket> socketFactory,
             ApplicationCacheRecorder recorder,
             IRemoteTraceMonitorСonsistent remoteTraceMonitor = default,
             string address = "127.0.0.0:11111")
@@ -141,39 +227,47 @@ namespace RemoteApi.Integration.Helpers
         
         internal static void LogCacheRecorderTestInfo(ITestOutputHelper output, ApplicationCacheRecorder recorder)
         {
-            output.WriteLine("Sysytem Errors:");
+            output.WriteLine("SYSTEM ERRORS:");
             output.WriteLine(recorder.SystemErrorCache);
-            output.WriteLine("Sysytem Info:");
+            output.WriteLine("SYSTEM INFO:");
             output.WriteLine(recorder.SystemInfoCache);
-            output.WriteLine("Application Error:");
+            output.WriteLine("APPLICATION ERROR:");
             output.WriteLine(recorder.AppErrorCache);
-            output.WriteLine("Application Info:");
+            output.WriteLine("APPLICATION INFO:");
             output.WriteLine(recorder.AppInfoCache);
-            output.WriteLine("Messages on display:");
+            output.WriteLine("MESSAGES ON DISPLAY:");
             output.WriteLine(recorder.DisplayMessagesCache);
         }
     }
     
-    internal class RemoteOperatorTestWrapperRealSockets2
+    internal class RemoteOperatorTestWrapperRealSockets2 : IntegrationTestsHelpers.BaseWrapperRealSockets
     {
-        public IReadOnlyList<SocketSubstitution> Sockets { get; }
         public IApiOperator Operator { get; }
-        public ApplicationCacheRecorder Recorder { get; }
-        public Task MessageDisplayed => _remoteTraceMonitorСonsistentTester.MessageDisplayed;
+        public Task MessageDisplayed => _remoteTraceMonitorConsistentTester.MessageDisplayed;
 
-        private readonly RemoteTraceMonitorСonsistentTester _remoteTraceMonitorСonsistentTester;
+        private readonly RemoteTraceMonitorConsistentTester _remoteTraceMonitorConsistentTester;
             
-        public RemoteOperatorTestWrapperRealSockets2(IReadOnlyList<SocketSubstitution> sockets, IApiOperator @operator, ApplicationCacheRecorder recorder, RemoteTraceMonitorСonsistentTester remoteTraceMonitorСonsistentTester)
+        public RemoteOperatorTestWrapperRealSockets2(IReadOnlyList<SocketSubstitution> sockets, IApiOperator @operator, ApplicationCacheRecorder recorder, RemoteTraceMonitorConsistentTester remoteTraceMonitorConsistentTester) 
+            : base(sockets, recorder)
         {
-            Sockets = sockets;
             Operator = @operator;
-            Recorder = recorder;
-            _remoteTraceMonitorСonsistentTester = remoteTraceMonitorСonsistentTester;
+            _remoteTraceMonitorConsistentTester = remoteTraceMonitorConsistentTester;
         }
 
         public Task<bool> RaiseCommandReceived(string value)
         {
-            return _remoteTraceMonitorСonsistentTester.RaiseCommandReceived(value);
+            return _remoteTraceMonitorConsistentTester.RaiseCommandReceived(value);
+        }
+    }
+    
+    internal class TraceableRemoteApiMapWrapperRealSockets2 : IntegrationTestsHelpers.BaseWrapperRealSockets
+    {
+        public ITraceableRemoteApiMap ApiMap { get; }
+
+        public TraceableRemoteApiMapWrapperRealSockets2(IReadOnlyList<SocketSubstitution> sockets, ITraceableRemoteApiMap apiMap, ApplicationCacheRecorder recorder)
+            : base(sockets, recorder)
+        {
+            ApiMap = apiMap;
         }
     }
     
@@ -182,21 +276,21 @@ namespace RemoteApi.Integration.Helpers
         public IReadOnlyList<SocketTesterWrapper> Sockets { get; }
         public IApiOperator Operator { get; }
         public ApplicationCacheRecorder Recorder { get; }
-        public Task MessageDisplayed => _remoteTraceMonitorСonsistentTester.MessageDisplayed;
+        public Task MessageDisplayed => _remoteTraceMonitorConsistentTester.MessageDisplayed;
 
-        private readonly RemoteTraceMonitorСonsistentTester _remoteTraceMonitorСonsistentTester;
+        private readonly RemoteTraceMonitorConsistentTester _remoteTraceMonitorConsistentTester;
             
-        public RemoteOperatorTestWrapperRealSockets(IReadOnlyList<SocketTesterWrapper> sockets, IApiOperator @operator, ApplicationCacheRecorder recorder, RemoteTraceMonitorСonsistentTester remoteTraceMonitorСonsistentTester)
+        public RemoteOperatorTestWrapperRealSockets(IReadOnlyList<SocketTesterWrapper> sockets, IApiOperator @operator, ApplicationCacheRecorder recorder, RemoteTraceMonitorConsistentTester remoteTraceMonitorConsistentTester)
         {
             Sockets = sockets;
             Operator = @operator;
             Recorder = recorder;
-            _remoteTraceMonitorСonsistentTester = remoteTraceMonitorСonsistentTester;
+            _remoteTraceMonitorConsistentTester = remoteTraceMonitorConsistentTester;
         }
 
         public Task<bool> RaiseCommandReceived(string value)
         {
-            return _remoteTraceMonitorСonsistentTester.RaiseCommandReceived(value);
+            return _remoteTraceMonitorConsistentTester.RaiseCommandReceived(value);
         }
     }
     
@@ -230,6 +324,5 @@ namespace RemoteApi.Integration.Helpers
             _connectedTask.SetResult(true);
         }
     }
-    
-    
+
 }

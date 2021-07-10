@@ -43,7 +43,7 @@ namespace C8F2740A.NetworkNode.SessionTCP.Factories
             return instructionReceiver;
         }
         
-        protected virtual ISocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
+        protected virtual ISocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType, string tag)
         {
             return new SocketAbstraction(addressFamily, socketType, protocolType);
         }

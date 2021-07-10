@@ -39,7 +39,7 @@ namespace RemoteApi.Integration
         }
 
         private IApiOperator CreateLocalOperator(
-            Func<AddressFamily, SocketType, ProtocolType, ISocket> socketFactory,
+            Func<AddressFamily, SocketType, ProtocolType, string, ISocket> socketFactory,
             IRecorder recorder,
             IRemoteTraceMonitorСonsistent remoteTraceMonitor = default,
             string address = "111.111.111.111:11111")
@@ -122,7 +122,7 @@ namespace RemoteApi.Integration
         public void OperatorConstructor_WhenCalled_ShouldCreateTwoSockets()
         {
             var socketCreated = 0;
-            ISocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
+            ISocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType, string tag)
             {
                 socketCreated++;
                 return new SocketTester();
@@ -144,7 +144,7 @@ namespace RemoteApi.Integration
                 .InSequence(); 
             Mock.Arrange(() => socketTesterFactory.Create()).Returns(socketTester2)
                 .InSequence();
-            ISocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
+            ISocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType, string tag)
             {
                 return socketTesterFactory.Create();
             }
@@ -164,7 +164,7 @@ namespace RemoteApi.Integration
             var socketTester3 = new SocketTester("accepted");
             var socketFactory = ArrangeSocketFactoryLocal(socketTester1, socketTester2, socketTester3);
             
-            var remoteTraceMonitorСonsistent = new RemoteTraceMonitorСonsistentTester(null);
+            var remoteTraceMonitorСonsistent = new RemoteTraceMonitorConsistentTester(null);
             CreateLocalOperator(socketFactory, _cacheRecorder, remoteTraceMonitorСonsistent);
 
             await remoteTraceMonitorСonsistent.Initialized;
@@ -180,7 +180,7 @@ namespace RemoteApi.Integration
                 Occurs.Never());
         }
 
-        private Func<AddressFamily, SocketType, ProtocolType, ISocket> ArrangeSocketFactoryLocal(
+        private Func<AddressFamily, SocketType, ProtocolType, string, ISocket> ArrangeSocketFactoryLocal(
             SocketTester socketConnecter, 
             SocketTester socketListener, 
             SocketTester socketAccepted, 
@@ -212,7 +212,7 @@ namespace RemoteApi.Integration
                 socketListener.RaiseSocketAccepted(socketAccepted);
             };
             
-            ISocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
+            ISocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType, string tag)
             {
                 return socketTesterFactory.Create();
             }

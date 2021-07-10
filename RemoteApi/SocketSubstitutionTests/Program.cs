@@ -19,7 +19,7 @@ namespace SocketSubstitutionTests
                 socket.Dispose();
             });
 
-            await socket.Arrange(socket.DisposeCalledTimes, 2);
+            await socket.Arrange2(socket.DisposeCalledTimes, 2);
             Console.WriteLine("Complete");
 
             Console.ReadLine();

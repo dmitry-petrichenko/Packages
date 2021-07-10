@@ -23,7 +23,6 @@ namespace C8F2740A.NetworkNode.RemoteApi
     {
         public event Action<string> InstructionReceived;
         
-        private Dictionary<string, Func<IEnumerable<string>, Task<(bool, string)>>> _commandsMap;
         private IInstructionSenderHolder _instructionSenderHolder;
 
         private readonly IInstructionSenderFactory _instructionsSenderFactory;

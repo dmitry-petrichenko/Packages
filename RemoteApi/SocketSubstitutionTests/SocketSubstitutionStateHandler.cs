@@ -1,37 +1,29 @@
-﻿using System.Threading.Tasks;
+﻿using System;
 using RemoteApi.Integration.Helpers;
 
 namespace SocketSubstitutionTests
 {
-    internal class SocketSubstitutionStateAwaitor
+    internal class SocketSubstitutionStateHandler
     {
-        private TaskCompletionSource<bool> _taskCompletionSource;
+        private Action _handler;
         private int _aimedValue;
         
         private readonly SocketSubstitution _socketSubstitution;
         private readonly Counter _counter;
         
-        public SocketSubstitutionStateAwaitor(
+        public SocketSubstitutionStateHandler(
             SocketSubstitution socketSubstitution,
             Counter counter,
+            Action handler,
             int aimedValue)
         {
             _socketSubstitution = socketSubstitution;
             _counter = counter;
             _aimedValue = aimedValue;
-            _taskCompletionSource = new TaskCompletionSource<bool>();
+            _handler = handler;
 
             _socketSubstitution.Updated += UpdatedHandler;
 
-            StartTimeout();
-            Task = _taskCompletionSource.Task;
-        }
-
-        private async void StartTimeout()
-        {
-            await System.Threading.Tasks.Task.Delay(1000);
-
-            _taskCompletionSource.TrySetResult(false);
         }
 
         private void UpdatedHandler(
@@ -41,10 +33,8 @@ namespace SocketSubstitutionTests
             if (_counter.Value == _aimedValue)
             {
                 _socketSubstitution.Updated -= UpdatedHandler;
-                _taskCompletionSource.SetResult(true);
+                _handler?.Invoke();
             }
         }
-
-        public Task<bool> Task { get; }
     }
 }

@@ -8,16 +8,16 @@ namespace RemoteApi.Integration.Helpers
 {
     public class TestInstructionReceiverFactory : BaseInstructionReceiverFactory
     {
-        private readonly Func<AddressFamily, SocketType, ProtocolType, ISocket> _socketFactory;
+        private readonly Func<AddressFamily, SocketType, ProtocolType, string, ISocket> _socketFactory;
         
-        public TestInstructionReceiverFactory(Func<AddressFamily, SocketType, ProtocolType, ISocket> socketFactory, IRecorder recorder) : base(recorder)
+        public TestInstructionReceiverFactory(Func<AddressFamily, SocketType, ProtocolType, string, ISocket> socketFactory, IRecorder recorder) : base(recorder)
         {
             _socketFactory = socketFactory;
         }
         
-        protected override ISocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
+        protected override ISocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType, string tag)
         {
-            return _socketFactory.Invoke(addressFamily, socketType, protocolType);
+            return _socketFactory.Invoke(addressFamily, socketType, protocolType, tag);
         }
     }
 }

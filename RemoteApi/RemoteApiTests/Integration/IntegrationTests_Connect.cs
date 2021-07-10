@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using C8F2740A.NetworkNode.RemoteApi.Trace;
 using RemoteApi.Integration.Helpers;
+using SocketSubstitutionTests;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -18,12 +19,23 @@ namespace RemoteApi.Integration
         [Fact]
         public async void Operator_WhenConnectToRemoteSocket_ShouldDisconnectLocal2()
         {
-            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2("127.0.0.1:11113");
-            await apiOperator.MessageDisplayed;
-            await Task.Delay(1000);
+            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2("127.0.0.1:11111");
+            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2("127.0.0.1:11112");
+            
+            var connect1 = apiOperator.GetSocketByTag("connect_1");
+            var res = await connect1.Arrange2(connect1.SendCalledTimes, 2);
+            Assert.True(res);
+
+            await apiOperator.RaiseCommandReceived("connect 127.0.0.1:11112");
+            var connect2 = apiOperator.GetSocketByTag("connect_2");
+            var res2 = await connect2.Arrange2(connect2.ReceiveCalledTimes, 2);
+            Assert.True(res2);
             
             IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
             _output.WriteLine("-----------------------------");
+            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, remote.Recorder);
+            
+            Assert.Equal(1, connect1.DisposeCalledTimes.Value);
         }
 
         [Fact]

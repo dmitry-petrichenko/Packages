@@ -4,7 +4,7 @@ using C8F2740A.NetworkNode.RemoteApi.Monitor;
 
 namespace RemoteApi.Integration.Helpers
 {
-    public class RemoteTraceMonitorСonsistentTester : IRemoteTraceMonitorСonsistent
+    public class RemoteTraceMonitorConsistentTester : IRemoteTraceMonitorСonsistent
     {
         public int SetPromptCalledTimes { get; private set; }
         
@@ -17,7 +17,7 @@ namespace RemoteApi.Integration.Helpers
         public Task Initialized => _initializationTask.Task;
         public Task MessageDisplayed => _displayMessageTask.Task;
         
-        public RemoteTraceMonitorСonsistentTester(ApplicationCacheRecorder applicationCacheRecorder)
+        public RemoteTraceMonitorConsistentTester(ApplicationCacheRecorder applicationCacheRecorder)
         {
             _applicationCacheRecorder = applicationCacheRecorder;
             _initializationTask = new TaskCompletionSource<bool>();

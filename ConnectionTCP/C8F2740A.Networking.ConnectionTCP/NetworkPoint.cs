@@ -26,12 +26,12 @@ namespace C8F2740A.Networking.ConnectionTCP
         public NetworkPoint(
             INetworkAddress networkAddress, 
             Func<ISocket, INetworkTunnel> networkTunnelFactory,
-            Func<AddressFamily, SocketType, ProtocolType, ISocket> socketFactory,
+            Func<AddressFamily, SocketType, ProtocolType, string, ISocket> socketFactory,
             IRecorder recorder)
         {
             _recorder = recorder;
             _networkTunnelFactory = networkTunnelFactory;
-            _sListener = socketFactory.Invoke(networkAddress.IP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            _sListener = socketFactory.Invoke(networkAddress.IP.AddressFamily, SocketType.Stream, ProtocolType.Tcp, "listen");
 
             Bind(networkAddress.IP, networkAddress.Port);
             Open();
