@@ -47,6 +47,7 @@ namespace C8F2740A.NetworkNode.SessionTCP
             _currentSession.Responded += RespondedHandler;
             _currentSession.Closed += ClosedHandler;
             HasActiveSession = true;
+            _currentSession.Listen();
         }
         
         public void Clear()

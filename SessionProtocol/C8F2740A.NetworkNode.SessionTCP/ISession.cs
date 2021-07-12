@@ -8,6 +8,7 @@ namespace C8F2740A.NetworkNode.SessionTCP
         void Response(IEnumerable<byte> data);
         void Send(IEnumerable<byte> data);
         void Close();
+        void Listen();
         
         event Action<IEnumerable<byte>> Received;
         event Action<IEnumerable<byte>> Responded;

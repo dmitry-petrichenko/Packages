@@ -24,7 +24,7 @@ namespace RemoteApi.Integration.Helpers
             var sockets = new List<SocketSubstitution>();
             var remoteTraceMonitorСonsistent = new RemoteTraceMonitorConsistentTester(recorder);
 
-            var factoryOfFactory = new FactoryOfSubstitutedSocketFactory(sockets);
+            var factoryOfFactory = new FactoryOfSubstitutedSocketFactory(sockets, "operator");
             var socketFactory = factoryOfFactory.Create();
             
             var apiOperator = CreateLocalOperator(socketFactory, recorder, remoteTraceMonitorСonsistent, address);
@@ -40,7 +40,7 @@ namespace RemoteApi.Integration.Helpers
             var sockets = new List<SocketSubstitution>();
             var apiMapWrapper = default(TraceableRemoteApiMapWrapperRealSockets2);
 
-            var factoryOfFactory = new FactoryOfSubstitutedSocketFactory(sockets);
+            var factoryOfFactory = new FactoryOfSubstitutedSocketFactory(sockets, "remote");
             var socketFactory = factoryOfFactory.Create();
             
             // RemoteApiMap
@@ -87,11 +87,13 @@ namespace RemoteApi.Integration.Helpers
         {
             private readonly Dictionary<string, int> _tags;
             private readonly List<SocketSubstitution> _sockets;
+            private readonly string _globalTag;
             
-            public FactoryOfSubstitutedSocketFactory(List<SocketSubstitution> sockets)
+            public FactoryOfSubstitutedSocketFactory(List<SocketSubstitution> sockets, string globalTag)
             {
                 _tags = new Dictionary<string, int>();
                 _sockets = sockets;
+                _globalTag = globalTag;
             }
 
             public Func<AddressFamily, SocketType, ProtocolType, string, ISocket> Create()
@@ -116,12 +118,12 @@ namespace RemoteApi.Integration.Helpers
                     if (_tags.ContainsKey(tag))
                     {
                         _tags[tag]++;
-                        socketName = $"{tag}_{_tags[tag]}";
+                        socketName = $"{_globalTag}:{tag}_{_tags[tag]}";
                     }
                     else
                     {
                         _tags.Add(tag, 1);
-                        socketName = $"{tag}_1";
+                        socketName = $"{_globalTag}:{tag}_1";
                     }
 
                     var socket = new SocketSubstitution(SocketRegularFactory, SocketAcceptFactory, family, type, protocolType, socketName);

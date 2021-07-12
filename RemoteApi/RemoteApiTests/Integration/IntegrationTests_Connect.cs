@@ -23,7 +23,7 @@ namespace RemoteApi.Integration
         }
         
         [Fact]
-        public async void Operator_WhenConnectToRemoteSocket_ShouldDisconnectLocal2()
+        public async void Operator_WhenConnectToRemoteSocket_ShouldDisconnectLocal()
         {
             var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2("127.0.0.1:11111");
             var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2("127.0.0.1:11112");
@@ -50,9 +50,10 @@ namespace RemoteApi.Integration
         [Fact]
         public async void Operator_WhenRemoteSocketDisconnected_ShouldConnectToRemoteAgainToExecuteCommand()
         {
+            var wrongCommandReceived = false;
             var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2("127.0.0.1:11113");
             var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2("127.0.0.1:11114");
-            remote.ApiMap.RegisterWrongCommandHandler(() => { });
+            remote.ApiMap.RegisterWrongCommandHandler(() => wrongCommandReceived = true);
             
             await WaitingInitializationComplete(apiOperator);
             await apiOperator.RaiseCommandReceived("connect 127.0.0.1:11114");
@@ -68,7 +69,11 @@ namespace RemoteApi.Integration
             
             // wait close complete
             var connect2 = apiOperator.GetSocketByTag("connect_2");
-            await connect2.ArrangeWaiting(connect2.CloseCalledTimes, 1);
+            var res = await connect2.ArrangeWaiting(connect2.CloseCalledTimes, 1);
+            Assert.True(res);
+            
+            var remoteAccept1 = remote.GetSocketByTag("accept_1");
+            await remoteAccept1.ArrangeWaiting(remoteAccept1.DisposeCalledTimes, 1);
 
             await apiOperator.RaiseCommandReceived("hello");
 
@@ -79,53 +84,39 @@ namespace RemoteApi.Integration
             // Assert
             Assert.Equal(0, apiOperator.Recorder.SystemErrorCalledTimes);
             Assert.Equal(0, remote.Recorder.SystemErrorCalledTimes);
+            Assert.True(wrongCommandReceived);
         }
 
         //-----------------------------------------
 
         [Fact]
-        public async void Operator_WhenRemoteSocketDisconnected_ShouldConnectAgain()
-        {
-            var wrongCommandCalledTimes = 0;
-            var wrongCommandCalledTimesIntermediateState = 0;
-            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets("127.0.0.1:11112");
-            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets("127.0.0.1:22223");
-            remote.ApiMap.RegisterWrongCommandHandler(() => wrongCommandCalledTimes++);
-            await apiOperator.MessageDisplayed;
-            await apiOperator.RaiseCommandReceived("connect 127.0.0.1:22223");
-            await remote.ConnectedComplete;
-            
-            remote.Sockets[1].Close();
-            wrongCommandCalledTimesIntermediateState = wrongCommandCalledTimes;
-            await apiOperator.Sockets[2].Disposed;
-
-            apiOperator.Recorder.ClearCache();
-            remote.Recorder.ClearCache();
-
-            await apiOperator.RaiseCommandReceived("hello");
-
-            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
-            _output.WriteLine("-----------------------------");
-            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, remote.Recorder);
-            Assert.Equal(1, apiOperator.Sockets[1].CloseCalledTimes);
-            Assert.Equal(1, wrongCommandCalledTimes);
-            Assert.Equal(0, wrongCommandCalledTimesIntermediateState);
-        }
-        
-        [Fact]
         public async void Operator_WhenRemoteSocketDisconnectedAndLost_ShouldTryConnectAndShowMessage()
         {
-            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets("127.0.0.1:11111");
-            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets("127.0.0.1:22222");
-            remote.ApiMap.RegisterWrongCommandHandler(() =>
-                ((IApplicationRecorder) remote.Recorder).RecordInfo("wrong", "wrong"));
-            await apiOperator.MessageDisplayed;
-            await apiOperator.RaiseCommandReceived("connect 127.0.0.1:22222");
-            await remote.ConnectedComplete;
+            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2("127.0.0.1:11115");
+            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2("127.0.0.1:11116");
+
+            await WaitingInitializationComplete(apiOperator);
             
-            remote.Sockets[1].Close();
-            remote.Sockets[0].Close();
-            await apiOperator.Sockets[2].Disposed;
+            await apiOperator.RaiseCommandReceived("connect 127.0.0.1:11116");
+
+            // wait receive complete
+            var operatorAccept1 = remote.GetSocketByTag("accept_1");
+            await operatorAccept1.ArrangeWaiting(operatorAccept1.ReceiveCalledTimes, 2);
+
+            var remoteListen1 = remote.GetSocketByTag("listen_1");
+            var remoteAccept1 = remote.GetSocketByTag("accept_1");
+            remoteListen1.Close();
+            remoteAccept1.Close();
+            
+            var r1 = 
+                await remoteListen1
+                    .ArrangeWaiting(remoteListen1.CloseCalledTimes, 1);
+            var r2 = 
+                await remoteAccept1
+                    .ArrangeWaiting(remoteAccept1.CloseCalledTimes, 1);
+            
+            Assert.True(r1);
+            Assert.True(r2);
 
             apiOperator.Recorder.ClearCache();
             remote.Recorder.ClearCache();
@@ -135,9 +126,6 @@ namespace RemoteApi.Integration
             IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
             _output.WriteLine("-----------------------------");
             IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, remote.Recorder);
-            Assert.Equal(1, apiOperator.Sockets[1].CloseCalledTimes);
-            Assert.Equal(1, apiOperator.Sockets[1].DisposeCalledTimes);
-            Assert.Equal(2, apiOperator.Recorder.SystemErrorCalledTimes);
         }
     }
 }

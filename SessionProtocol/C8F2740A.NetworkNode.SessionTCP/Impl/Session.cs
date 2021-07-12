@@ -51,13 +51,17 @@ namespace C8F2740A.NetworkNode.SessionTCP
                 { _responseBytePrefix, BytesRespondedHandler },
                 { 0, BytesUnknownHandler },
             };
-
-            _networkTunnel.Listen();
+            
             _networkTunnel.Received += ReceivedHandler;
             _networkTunnel.Closed += CloseHandler;
 
             _requestFromRemoteReceived = false;
             _requestToRemoteSent = false;
+        }
+
+        public void Listen()
+        {
+            _networkTunnel.Listen();
         }
 
         public void Dispose()

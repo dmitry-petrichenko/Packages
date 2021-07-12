@@ -9,9 +9,10 @@ namespace SocketSubstitutionTests
         public static Task<bool> ArrangeWaiting(
             this SocketSubstitution socketSubstitution,
             Counter parameter, 
-            int aimedValue)
+            int aimedValue, 
+            int timeoutTime = 1000)
         {
-            return new SocketSubstitutionStateAwaitor(socketSubstitution, parameter, aimedValue).Task;
+            return new SocketSubstitutionStateAwaitor(socketSubstitution, parameter, aimedValue, timeoutTime).Task;
         }
     }
 }
