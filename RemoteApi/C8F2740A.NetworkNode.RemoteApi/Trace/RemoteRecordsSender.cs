@@ -33,7 +33,7 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
 
         public void ActivateAndSendCache()
         {
-            SafeExecution.TryCatch(() => ActivateAndSendCacheInternal(),
+            SafeExecution.TryCatch(ActivateAndSendCacheInternal,
                 exception => _recorder.DefaultException(this, exception));
         }
         

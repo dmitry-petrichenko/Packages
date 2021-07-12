@@ -104,11 +104,11 @@ namespace C8F2740A.Networking.ConnectionTCP
 
         private void CloseInternal()
         {
+            Closed?.Invoke();
             _isDisposed = true;
             RecordOpenCloseInfo("Tunnel closed");
             _socket.Close();
             _socket.Dispose();
-            Closed?.Invoke();
         }
 
         private void RecordError(string message)

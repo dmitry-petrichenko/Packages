@@ -99,9 +99,9 @@ namespace C8F2740A.NetworkNode.SessionTCP
             _currentSession = default;
             HasActiveSession = false;
             
-            if (_sendInstructionTask != default && !_sendInstructionTask.Task.IsCompleted)
+            if (_sendInstructionTask != default)
             {
-                _sendInstructionTask.SetCanceled();
+                _sendInstructionTask.TrySetCanceled();
                 _sendInstructionTask = default;
             }
         }

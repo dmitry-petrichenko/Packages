@@ -195,9 +195,9 @@ namespace C8F2740A.NetworkNode.SessionTCP
 
         private void CloseHandler()
         {
+            Closed?.Invoke();
             _networkTunnel.Received -= ReceivedHandler;
             _networkTunnel.Closed -= CloseHandler;
-            Closed?.Invoke();
         }
     }
 }

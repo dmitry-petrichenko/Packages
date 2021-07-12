@@ -39,7 +39,7 @@ namespace RemoteApi.Integration.Helpers
             await Task.Delay(100);
             if (_displayMessageTask.Task.Status != TaskStatus.RanToCompletion)
             {
-                _displayMessageTask.SetResult(true);
+                _displayMessageTask.TrySetResult(true);
             }
         }
 

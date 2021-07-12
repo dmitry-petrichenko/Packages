@@ -6,7 +6,7 @@ namespace SocketSubstitutionTests
 {
     public static class SocketSubstitutionExtensions
     {
-        public static Task<bool> Arrange2(
+        public static Task<bool> ArrangeWaiting(
             this SocketSubstitution socketSubstitution,
             Counter parameter, 
             int aimedValue)

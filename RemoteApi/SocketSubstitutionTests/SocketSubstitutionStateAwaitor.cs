@@ -41,7 +41,7 @@ namespace SocketSubstitutionTests
             if (_counter.Value == _aimedValue)
             {
                 _socketSubstitution.Updated -= UpdatedHandler;
-                _taskCompletionSource.SetResult(true);
+                _taskCompletionSource.TrySetResult(true);
             }
         }
 

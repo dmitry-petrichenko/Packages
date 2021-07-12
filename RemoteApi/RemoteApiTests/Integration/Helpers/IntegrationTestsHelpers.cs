@@ -227,11 +227,11 @@ namespace RemoteApi.Integration.Helpers
         
         internal static void LogCacheRecorderTestInfo(ITestOutputHelper output, ApplicationCacheRecorder recorder)
         {
-            output.WriteLine("SYSTEM ERRORS:");
+            output.WriteLine($"SYSTEM ERRORS ({recorder.SystemErrorCalledTimes}):");
             output.WriteLine(recorder.SystemErrorCache);
             output.WriteLine("SYSTEM INFO:");
             output.WriteLine(recorder.SystemInfoCache);
-            output.WriteLine("APPLICATION ERROR:");
+            output.WriteLine($"APPLICATION ERROR ({recorder.AppErrorCalledTimes}):");
             output.WriteLine(recorder.AppErrorCache);
             output.WriteLine("APPLICATION INFO:");
             output.WriteLine(recorder.AppInfoCache);
