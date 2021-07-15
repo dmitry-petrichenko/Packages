@@ -6,12 +6,14 @@ using C8F2740A.Common.Records;
 
 namespace C8F2740A.NetworkNode.SessionTCP
 {
-    public interface ISessionHolder : IDisposable
+    public interface ISessionHolder
     {
         void Set(ISession session);
         void Clear();
         Task<(bool, IEnumerable<byte>)> SendInstruction(IEnumerable<byte> instruction);
+        
         event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived;
+        event Action Disconnected;
         
         bool HasActiveSession { get; }
     }
@@ -21,6 +23,7 @@ namespace C8F2740A.NetworkNode.SessionTCP
         public bool HasActiveSession { get; private set; }
         
         public event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived;
+        public event Action Disconnected;
 
         private readonly IRecorder _recorder;
         
@@ -41,23 +44,18 @@ namespace C8F2740A.NetworkNode.SessionTCP
                 throw new Exception("Session cannot be null");
             }
             
-            Clear();
+            ClearAndReset();
             _currentSession = session;
             _currentSession.Received += ReceivedHandler;
             _currentSession.Responded += RespondedHandler;
-            _currentSession.Closed += ClosedHandler;
+            _currentSession.Disconnected += DisconnectedHandler;
             HasActiveSession = true;
             _currentSession.Listen();
         }
         
         public void Clear()
         {
-            if (_currentSession == default)
-            {
-                return;
-            }
-            
-            _currentSession.Close();
+            ClearAndReset();
         }
 
         public async Task<(bool, IEnumerable<byte>)> SendInstruction(IEnumerable<byte> instruction)
@@ -86,18 +84,22 @@ namespace C8F2740A.NetworkNode.SessionTCP
             return (true, response);
         }
 
-        private void ClosedHandler()
+        private void DisconnectedHandler()
         {
-            ClearAndReset();
+            Disconnected?.Invoke();
         }
 
         private void ClearAndReset()
         {
-            _currentSession.Received -= ReceivedHandler;
-            _currentSession.Responded -= RespondedHandler;
-            _currentSession.Closed -= ClosedHandler;
-
-            _currentSession = default;
+            if (_currentSession != default)
+            {
+                _currentSession.Received -= ReceivedHandler;
+                _currentSession.Responded -= RespondedHandler;
+                _currentSession.Disconnected -= DisconnectedHandler;
+                _currentSession.Dispose();
+                _currentSession = default;
+            }
+            
             HasActiveSession = false;
             
             if (_sendInstructionTask != default)
@@ -148,11 +150,6 @@ namespace C8F2740A.NetworkNode.SessionTCP
             {
                 throw new Exception("Attempt to send when session is null");
             }
-        }
-
-        public void Dispose()
-        {
-            ClearAndReset();
         }
     }
 }

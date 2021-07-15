@@ -7,6 +7,7 @@ using C8F2740A.NetworkNode.RemoteApi.Extensions;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
 using C8F2740A.Networking.ConnectionTCP;
 using C8F2740A.NetworkNode.RemoteApi.Trace;
+using C8F2740A.NetworkNode.SessionTCP;
 
 namespace C8F2740A.NetworkNode.RemoteApi
 {
@@ -17,12 +18,14 @@ namespace C8F2740A.NetworkNode.RemoteApi
         void Disconnect();
         
         event Action<string> InstructionReceived;
+        event Action Disconnected;
     }
     
-    public class RemoteApiOperator : IRemoteApiOperator, IDisposable
+    public class RemoteApiOperator : IRemoteApiOperator
     {
         public event Action<string> InstructionReceived;
-        
+        public event Action Disconnected;
+
         private IInstructionSenderHolder _instructionSenderHolder;
 
         private readonly IInstructionSenderFactory _instructionsSenderFactory;
@@ -41,6 +44,18 @@ namespace C8F2740A.NetworkNode.RemoteApi
             _recorder = recorder;
 
             _instructionSenderHolder.InstructionReceived += InstructionReceivedHandler;
+            _instructionSenderHolder.Disconnected += InstructionSenderDisconnectedHandler;
+        }
+
+        private void InstructionSenderDisconnectedHandler()
+        {
+            if (_instructionSenderHolder.HasActiveSender)
+            {
+                _instructionSenderHolder.Clear();
+            }
+            
+            _applicationRecorder.RecordInfo(GetType().Name, "Remote point disconnected");
+            Disconnected?.Invoke();
         }
 
         private IEnumerable<byte> InstructionReceivedHandler(IEnumerable<byte> value)
@@ -81,19 +96,23 @@ namespace C8F2740A.NetworkNode.RemoteApi
                 return false;
             }
             
-            var instructionsSender = _instructionsSenderFactory.Create(address);
+            IInstructionSender instructionsSender = _instructionsSenderFactory.Create(address);
+            if (!instructionsSender.TryConnect())
+            {
+                _applicationRecorder.RecordInfo(GetType().Name, "Fail to connect to remote");
+                return false;
+            }
+            
             _instructionSenderHolder.Set(instructionsSender);
             
             var (result, data) =  await _instructionSenderHolder.TrySendInstruction(RemoteApiCommands.TRACE.ToEnumerableByte());
-            
             if (!result)
             {
-                // вернуться к локал
-                //_instructionSenderHolder.Clear();
                 _applicationRecorder.RecordInfo(GetType().Name, "Fail to connect to remote");
+                return false;
             }
             
-            return result;
+            return true;
         }
 
         public void Disconnect()
@@ -102,10 +121,6 @@ namespace C8F2740A.NetworkNode.RemoteApi
             {
                 _instructionSenderHolder.Clear();
             }
-        }
-
-        public void Dispose()
-        {
         }
     }
 }

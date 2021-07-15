@@ -12,28 +12,18 @@ namespace C8F2740A.NetworkNode.SessionTCP
         private readonly INetworkTunnel _networkTunnel;
         private readonly IRecorder _recorder;
         private readonly byte _requestBytePrefix, _responseBytePrefix;
+        private readonly IndexerCalculator _requestCalculator, _responseCalculator;
+        private readonly Dictionary<byte, Action<IEnumerable<byte>, byte>> _responceEventMap;
 
         internal static readonly byte REQUEST = 0b1100_0000;
         internal static readonly byte RESPONSE = 0b0011_0000;
-
-        private IndexerCalculator _requestCalculator, _responseCalculator;
-        private Dictionary<byte, Action<IEnumerable<byte>, byte>> _responceEventMap;
+        
         private bool _requestFromRemoteReceived;
         private bool _requestToRemoteSent;
-
-        public void Close()
-        {
-            if (_networkTunnel == default)
-            {
-                return;
-            }
-            
-            _networkTunnel.Close();
-        }
-
+        
         public event Action<IEnumerable<byte>> Received;
         public event Action<IEnumerable<byte>> Responded;
-        public event Action Closed;
+        public event Action Disconnected;
 
         public Session(INetworkTunnel networkTunnel, IRecorder recorder)
         {
@@ -53,7 +43,7 @@ namespace C8F2740A.NetworkNode.SessionTCP
             };
             
             _networkTunnel.Received += ReceivedHandler;
-            _networkTunnel.Closed += CloseHandler;
+            _networkTunnel.Disconnected += DisconnectHandler;
 
             _requestFromRemoteReceived = false;
             _requestToRemoteSent = false;
@@ -67,7 +57,8 @@ namespace C8F2740A.NetworkNode.SessionTCP
         public void Dispose()
         {
             _networkTunnel.Received -= ReceivedHandler;
-            _networkTunnel.Closed -= CloseHandler;
+            _networkTunnel.Disconnected -= DisconnectHandler;
+            _networkTunnel.Dispose();
         }
 
         public void Response(IEnumerable<byte> data)
@@ -197,11 +188,9 @@ namespace C8F2740A.NetworkNode.SessionTCP
             _recorder.RecordError(GetType().Name, exception.Message);
         }
 
-        private void CloseHandler()
+        private void DisconnectHandler()
         {
-            Closed?.Invoke();
-            _networkTunnel.Received -= ReceivedHandler;
-            _networkTunnel.Closed -= CloseHandler;
+            Disconnected?.Invoke();
         }
     }
 }

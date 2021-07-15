@@ -30,22 +30,27 @@ namespace C8F2740A.NetworkNode.SessionTCP.Impl
             _sessionHolder = sessionHolder;
 
             _nodeGateway.ConnectionReceived += ConnectionReceivedHandler;
+            _sessionHolder.Disconnected += DisconnectedHandler;
         }
 
-        private void ConnectionReceivedHandler(ISession session)
+        private void DisconnectedHandler()
+        {
+            ClearSession();
+        }
+
+        private void ClearSession()
         {
             if (_sessionHolder.HasActiveSession)
             {
                 _sessionHolder.Clear();
             }
-            
-            _sessionHolder.Set(session);
         }
 
-        public void Dispose()
+        private void ConnectionReceivedHandler(ISession session)
         {
-            _sessionHolder.Clear();
-            _nodeGateway.ConnectionReceived -= ConnectionReceivedHandler;
+            ClearSession();
+            
+            _sessionHolder.Set(session);
         }
 
         public Task<(bool, IEnumerable<byte>)> TrySendInstruction(IEnumerable<byte> instruction)

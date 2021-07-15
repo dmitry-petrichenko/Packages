@@ -24,8 +24,8 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
             remove => _remoteApiOperator.InstructionReceived -= value; 
         }
 
-        public event Action<string> Connected;
         public event Action Disconnected;
+        public event Action<string> Connected;
         
         private readonly IRemoteApiOperator _remoteApiOperator;
         private readonly IRecorder _recorder;
@@ -36,6 +36,13 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
         {
             _remoteApiOperator = remoteApiOperator;
             _recorder = recorder;
+
+            _remoteApiOperator.Disconnected += DisconnectedHandler;
+        }
+
+        private void DisconnectedHandler()
+        {
+            Disconnected?.Invoke();
         }
 
         public Task<bool> ExecuteCommand(string command)
@@ -83,6 +90,7 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
         {
             _remoteApiOperator.Disconnect();
             Disconnected?.Invoke();
+            
             return Task.FromResult(true);
         }
     }

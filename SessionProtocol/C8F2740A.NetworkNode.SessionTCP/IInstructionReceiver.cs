@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using C8F2740A.Common.Records;
 
 namespace C8F2740A.NetworkNode.SessionTCP
 {
-    public interface IInstructionReceiver : IDisposable
+    public interface IInstructionReceiver
     {
         bool HasActiveSession { get; }
 

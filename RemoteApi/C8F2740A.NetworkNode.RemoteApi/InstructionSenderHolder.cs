@@ -15,6 +15,7 @@ namespace C8F2740A.NetworkNode.RemoteApi
         bool HasActiveSender { get; }
 
         event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived;
+        event Action Disconnected;
     } 
     
     public class InstructionSenderHolder : IInstructionSenderHolder
@@ -24,6 +25,9 @@ namespace C8F2740A.NetworkNode.RemoteApi
         private readonly IRecorder _recorder;
         
         private IInstructionSender _currentInstructionSender;
+        
+        public event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived;
+        public event Action Disconnected;
         
         public InstructionSenderHolder(IRecorder recorder)
         {
@@ -39,7 +43,13 @@ namespace C8F2740A.NetworkNode.RemoteApi
             
             _currentInstructionSender = instructionSender;
             _currentInstructionSender.InstructionReceived += InstructionReceivedHandler;
+            _currentInstructionSender.Disconnected += DisconnectedHandler;
             HasActiveSender = true;
+        }
+        
+        private void DisconnectedHandler()
+        {
+            Disconnected?.Invoke();
         }
 
         private IEnumerable<byte> InstructionReceivedHandler(IEnumerable<byte> instruction)
@@ -50,6 +60,7 @@ namespace C8F2740A.NetworkNode.RemoteApi
         public void Clear()
         {
             _currentInstructionSender.InstructionReceived -= InstructionReceivedHandler;
+            _currentInstructionSender.Disconnected -= DisconnectedHandler;
             _currentInstructionSender.Dispose();
             _currentInstructionSender = default;
             HasActiveSender = false;
@@ -59,7 +70,5 @@ namespace C8F2740A.NetworkNode.RemoteApi
         {
             return _currentInstructionSender.TrySendInstruction(instruction);
         }
-
-        public event Func<IEnumerable<byte>, IEnumerable<byte>> InstructionReceived;
     }
 }

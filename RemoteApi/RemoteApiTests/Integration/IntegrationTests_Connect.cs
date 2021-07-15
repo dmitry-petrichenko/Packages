@@ -105,23 +105,29 @@ namespace RemoteApi.Integration
 
             var remoteListen1 = remote.GetSocketByTag("listen_1");
             var remoteAccept1 = remote.GetSocketByTag("accept_1");
+            
+            apiOperator.Recorder.ClearCache();
+            remote.Recorder.ClearCache();
+            
             remoteListen1.Close();
             remoteAccept1.Close();
             
             var r1 = 
                 await remoteListen1
-                    .ArrangeWaiting(remoteListen1.CloseCalledTimes, 1);
+                    .ArrangeWaiting(remoteListen1.CloseCalledTimes, 1, 5000);
             var r2 = 
                 await remoteAccept1
-                    .ArrangeWaiting(remoteAccept1.CloseCalledTimes, 1);
+                    .ArrangeWaiting(remoteAccept1.CloseCalledTimes, 1, 5000);
             
             Assert.True(r1);
             Assert.True(r2);
 
-            apiOperator.Recorder.ClearCache();
-            remote.Recorder.ClearCache();
+            //apiOperator.Recorder.ClearCache();
+            //remote.Recorder.ClearCache();
+
+            await Task.Delay(5000);
             
-            await apiOperator.RaiseCommandReceived("hello");
+            //await apiOperator.RaiseCommandReceived("hello");
 
             IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
             _output.WriteLine("-----------------------------");

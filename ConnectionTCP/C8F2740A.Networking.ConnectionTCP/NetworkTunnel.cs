@@ -9,26 +9,24 @@ using C8F2740A.Networking.ConnectionTCP.Network;
 
 namespace C8F2740A.Networking.ConnectionTCP
 {
-    public interface INetworkTunnel : IDisposable
+    public interface INetworkTunnel
     {
         Task Listen();
         void Send(byte[] data);
-        void Close();
+        void Dispose();
 
         event Action<byte[]> Received;
-        event Action Closed;
+        event Action Disconnected;
     }
     
     public class NetworkTunnel : INetworkTunnel
     {
         public event Action<byte[]> Received;
-        public event Action Closed;
+        public event Action Disconnected;
         
         private readonly ISocket _socket;
         private readonly IRecorder _recorder;
-        
-        private bool _isDisposed;
-        
+
         public NetworkTunnel(ISocket socket, IRecorder recorder)
         {
             _recorder = recorder;
@@ -43,20 +41,9 @@ namespace C8F2740A.Networking.ConnectionTCP
             SafeExecution.TryCatch(() => _socket.Send(data), ExceptionHandler);
         }
 
-        public void Close()
-        {
-            CloseInternal();
-        }
-
         public void Dispose()
         {
-            if (_isDisposed)
-            {
-                return;
-            }
-
-            _isDisposed = true;
-            CloseInternal();
+            DisposeInternal();
         }
 
         public Task Listen()
@@ -79,7 +66,7 @@ namespace C8F2740A.Networking.ConnectionTCP
                 Received?.Invoke(data.Take(bytes).ToArray());
             }
 
-            Dispose();
+            Disconnected?.Invoke();
         }
         
         private void ExceptionHandler(Exception exception)
@@ -94,7 +81,7 @@ namespace C8F2740A.Networking.ConnectionTCP
 
             if (socketException.ErrorCode == 10054)
             {
-                Dispose();
+                Disconnected?.Invoke();
             }
             else
             {
@@ -102,10 +89,8 @@ namespace C8F2740A.Networking.ConnectionTCP
             }
         }
 
-        private void CloseInternal()
+        private void DisposeInternal()
         {
-            Closed?.Invoke();
-            _isDisposed = true;
             RecordOpenCloseInfo("Tunnel closed");
             _socket.Close();
             _socket.Dispose();
