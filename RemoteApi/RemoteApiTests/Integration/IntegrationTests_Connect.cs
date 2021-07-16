@@ -69,7 +69,7 @@ namespace RemoteApi.Integration
             
             // wait close complete
             var connect2 = apiOperator.GetSocketByTag("connect_2");
-            var res = await connect2.ArrangeWaiting(connect2.CloseCalledTimes, 1);
+            var res = await connect2.ArrangeWaiting(connect2.CloseCalledTimes, 1, 2000);
             Assert.True(res);
             
             var remoteAccept1 = remote.GetSocketByTag("accept_1");
@@ -111,23 +111,28 @@ namespace RemoteApi.Integration
             
             remoteListen1.Close();
             remoteAccept1.Close();
-            
+
+            // wait close
             var r1 = 
                 await remoteListen1
-                    .ArrangeWaiting(remoteListen1.CloseCalledTimes, 1, 5000);
+                    .ArrangeWaiting(remoteListen1.CloseCalledTimes, 1, 4000);
             var r2 = 
                 await remoteAccept1
-                    .ArrangeWaiting(remoteAccept1.CloseCalledTimes, 1, 5000);
-            
+                    .ArrangeWaiting(remoteAccept1.CloseCalledTimes, 1, 4000);
             Assert.True(r1);
             Assert.True(r2);
-
-            //apiOperator.Recorder.ClearCache();
-            //remote.Recorder.ClearCache();
-
-            await Task.Delay(5000);
             
-            //await apiOperator.RaiseCommandReceived("hello");
+            apiOperator.Recorder.ClearCache();
+            remote.Recorder.ClearCache();
+            
+            // wait connect again complete
+            var operatorListen1 = apiOperator.GetSocketByTag("listen_1");
+            var r3 = await operatorListen1.ArrangeWaiting(operatorListen1.AcceptAsyncCalledTimes, 2, 4000);
+            Assert.True(r3);
+            
+            var operatorConnect4 = apiOperator.GetSocketByTag("connect_4");
+            var r4 = await operatorConnect4.ArrangeWaiting(operatorConnect4.ReceiveCalledTimes, 2);
+            Assert.True(r4);
 
             IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
             _output.WriteLine("-----------------------------");
