@@ -10,7 +10,7 @@ namespace SocketSubstitutionTests
             this SocketSubstitution socketSubstitution,
             Counter parameter, 
             int aimedValue, 
-            int timeoutTime = 1000)
+            int timeoutTime = 5000)
         {
             return new SocketSubstitutionStateAwaitor(socketSubstitution, parameter, aimedValue, timeoutTime).Task;
         }

@@ -16,6 +16,8 @@ namespace RemoteApi.Integration.Helpers
         public int AppErrorCalledTimes { get; private set; }
         public int AppInfoCalledTimes { get; private set; }
         public int DisplayMessagesCalledTimes { get; private set; }
+
+        internal event Action<string> DisplayMessageCalledWithText;
         
         private IMessagesCache _messageCache;
         
@@ -95,6 +97,8 @@ namespace RemoteApi.Integration.Helpers
             {
                 DisplayMessagesCache += message;
             }
+            
+            DisplayMessageCalledWithText?.Invoke(message);
         }
         
         public void ClearTextBox()

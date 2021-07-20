@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using C8F2740A.NetworkNode.RemoteApi.Trace;
 using RemoteApi.Integration.Helpers;
 using SocketSubstitutionTests;
 using Xunit;
@@ -7,6 +6,8 @@ using Xunit.Abstractions;
 
 namespace RemoteApi.Integration
 {
+    
+    
     public class IntegrationTests_Connect
     {
         private ITestOutputHelper _output;
@@ -16,12 +17,6 @@ namespace RemoteApi.Integration
             _output = output;
         }
 
-        private Task<bool> WaitingInitializationComplete(RemoteOperatorTestWrapperRealSockets2 apiOperator)
-        {
-            var connect1 = apiOperator.GetSocketByTag("connect_1");
-            return connect1.ArrangeWaiting(connect1.SendCalledTimes, 2);
-        }
-        
         [Fact]
         public async void Operator_WhenConnectToRemoteSocket_ShouldDisconnectLocal()
         {
@@ -55,7 +50,7 @@ namespace RemoteApi.Integration
             var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2("127.0.0.1:11114");
             remote.ApiMap.RegisterWrongCommandHandler(() => wrongCommandReceived = true);
             
-            await WaitingInitializationComplete(apiOperator);
+            await IntegrationTestsHelpers.WaitingConnectComplete(apiOperator, "connect_1");
             await apiOperator.RaiseCommandReceived("connect 127.0.0.1:11114");
 
             // wait receive complete
@@ -95,7 +90,7 @@ namespace RemoteApi.Integration
             var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2("127.0.0.1:11115");
             var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2("127.0.0.1:11116");
 
-            await WaitingInitializationComplete(apiOperator);
+            await IntegrationTestsHelpers.WaitingConnectComplete(apiOperator, "connect_1");
             
             await apiOperator.RaiseCommandReceived("connect 127.0.0.1:11116");
 

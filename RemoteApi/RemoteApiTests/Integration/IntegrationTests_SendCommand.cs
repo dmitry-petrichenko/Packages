@@ -1,5 +1,6 @@
 ﻿using C8F2740A.NetworkNode.RemoteApi.Trace;
 using RemoteApi.Integration.Helpers;
+using SocketSubstitutionTests;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -12,10 +13,6 @@ namespace RemoteApi.Integration
         public IntegrationTests_SendCommand(ITestOutputHelper output)
         {
             _output = output;
-        }
-        
-        public void Dispose()
-        {
         }
 
         [Theory]
@@ -57,47 +54,43 @@ namespace RemoteApi.Integration
             Assert.Equal(expectedWrongCommandCalled, actualWrongCommandCalledTimes);
             Assert.Equal(expectedMessageDisplays, apiOperator.Recorder.DisplayMessagesCalledTimes);
         }
-        
-        [Theory]
-        [InlineData(1, 1, 1, "8111", "8222")]
-        [InlineData(2, 2, 2, "8333", "8444")]
-        [InlineData(3, 3, 3, "8555", "8666")]
-        public async void Operator_WhenCommandSend_ShouldDisplayInMonitor2(
-            int expectedMessageDisplays, 
-            int sendCommandTimes, 
-            int expectedWrongCommandCalled, 
-            string localPort,
-            string remotePort)
+
+
+        [Fact]
+        public async void Operator_WhenCommandSend_ShouldDisplayInMonitor2()
         {
-            var actualCommandCalledTimes = 0;
-            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets($"127.0.0.1:{localPort}");
-            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets($"127.0.0.1:{remotePort}");
-            remote.ApiMap.RegisterCommand("someCommand", () =>
+            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2($"127.0.0.1:22221");
+            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2($"127.0.0.1:22222");
+            remote.ApiMap.RegisterCommand("command1", () =>
             {
-                actualCommandCalledTimes++;
-                ((IApplicationRecorder) remote.Recorder).RecordInfo("", "some command executed");
+                ((IApplicationRecorder) remote.Recorder).RecordInfo("sme", "done");
             });
-
-            await apiOperator.MessageDisplayed;
-            await apiOperator.RaiseCommandReceived($"connect 127.0.0.1:{remotePort}");
-            await remote.ConnectedComplete;
             
-            apiOperator.Recorder.ClearCache();
-            remote.Recorder.ClearCache();
+            await IntegrationTestsHelpers.AssertConnectComplete(apiOperator, "connect_1");
+            
+            await apiOperator.RaiseCommandReceived("connect 127.0.0.1:22222");
+            await IntegrationTestsHelpers.AssertConnectComplete(apiOperator, "connect_2");
+            var operatorDisplayedTest = apiOperator.Recorder.ArrangeWaitingMessage("sme:done", 5000);
+            var remoteDisplayedTest = remote.Recorder.ArrangeWaitingMessage("sme:done", 5000);
+            await apiOperator.RaiseCommandReceived("command1");
+            // wait command complete
+            var connect2 = apiOperator.GetSocketByTag("connect_2");
+            await connect2.ArrangeWaiting(connect2.ReceiveCalledTimes, 4);
+            //--
 
-            for (int i = 0; i < sendCommandTimes; i++)
-            {
-                await apiOperator.RaiseCommandReceived("someCommand");
-                await apiOperator.MessageDisplayed;
-            }
-
+            var res1 = await operatorDisplayedTest;
+            //var res2 = await remoteDisplayedTest;
+            
+            Assert.True(res1);
+            //Assert.True(res2);
+            Assert.Equal(0, apiOperator.Recorder.SystemErrorCalledTimes);
+            Assert.Equal(0, remote.Recorder.SystemErrorCalledTimes);
+            
             IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
             _output.WriteLine("-----------------------------");
             IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, remote.Recorder);
-            Assert.Equal(expectedWrongCommandCalled, actualCommandCalledTimes);
-            Assert.Equal(expectedMessageDisplays, apiOperator.Recorder.DisplayMessagesCalledTimes);
         }
-        
+
         [Theory]
         [InlineData(1, 1, "a", "11118", "22229")]
         [InlineData(1, 3, "abc", "11121", "22231")]

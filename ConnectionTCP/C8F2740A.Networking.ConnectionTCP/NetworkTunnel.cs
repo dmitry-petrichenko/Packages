@@ -106,7 +106,7 @@ namespace C8F2740A.Networking.ConnectionTCP
             IPEndPoint local = _socket.LocalEndPoint;
             IPEndPoint remote = _socket.RemoteEndPoint;
             _recorder.RecordInfo(GetType().Name, 
-                $"{message}: ({remote.Address}:{remote.Port}) -> ({local.Address}:{local.Port})");
+                $"{message}: ({local.Address}:{local.Port}) <- ({remote.Address}:{remote.Port})");
         }
         
         private void RecordSendInfo(string message)

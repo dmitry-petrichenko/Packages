@@ -9,13 +9,37 @@ using C8F2740A.NetworkNode.RemoteApi.Factories;
 using C8F2740A.NetworkNode.RemoteApi.Monitor;
 using C8F2740A.NetworkNode.RemoteApi.Operator;
 using C8F2740A.NetworkNode.RemoteApi.Trace;
+using SocketSubstitutionTests;
 using Telerik.JustMock;
+using Xunit;
 using Xunit.Abstractions;
 
 namespace RemoteApi.Integration.Helpers
 {
-    public class IntegrationTestsHelpers
+    internal class IntegrationTestsHelpers
     {
+        internal static Task<bool> WaitingConnectComplete(RemoteOperatorTestWrapperRealSockets2 apiOperator, string tag)
+        {
+            var connect1 = apiOperator.GetSocketByTag(tag);
+            
+            return connect1.ArrangeWaiting(connect1.SendCalledTimes, 2);
+        }
+        
+        internal static async Task AssertConnectComplete(RemoteOperatorTestWrapperRealSockets2 apiOperator, string tag)
+        {
+            var result = await WaitingConnectComplete(apiOperator, tag);
+            
+            Assert.True(result);
+        }
+        
+        internal static async Task AssertCloseComplete(RemoteOperatorTestWrapperRealSockets2 apiOperator, string tag)
+        {
+            var connect1 = apiOperator.GetSocketByTag(tag);
+            var result = await connect1.ArrangeWaiting(connect1.CloseCalledTimes, 1);
+            
+            Assert.True(result);
+        }
+        
         internal static RemoteOperatorTestWrapperRealSockets2 ArrangeLocalOperatorTestWrapperRealSockets2(
             string address)
         {
