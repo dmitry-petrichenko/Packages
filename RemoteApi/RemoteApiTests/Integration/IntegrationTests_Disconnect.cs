@@ -7,6 +7,7 @@ using Xunit.Abstractions;
 
 namespace RemoteApi.Integration
 {
+    [Collection("Serial")]
     public class IntegrationTests_Disconnect
     {
         private ITestOutputHelper _output;

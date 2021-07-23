@@ -31,7 +31,7 @@ namespace RemoteApi.Integration.Helpers
             
             Assert.True(result);
         }
-        
+
         internal static async Task AssertCloseComplete(RemoteOperatorTestWrapperRealSockets2 apiOperator, string tag)
         {
             var connect1 = apiOperator.GetSocketByTag(tag);
