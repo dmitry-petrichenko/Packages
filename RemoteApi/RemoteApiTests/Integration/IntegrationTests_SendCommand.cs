@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using C8F2740A.NetworkNode.RemoteApi.Trace;
 using RemoteApi.Integration.Helpers;
 using SocketSubstitutionTests;
@@ -73,6 +75,37 @@ namespace RemoteApi.Integration
             Assert.True(wrongCommandCalled);
             Assert.Equal(0, apiOperator.Recorder.SystemErrorCalledTimes);
             Assert.Equal(0, remote.Recorder.SystemErrorCalledTimes);
+            
+            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
+            _output.WriteLine("-----------------------------");
+            IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, remote.Recorder);
+        }
+        
+        [Fact]
+        public async void Operator_WhenCommandSendAndDelayedResponse_ShouldCompleteSendingAfterTimeout()
+        {
+            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2($"127.0.0.1:22227");
+            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2($"127.0.0.1:22228");
+            
+            await IntegrationTestsHelpers.AssertConnectComplete(apiOperator, "connect_1");
+            
+            await apiOperator.RaiseCommandReceived("connect 127.0.0.1:22228");
+            await IntegrationTestsHelpers.AssertConnectComplete(apiOperator, "connect_2");
+
+            var remoteAccept1 = remote.GetSocketByTag("accept_1");
+            remoteAccept1.UpdatedBefore += (substitution, line, methodName) =>
+            {
+                if (methodName.Equals("Send"))
+                {
+                    line.Value = () => throw new Exception("exception");
+                }
+            };
+            //IntegrationTestsHelpers.ArrangeDelayForSocketExecution(remote, "accept_1");
+            await apiOperator.RaiseCommandReceived("one");
+
+            await Task.Delay(9000);
+            //Assert.Equal(0, apiOperator.Recorder.SystemErrorCalledTimes);
+            //Assert.Equal(0, remote.Recorder.SystemErrorCalledTimes);
             
             IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
             _output.WriteLine("-----------------------------");

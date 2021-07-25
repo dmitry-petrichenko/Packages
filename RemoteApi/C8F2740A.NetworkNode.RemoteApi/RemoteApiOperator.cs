@@ -82,7 +82,7 @@ namespace C8F2740A.NetworkNode.RemoteApi
 
             if (!result.Item1)
             {
-                _recorder.RecordError(GetType().Name, "Fail to execute command");
+                _applicationRecorder.RecordError(GetType().Name, "Fail to execute command");
             }
 
             return result.Item1;

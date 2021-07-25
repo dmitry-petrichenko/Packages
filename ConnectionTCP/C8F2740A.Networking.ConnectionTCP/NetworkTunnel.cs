@@ -26,7 +26,7 @@ namespace C8F2740A.Networking.ConnectionTCP
         
         private readonly ISocket _socket;
         private readonly IRecorder _recorder;
-
+        
         public NetworkTunnel(ISocket socket, IRecorder recorder)
         {
             _recorder = recorder;
@@ -79,14 +79,7 @@ namespace C8F2740A.Networking.ConnectionTCP
                 return;
             }
 
-            if (socketException.ErrorCode == 10054)
-            {
-                Disconnected?.Invoke();
-            }
-            else
-            {
-                RecordError(socketException.Message);
-            }
+            Disconnected?.Invoke();
         }
 
         private void DisposeInternal()
@@ -103,10 +96,30 @@ namespace C8F2740A.Networking.ConnectionTCP
         
         private void RecordReceivedInfo(string message)
         {
-            IPEndPoint local = _socket.LocalEndPoint;
             IPEndPoint remote = _socket.RemoteEndPoint;
             _recorder.RecordInfo(GetType().Name, 
-                $"{message}: ({local.Address}:{local.Port}) <- ({remote.Address}:{remote.Port})");
+                $"{message}: {LocalIpAddress} <- ({remote.Address}:{remote.Port})");
+        }
+
+        private string IPEndPointToString(IPEndPoint ipEndPoint)
+        {
+            var result = $"({ipEndPoint.Address}:{ipEndPoint.Port})";
+            return result;
+        }
+
+        private string _localIpAddress = "";
+        
+        private string LocalIpAddress
+        {
+            get
+            {
+                if (_localIpAddress == "")
+                {
+                    _localIpAddress = IPEndPointToString(_socket.LocalEndPoint);
+                }
+
+                return _localIpAddress;
+            }
         }
         
         private void RecordSendInfo(string message)
@@ -119,16 +132,9 @@ namespace C8F2740A.Networking.ConnectionTCP
         
         private void RecordOpenCloseInfo(string message)
         {
-            if (!_socket.Connected)
-            {
-                _recorder.RecordInfo(GetType().Name, 
-                    $"{message}: Closed socket");
-                return;
-            }
-            
             IPEndPoint local = _socket.LocalEndPoint;
             _recorder.RecordInfo(GetType().Name, 
-                $"{message}: local ({local.Address}:{local.Port})");
+                $"{message}: local {LocalIpAddress}");
         }
 
         private string BuildMessageError(string message)

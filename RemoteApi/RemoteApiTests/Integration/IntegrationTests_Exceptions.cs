@@ -30,7 +30,7 @@ namespace RemoteApi.Integration
             await IntegrationTestsHelpers.AssertConnectComplete(apiOperator, "connect_2");
 
             var connect2 = apiOperator.GetSocketByTag("connect_2");
-            connect2.Updated += (substitution, line) =>
+            connect2.UpdatedAfter += (substitution, line, tag) =>
             {
                 if (substitution.SendCalledTimes.Value == 3)
                 {

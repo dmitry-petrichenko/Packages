@@ -24,12 +24,12 @@ namespace SocketSubstitutionTests
             _taskCompletionSource = new TaskCompletionSource<bool>();
             _timeoutTime = timeoutTime;
 
-            _socketSubstitution.Updated += UpdatedHandler;
+            _socketSubstitution.UpdatedAfter += UpdatedAfterHandler;
 
             StartTimeout();
             Task = _taskCompletionSource.Task;
 
-            UpdatedHandler(_socketSubstitution, new ExceptionLine());
+            UpdatedAfterHandler(_socketSubstitution, new ExceptionLine(), "");
         }
 
         private async void StartTimeout()
@@ -38,13 +38,14 @@ namespace SocketSubstitutionTests
             System.Threading.Tasks.Task.Run(() => _taskCompletionSource.TrySetResult(false));
         }
 
-        private void UpdatedHandler(
+        private void UpdatedAfterHandler(
             SocketSubstitution socketSubstitution, 
-            ExceptionLine exceptionLine)
+            ExceptionLine exceptionLine,
+            string tag)
         {
             if (_counter.Value == _aimedValue)
             {
-                _socketSubstitution.Updated -= UpdatedHandler;
+                _socketSubstitution.UpdatedAfter -= UpdatedAfterHandler;
                 System.Threading.Tasks.Task.Run(() => _taskCompletionSource.TrySetResult(true));
             }
         }

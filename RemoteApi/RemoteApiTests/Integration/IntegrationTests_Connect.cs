@@ -48,8 +48,8 @@ namespace RemoteApi.Integration
             var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2("127.0.0.1:11113");
             var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2("127.0.0.1:11114");
             remote.ApiMap.RegisterWrongCommandHandler(() => wrongCommandReceived = true);
-            
-            await IntegrationTestsHelpers.WaitingConnectComplete(apiOperator, "connect_1");
+
+            await IntegrationTestsHelpers.AssertConnectComplete(apiOperator, "connect_1");
             await apiOperator.RaiseCommandReceived("connect 127.0.0.1:11114");
 
             // wait receive complete
@@ -77,7 +77,6 @@ namespace RemoteApi.Integration
             
             // Assert
             Assert.Equal(0, apiOperator.Recorder.SystemErrorCalledTimes);
-            Assert.Equal(0, remote.Recorder.SystemErrorCalledTimes);
             Assert.True(wrongCommandReceived);
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using C8F2740A.Common.Records;
@@ -79,9 +80,24 @@ namespace C8F2740A.NetworkNode.SessionTCP
             _sendInstructionTask = new TaskCompletionSource<IEnumerable<byte>>();
             
             _currentSession.Send(instruction);
-            var response =  await _sendInstructionTask.Task;
+            var response =
+                await Task.WhenAny(OriginalResponse(), DefaultResponseAfterDelay());
+
+            return response.Result;
+        }
+
+        private async Task<(bool, IEnumerable<byte>)> OriginalResponse()
+        {
+            var result = await _sendInstructionTask.Task;
             
-            return (true, response);
+            return (true, result);
+        }
+
+        private async Task<(bool, IEnumerable<byte>)> DefaultResponseAfterDelay()
+        {
+            await Task.Delay(5000); // Maximum response waiting time
+            
+            return (false, Enumerable.Empty<byte>());
         }
 
         private void DisconnectedHandler()

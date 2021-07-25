@@ -24,7 +24,8 @@ namespace RemoteApi.Integration.Helpers
         public IPEndPoint RemoteEndPoint => _socket.RemoteEndPoint;
         public bool Connected => _socket.Connected;
         
-        public event Action<SocketSubstitution, ExceptionLine> Updated;
+        public event Action<SocketSubstitution, ExceptionLine, string> UpdatedAfter;
+        public event Action<SocketSubstitution, ExceptionLine, string> UpdatedBefore;
 
         private ISocket _socket;
         private Func<AddressFamily, SocketType, ProtocolType, ISocket> _factory;
@@ -67,44 +68,49 @@ namespace RemoteApi.Integration.Helpers
 
         public void Dispose()
         {
+            UpdateBeforeInternal("Dispose");
             _socket.Dispose();
             DisposeCalledTimes.Tick();
-            Update();
+            UpdateAfterInternal("Dispose");
         }
 
         public void Bind(IPAddress ipAddress, int port)
         {
+            UpdateBeforeInternal("Bind");
             _socket.Bind(ipAddress, port);
             BindCalledTimes.Tick();
-            Update();
+            UpdateAfterInternal("Bind");
         }
 
         public void Connect(IPAddress ipAddress, int port)
         {
+            UpdateBeforeInternal("Connect");
             _socket.Connect(ipAddress, port);
             ConnectCalledTimes.Tick();
-            Update();
+            UpdateAfterInternal("Connect");
         }
 
         public void Listen(int backlog)
         {
+            UpdateBeforeInternal("Listen");
             _socket.Listen(backlog);
             ListenCalledTimes.Tick();
-            Update();
+            UpdateAfterInternal("Listen");
         }
 
         public void Send(byte[] data)
         {
+            UpdateBeforeInternal("Send");
             _socket.Send(data);
             SendCalledTimes.Tick();
-            Update();
+            UpdateAfterInternal("Send");
         }
 
         public int Receive(byte[] bytes)
         {
             int receivedValue = _socket.Receive(bytes);
             ReceiveCalledTimes.Tick();
-            Update();
+            UpdateAfterInternal("Receive");
             
             return receivedValue;
         }
@@ -114,22 +120,30 @@ namespace RemoteApi.Integration.Helpers
             var socket = await _socket.AcceptAsync();
             AcceptAsyncCalledTimes.Tick();
             var wrapper = _acceptFactory.Invoke(socket, $"{Tag}:accept_{AcceptAsyncCalledTimes.Value}");
-            Update();
+            UpdateAfterInternal("AcceptAsync");
             
             return wrapper;
         }
 
         public void Close()
         {
+            UpdateBeforeInternal("Close");
             _socket.Close();
             CloseCalledTimes.Tick();
-            Update();
+            UpdateAfterInternal("Close");
         }
-
-        private void Update()
+        
+        private void UpdateBeforeInternal(string methodName)
         {
             ExceptionLine exceptionLine = new ExceptionLine();
-            Updated?.Invoke(this, exceptionLine);
+            UpdatedBefore?.Invoke(this, exceptionLine, methodName);
+            exceptionLine.Value.Invoke();
+        }
+
+        private void UpdateAfterInternal(string methodName)
+        {
+            ExceptionLine exceptionLine = new ExceptionLine();
+            UpdatedAfter?.Invoke(this, exceptionLine, methodName);
             exceptionLine.Value.Invoke();
         }
     }
