@@ -47,6 +47,8 @@ namespace SocketSubstitutionTests
         public IPEndPoint LocalEndPoint { get; }
         public IPEndPoint RemoteEndPoint { get; }
         public bool Connected { get; }
+        public string Tag { get; }
+
         public void Bind(IPAddress ipAddress, int port)
         {
         }

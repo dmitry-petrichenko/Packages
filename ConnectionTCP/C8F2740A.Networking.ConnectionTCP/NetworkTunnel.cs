@@ -32,12 +32,12 @@ namespace C8F2740A.Networking.ConnectionTCP
             _recorder = recorder;
             _socket = socket;
             
-            RecordOpenCloseInfo("Tunnel opened");
+            RecordOpenCloseInfo("opened");
         }
 
         public void Send(byte[] data)
         {
-            RecordSendInfo($"Tunnel.Send {data.Length}");
+            RecordSendInfo($"send {data.Length}");
             SafeExecution.TryCatch(() => _socket.Send(data), ExceptionHandler);
         }
 
@@ -58,7 +58,7 @@ namespace C8F2740A.Networking.ConnectionTCP
             while (_socket.Connected)
             {
                 int bytes = _socket.Receive(data);
-                RecordReceivedInfo($"Bytes received {bytes}");
+                RecordReceivedInfo($"received {bytes}");
                 
                 if (bytes == 0) 
                     break;
@@ -84,7 +84,7 @@ namespace C8F2740A.Networking.ConnectionTCP
 
         private void DisposeInternal()
         {
-            RecordOpenCloseInfo("Tunnel closed");
+            RecordOpenCloseInfo("closed");
             _socket.Close();
             _socket.Dispose();
         }
@@ -132,9 +132,8 @@ namespace C8F2740A.Networking.ConnectionTCP
         
         private void RecordOpenCloseInfo(string message)
         {
-            IPEndPoint local = _socket.LocalEndPoint;
             _recorder.RecordInfo(GetType().Name, 
-                $"{message}: local {LocalIpAddress}");
+                    $"{message}: local {LocalIpAddress}");
         }
 
         private string BuildMessageError(string message)

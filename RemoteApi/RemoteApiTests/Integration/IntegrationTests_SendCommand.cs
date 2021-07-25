@@ -100,12 +100,12 @@ namespace RemoteApi.Integration
                     line.Value = () => throw new Exception("exception");
                 }
             };
-            //IntegrationTestsHelpers.ArrangeDelayForSocketExecution(remote, "accept_1");
+
             await apiOperator.RaiseCommandReceived("one");
 
-            await Task.Delay(9000);
-            //Assert.Equal(0, apiOperator.Recorder.SystemErrorCalledTimes);
-            //Assert.Equal(0, remote.Recorder.SystemErrorCalledTimes);
+            await Task.Delay(6000);
+            Assert.Equal(1, apiOperator.Recorder.AppErrorCalledTimes);
+            Assert.Equal(0, apiOperator.Recorder.SystemErrorCalledTimes);
             
             IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
             _output.WriteLine("-----------------------------");

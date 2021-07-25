@@ -57,7 +57,7 @@ namespace C8F2740A.Networking.ConnectionTCP
         private async Task OpenInternal()
         {
             _isOpened = true;
-            _recorder.RecordInfo(nameof(NetworkPoint), $"NetworkPoint opened {(_sListener.LocalEndPoint).Address}:{(_sListener.LocalEndPoint).Port}");
+            _recorder.RecordInfo(nameof(NetworkPoint), $"opened {(_sListener.LocalEndPoint).Address}:{(_sListener.LocalEndPoint).Port}");
             
             while (_isOpened)
             {

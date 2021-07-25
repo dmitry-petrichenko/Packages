@@ -45,7 +45,7 @@ namespace RemoteApi.Integration.Helpers
         {
             var recorder = new ApplicationCacheRecorder();
             ((IApplicationRecorder)recorder).RecordInfo("system", "ready");
-            var sockets = new List<SocketSubstitution>();
+            var sockets = new SocketSubtitutionCollection();
             var remoteTraceMonitorСonsistent = new RemoteTraceMonitorConsistentTester(recorder);
 
             var factoryOfFactory = new FactoryOfSubstitutedSocketFactory(sockets, "operator");
@@ -61,7 +61,7 @@ namespace RemoteApi.Integration.Helpers
         {
             var recorder = new ApplicationCacheRecorder();
             ((IApplicationRecorder)recorder).RecordInfo("system", "ready");
-            var sockets = new List<SocketSubstitution>();
+            var sockets = new SocketSubtitutionCollection();
             var apiMapWrapper = default(TraceableRemoteApiMapWrapperRealSockets2);
 
             var factoryOfFactory = new FactoryOfSubstitutedSocketFactory(sockets, "remote");
@@ -82,12 +82,14 @@ namespace RemoteApi.Integration.Helpers
         
         internal class BaseWrapperRealSockets
         {
-            public IReadOnlyList<SocketSubstitution> Sockets { get; }
+            public IReadOnlyList<SocketSubstitution> Sockets => _sockets;
             public ApplicationCacheRecorder Recorder { get; }
+
+            private SocketSubtitutionCollection _sockets;
         
-            public BaseWrapperRealSockets(IReadOnlyList<SocketSubstitution> sockets, ApplicationCacheRecorder recorder)
+            public BaseWrapperRealSockets(SocketSubtitutionCollection sockets, ApplicationCacheRecorder recorder)
             {
-                Sockets = sockets;
+                _sockets = sockets;
                 Recorder = recorder;
             }
             
@@ -105,15 +107,29 @@ namespace RemoteApi.Integration.Helpers
 
                 return default;
             }
+            
+            public SocketSubstitution ArrangeSocketByTagDuringCreation(string tag, Action<SocketSubstitution> arrangeAction)
+            {
+                _sockets.SocketAdded += s =>
+                {
+                    var tagName = s.Tag.Split(":").Last();
+                    if (tagName.Equals(tag))
+                    {
+                        arrangeAction(s);
+                    }
+                };
+                
+                return default;
+            }
         }
 
         internal class FactoryOfSubstitutedSocketFactory
         {
             private readonly Dictionary<string, int> _tags;
-            private readonly List<SocketSubstitution> _sockets;
+            private readonly SocketSubtitutionCollection _sockets;
             private readonly string _globalTag;
             
-            public FactoryOfSubstitutedSocketFactory(List<SocketSubstitution> sockets, string globalTag)
+            public FactoryOfSubstitutedSocketFactory(SocketSubtitutionCollection sockets, string globalTag)
             {
                 _tags = new Dictionary<string, int>();
                 _sockets = sockets;
@@ -122,16 +138,16 @@ namespace RemoteApi.Integration.Helpers
 
             public Func<AddressFamily, SocketType, ProtocolType, string, ISocket> Create()
             {
-                ISocket SocketRegularFactory(AddressFamily family, SocketType type, ProtocolType protocolType)
+                ISocket SocketRegularFactory(AddressFamily family, SocketType type, ProtocolType protocolType, string tag)
                 {
-                    var socket = new SocketAbstraction(family, type, protocolType);
+                    var socket = new SocketAbstraction(family, type, protocolType, tag);
                     return socket;
                 }
 
                 ISocket SocketAcceptFactory(ISocket socket, string tag)
                 {
                     var socketSubstitution = new SocketSubstitution(socket, tag);
-                    _sockets.Add(socketSubstitution);
+                    _sockets.AddSocket(socketSubstitution);
                 
                     return socketSubstitution;
                 }
@@ -151,7 +167,7 @@ namespace RemoteApi.Integration.Helpers
                     }
 
                     var socket = new SocketSubstitution(SocketRegularFactory, SocketAcceptFactory, family, type, protocolType, socketName);
-                    _sockets.Add(socket);
+                    _sockets.AddSocket(socket);
                     return socket;
                 }
 
@@ -273,7 +289,7 @@ namespace RemoteApi.Integration.Helpers
 
         private readonly RemoteTraceMonitorConsistentTester _remoteTraceMonitorConsistentTester;
             
-        public RemoteOperatorTestWrapperRealSockets2(IReadOnlyList<SocketSubstitution> sockets, IApiOperator @operator, ApplicationCacheRecorder recorder, RemoteTraceMonitorConsistentTester remoteTraceMonitorConsistentTester) 
+        public RemoteOperatorTestWrapperRealSockets2(SocketSubtitutionCollection sockets, IApiOperator @operator, ApplicationCacheRecorder recorder, RemoteTraceMonitorConsistentTester remoteTraceMonitorConsistentTester) 
             : base(sockets, recorder)
         {
             Operator = @operator;
@@ -290,7 +306,7 @@ namespace RemoteApi.Integration.Helpers
     {
         public ITraceableRemoteApiMap ApiMap { get; }
 
-        public TraceableRemoteApiMapWrapperRealSockets2(IReadOnlyList<SocketSubstitution> sockets, ITraceableRemoteApiMap apiMap, ApplicationCacheRecorder recorder)
+        public TraceableRemoteApiMapWrapperRealSockets2(SocketSubtitutionCollection sockets, ITraceableRemoteApiMap apiMap, ApplicationCacheRecorder recorder)
             : base(sockets, recorder)
         {
             ApiMap = apiMap;

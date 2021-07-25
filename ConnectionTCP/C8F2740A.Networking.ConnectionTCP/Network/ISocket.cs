@@ -9,7 +9,8 @@ namespace C8F2740A.Networking.ConnectionTCP.Network
         IPEndPoint LocalEndPoint { get; }
         IPEndPoint RemoteEndPoint { get; }
         bool Connected { get; }
-        
+        string Tag { get; }
+
         void Bind(IPAddress ipAddress, int port);
         void Connect(IPAddress ipAddress, int port);
         void Listen(int backlog);

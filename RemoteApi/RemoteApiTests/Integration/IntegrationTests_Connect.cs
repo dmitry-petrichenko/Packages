@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using C8F2740A.Common.Records;
 using RemoteApi.Integration.Helpers;
 using SocketSubstitutionTests;
 using Xunit;
@@ -42,7 +44,7 @@ namespace RemoteApi.Integration
         }
 
         [Fact]
-        public async void Operator_WhenRemoteSocketDisconnected_ShouldConnectToRemoteAgainToExecuteCommand()
+        public async void Operator_WhenRemoteApiMapIsResponsingSlower_ShouldWorkCorrect()
         {
             var wrongCommandReceived = false;
             var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2("127.0.0.1:11113");
@@ -50,26 +52,28 @@ namespace RemoteApi.Integration
             remote.ApiMap.RegisterWrongCommandHandler(() => wrongCommandReceived = true);
 
             await IntegrationTestsHelpers.AssertConnectComplete(apiOperator, "connect_1");
+            
+            // arrange slowpoke remote
+            remote.ArrangeSocketByTagDuringCreation("accept_1", s =>
+            {
+                s.UpdatedBefore += (s, line, method) =>
+                {
+                    Thread.Sleep(3000);
+                };
+            });
+            //
+            
             await apiOperator.RaiseCommandReceived("connect 127.0.0.1:11114");
 
             // wait receive complete
             var accept1 = remote.GetSocketByTag("accept_1");
             await accept1.ArrangeWaiting(accept1.ReceiveCalledTimes, 2);
             
-            apiOperator.Recorder.ClearCache();
-            remote.Recorder.ClearCache();
-            
-            accept1.Close();
-            
-            // wait close complete
-            var connect2 = apiOperator.GetSocketByTag("connect_2");
-            var res = await connect2.ArrangeWaiting(connect2.CloseCalledTimes, 1, 2000);
-            Assert.True(res);
-            
-            var remoteAccept1 = remote.GetSocketByTag("accept_1");
-            await remoteAccept1.ArrangeWaiting(remoteAccept1.DisposeCalledTimes, 1);
-
+            ((IRecorder)apiOperator.Recorder).RecordInfo("--", "send command now");
             await apiOperator.RaiseCommandReceived("hello");
+            // wait receive command complete
+            var res = await accept1.ArrangeWaiting(accept1.SendCalledTimes, 3);
+            Assert.True(res);
 
             IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
             _output.WriteLine("-----------------------------");
@@ -77,10 +81,11 @@ namespace RemoteApi.Integration
             
             // Assert
             Assert.Equal(0, apiOperator.Recorder.SystemErrorCalledTimes);
+            Assert.Equal(0, apiOperator.Recorder.AppErrorCalledTimes);
+            Assert.Equal(0, remote.Recorder.SystemErrorCalledTimes);
+            Assert.Equal(0, remote.Recorder.AppErrorCalledTimes);
             Assert.True(wrongCommandReceived);
         }
-
-        //-----------------------------------------
 
         [Fact]
         public async void Operator_WhenRemoteSocketDisconnectedAndLost_ShouldTryConnectAndShowMessage()

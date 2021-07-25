@@ -7,9 +7,10 @@ namespace C8F2740A.Networking.ConnectionTCP.Network
     public class SocketAbstraction : ISocket
     {
         private Socket _socket;
-        
-        public SocketAbstraction(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
+
+        public SocketAbstraction(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType, string tag)
         {
+            Tag = tag;
             _socket = new Socket(addressFamily, socketType, protocolType);
         }
         
@@ -26,6 +27,7 @@ namespace C8F2740A.Networking.ConnectionTCP.Network
         public IPEndPoint LocalEndPoint => (IPEndPoint)_socket.LocalEndPoint;
         public IPEndPoint RemoteEndPoint => (IPEndPoint)_socket.RemoteEndPoint;
         public bool Connected => _socket.Connected;
+        public string Tag { get; }
 
         public void Bind(IPAddress ipAddress, int port)
         {

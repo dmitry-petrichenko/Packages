@@ -108,7 +108,7 @@ namespace C8F2740A.NetworkNode.RemoteApi
             var (result, data) =  await _instructionSenderHolder.TrySendInstruction(RemoteApiCommands.TRACE.ToEnumerableByte());
             if (!result)
             {
-                _applicationRecorder.RecordInfo(GetType().Name, "Fail to connect to remote");
+                _applicationRecorder.RecordInfo(GetType().Name, "Fail to execute TRACE command");
                 return false;
             }
             

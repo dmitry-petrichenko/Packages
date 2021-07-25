@@ -42,8 +42,7 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
 
         private void DisconnectedHandler()
         {
-            SafeExecution.TryCatchAsync(ConnectToSelfInternal,
-                exception => _recorder.DefaultException(this, exception));
+            ConnectToSelf();
         }
 
         public void Start()

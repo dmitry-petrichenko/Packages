@@ -28,12 +28,12 @@ namespace RemoteApi.Integration.Helpers
         public event Action<SocketSubstitution, ExceptionLine, string> UpdatedBefore;
 
         private ISocket _socket;
-        private Func<AddressFamily, SocketType, ProtocolType, ISocket> _factory;
+        private Func<AddressFamily, SocketType, ProtocolType, string, ISocket> _factory;
         private Func<ISocket, string, ISocket> _acceptFactory;
         
 
         public SocketSubstitution(
-            Func<AddressFamily, SocketType, ProtocolType, ISocket> factory,
+            Func<AddressFamily, SocketType, ProtocolType, string, ISocket> factory,
             Func<ISocket, string, ISocket> acceptFactory,
             AddressFamily addressFamily, 
             SocketType socketType, 
@@ -43,7 +43,7 @@ namespace RemoteApi.Integration.Helpers
             Tag = tag;
             _factory = factory;
             _acceptFactory = acceptFactory;
-            _socket = _factory.Invoke(addressFamily, socketType, protocolType);
+            _socket = _factory.Invoke(addressFamily, socketType, protocolType, Tag);
             Initialize();
         }
 
