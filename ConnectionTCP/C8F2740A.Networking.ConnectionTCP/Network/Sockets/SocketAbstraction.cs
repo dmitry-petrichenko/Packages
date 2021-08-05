@@ -2,7 +2,7 @@
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
-namespace C8F2740A.Networking.ConnectionTCP.Network
+namespace C8F2740A.Networking.ConnectionTCP.Network.Sockets
 {
     public class SocketAbstraction : ISocket
     {
@@ -21,6 +21,7 @@ namespace C8F2740A.Networking.ConnectionTCP.Network
 
         public void Dispose()
         {
+            _socket.Close();
             _socket.Dispose();
         }
 
@@ -59,11 +60,6 @@ namespace C8F2740A.Networking.ConnectionTCP.Network
             var socket = await _socket.AcceptAsync();
             
             return new SocketAbstraction(socket);
-        }
-
-        public void Close()
-        {
-            _socket.Close();
         }
     }
 }

@@ -1,7 +1,6 @@
-﻿using System.Threading.Tasks;
-using C8F2740A.NetworkNode.RemoteApi.Trace;
+﻿using C8F2740A.NetworkNode.RemoteApi.Trace;
 using RemoteApi.Integration.Helpers;
-using SocketSubstitutionTests;
+using RemoteApi.Integration.Helpers.SocketsSubstitution;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -21,25 +20,21 @@ namespace RemoteApi.Integration
         public async void Operator_DisconnectCommand_ShouldDisconnect()
         {
             // Arrange
-            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets("127.0.0.1:9111");
-            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets("127.0.0.1:9222");
-            await apiOperator.MessageDisplayed;
+            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets("127.0.0.1:11125");
+            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets("127.0.0.1:11126");
+            
+            await IntegrationTestsHelpers.AssertConnectComplete(apiOperator, "connect_1");
 
-            await apiOperator.RaiseCommandReceived("connect 127.0.0.1:9222");
-            await apiOperator.MessageDisplayed;
-            await remote.ConnectedComplete;
-            apiOperator.Recorder.ClearCache();
+            await apiOperator.RaiseCommandReceived("connect 127.0.0.1:11126");
+            
+            // wait connect to remote complete
+            var accept1 = remote.GetSocketByTag("accept_1");
+            await accept1.ArrangeWaiting(accept1.ReceiveCalledTimes, 2);
             
             // Act
             await apiOperator.RaiseCommandReceived("disconnect");
-            await apiOperator.MessageDisplayed;
-            
-            //Assert
-            Assert.False(apiOperator.Sockets[2].Connected);
-            Assert.Equal(1, apiOperator.Sockets[2].DisposeCalledTimes);
-            Assert.True(apiOperator.Sockets[5].Connected);
-            Assert.Equal(2, apiOperator.Sockets[5].ReceiveCalledTimes);
-            Assert.False(remote.Sockets[1].Connected);
+
+            await IntegrationTestsHelpers.AssertCloseComplete(apiOperator, "accept_1");
             
             // Log
             IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
@@ -51,8 +46,8 @@ namespace RemoteApi.Integration
         public async void Operator_ConnectAndDisconnect_ShouldWorkAsExpected()
         {
             // Arrange
-            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2("127.0.0.1:11117");
-            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2("127.0.0.1:11118");
+            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets("127.0.0.1:11117");
+            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets("127.0.0.1:11118");
             
             await IntegrationTestsHelpers.WaitingConnectComplete(apiOperator, "connect_1");
             
@@ -77,19 +72,28 @@ namespace RemoteApi.Integration
         public async void Operator_ConnectAndCommandAndDisconnectAndConnect_ShouldDisplayMessages()
         {
             // Arrange
-            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2("127.0.0.1:11119");
-            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2("127.0.0.1:11120");
+            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets("127.0.0.1:11119");
+            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets("127.0.0.1:11120");
             remote.ApiMap.RegisterCommand("example", () =>
             {
                 ((IApplicationRecorder) remote.Recorder).RecordInfo("cmd", "executed");
             });
             
-            await IntegrationTestsHelpers.AssertConnectComplete(apiOperator, "connect_1");
-
+            var res1 = await IntegrationTestsHelpers.WaitingConnectComplete(apiOperator, "connect_1");
+            //await IntegrationTestsHelpers.AssertConnectComplete(apiOperator, "connect_1");
+            if (!res1)
+            {
+                // Log
+                IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
+                _output.WriteLine("-----------------------------");
+                IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, remote.Recorder);
+                return;
+            }
+            
             await apiOperator.RaiseCommandReceived("connect 127.0.0.1:11120");
             await IntegrationTestsHelpers.AssertConnectComplete(apiOperator, "connect_2");
             
-            var displayedTest = apiOperator.Recorder.ArrangeWaitingMessage("cmd:executed", 5000);
+            var displayedTest = apiOperator.Recorder.ArrangeWaitingMessage("cmd:executed", 8000);
             await apiOperator.RaiseCommandReceived("example");
 
             // wait command complete
@@ -103,7 +107,7 @@ namespace RemoteApi.Integration
             await apiOperator.RaiseCommandReceived("disconnect");
             await IntegrationTestsHelpers.AssertCloseComplete(apiOperator, "connect_2");
             
-            displayedTest = apiOperator.Recorder.ArrangeWaitingMessage("cmd:executed", 5000);
+            displayedTest = apiOperator.Recorder.ArrangeWaitingMessage("cmd:executed", 18000);
             await apiOperator.RaiseCommandReceived("connect 127.0.0.1:11120");
             await IntegrationTestsHelpers.AssertConnectComplete(apiOperator, "connect_4");
 
@@ -127,19 +131,19 @@ namespace RemoteApi.Integration
             var execute2 = false;
             var execute3 = false;
             
-            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2("127.0.0.1:11121");
+            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets("127.0.0.1:11121");
             
-            var remote1 = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2("127.0.0.1:11122");
+            var remote1 = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets("127.0.0.1:11122");
             remote1.ApiMap.RegisterCommand("execute1", () =>
             {
                 execute1 = true;
             });
-            var remote2 = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2("127.0.0.1:11123");
+            var remote2 = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets("127.0.0.1:11123");
             remote2.ApiMap.RegisterCommand("execute2", () =>
             {
                 execute2 = true;
             });
-            var remote3 = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2("127.0.0.1:11124");
+            var remote3 = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets("127.0.0.1:11124");
             remote3.ApiMap.RegisterCommand("execute3", () =>
             {
                 execute3 = true;

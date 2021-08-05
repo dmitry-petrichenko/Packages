@@ -2,10 +2,9 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using C8F2740A.Networking.ConnectionTCP.Network;
-using SocketSubstitutionTests;
+using C8F2740A.Networking.ConnectionTCP.Network.Sockets;
 
-namespace RemoteApi.Integration.Helpers
+namespace RemoteApi.Integration.Helpers.SocketsSubstitution
 {
     public class SocketSubstitution : ISocket
     {
@@ -128,7 +127,7 @@ namespace RemoteApi.Integration.Helpers
         public void Close()
         {
             UpdateBeforeInternal("Close");
-            _socket.Close();
+            _socket.Dispose();
             CloseCalledTimes.Tick();
             UpdateAfterInternal("Close");
         }

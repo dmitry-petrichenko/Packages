@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace RemoteApi.Integration.Helpers
 {
-    public class SocketSubtitutionCollection : List<SocketSubstitution>
+    public class SocketSubtitutionCollection : List<SocketsSubstitution.SocketSubstitution>
     {
-        public event Action<SocketSubstitution> SocketAdded;
+        public event Action<SocketsSubstitution.SocketSubstitution> SocketAdded;
         
-        public void AddSocket(SocketSubstitution socket)
+        public void AddSocket(SocketsSubstitution.SocketSubstitution socket)
         {
             Add(socket);
             SocketAdded?.Invoke(socket);

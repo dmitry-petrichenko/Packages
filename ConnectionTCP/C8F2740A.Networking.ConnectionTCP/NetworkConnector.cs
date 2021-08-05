@@ -2,7 +2,7 @@
 using System.Net.Sockets;
 using C8F2740A.Common.ExecutionStrategies;
 using C8F2740A.Common.Records;
-using C8F2740A.Networking.ConnectionTCP.Network;
+using C8F2740A.Networking.ConnectionTCP.Network.SegmentedSockets;
 
 namespace C8F2740A.Networking.ConnectionTCP
 {
@@ -13,13 +13,13 @@ namespace C8F2740A.Networking.ConnectionTCP
     
     public class NetworkConnector : INetworkConnector
     {
-        private readonly Func<ISocket, INetworkTunnel> _networkTunnelFactory;
-        private readonly Func<AddressFamily, SocketType, ProtocolType, string, ISocket> _socketFactory;
+        private readonly Func<ISegmentedSocket, INetworkTunnel> _networkTunnelFactory;
+        private readonly Func<AddressFamily, SocketType, ProtocolType, string, ISegmentedSocket> _socketFactory;
         private readonly IRecorder _recorder;
 
         public NetworkConnector(
-            Func<ISocket, INetworkTunnel> networkTunnelFactory, 
-            Func<AddressFamily, SocketType, ProtocolType, string, ISocket> socketFactory,
+            Func<ISegmentedSocket, INetworkTunnel> networkTunnelFactory, 
+            Func<AddressFamily, SocketType, ProtocolType, string, ISegmentedSocket> socketFactory,
             IRecorder recorder)
         {
             _socketFactory = socketFactory;

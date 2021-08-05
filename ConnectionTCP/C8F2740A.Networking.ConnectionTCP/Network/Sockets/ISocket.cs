@@ -2,7 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 
-namespace C8F2740A.Networking.ConnectionTCP.Network
+namespace C8F2740A.Networking.ConnectionTCP.Network.Sockets
 {
     public interface ISocket : IDisposable
     {
@@ -17,6 +17,5 @@ namespace C8F2740A.Networking.ConnectionTCP.Network
         void Send(byte[] data);
         int Receive(byte[] bytes);
         Task<ISocket> AcceptAsync();
-        void Close();
     }
 }

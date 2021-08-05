@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using C8F2740A.Common.ExecutionStrategies;
 using C8F2740A.Common.Records;
-using C8F2740A.Networking.ConnectionTCP.Network;
+using C8F2740A.Networking.ConnectionTCP.Network.SegmentedSockets;
 
 namespace C8F2740A.Networking.ConnectionTCP
 {
@@ -15,8 +15,8 @@ namespace C8F2740A.Networking.ConnectionTCP
     
     public class NetworkPoint : INetworkPoint
     {
-        private readonly ISocket _sListener;
-        private readonly Func<ISocket, INetworkTunnel> _networkTunnelFactory;
+        private readonly ISegmentedSocket _sListener;
+        private readonly Func<ISegmentedSocket, INetworkTunnel> _networkTunnelFactory;
         private readonly IRecorder _recorder;
 
         private bool _isOpened;
@@ -25,8 +25,8 @@ namespace C8F2740A.Networking.ConnectionTCP
         
         public NetworkPoint(
             INetworkAddress networkAddress, 
-            Func<ISocket, INetworkTunnel> networkTunnelFactory,
-            Func<AddressFamily, SocketType, ProtocolType, string, ISocket> socketFactory,
+            Func<ISegmentedSocket, INetworkTunnel> networkTunnelFactory,
+            Func<AddressFamily, SocketType, ProtocolType, string, ISegmentedSocket> socketFactory,
             IRecorder recorder)
         {
             _recorder = recorder;
@@ -56,13 +56,13 @@ namespace C8F2740A.Networking.ConnectionTCP
         
         private async Task OpenInternal()
         {
-            _isOpened = true;
+             _isOpened = true;
             _recorder.RecordInfo(nameof(NetworkPoint), $"opened {(_sListener.LocalEndPoint).Address}:{(_sListener.LocalEndPoint).Port}");
             
             while (_isOpened)
             {
                 _sListener.Listen(10);
-                ISocket socket = await _sListener.AcceptAsync();
+                ISegmentedSocket socket = await _sListener.AcceptAsync();
 
                 SafeExecution.TryCatch(() => ConnectionAcceptedHandler(socket), ExceptionHandler);
             }
@@ -79,7 +79,7 @@ namespace C8F2740A.Networking.ConnectionTCP
             _isOpened = false;
         }
 
-        private void ConnectionAcceptedHandler(ISocket socket)
+        private void ConnectionAcceptedHandler(ISegmentedSocket socket)
         {
             var networkTunnel = _networkTunnelFactory.Invoke(socket);
             Accepted?.Invoke(networkTunnel);

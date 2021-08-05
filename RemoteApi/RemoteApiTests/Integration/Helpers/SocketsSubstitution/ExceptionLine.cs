@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SocketSubstitutionTests
+namespace RemoteApi.Integration.Helpers.SocketsSubstitution
 {
     public class ExceptionLine
     {

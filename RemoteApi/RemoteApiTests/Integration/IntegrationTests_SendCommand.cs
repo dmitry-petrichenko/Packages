@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using C8F2740A.NetworkNode.RemoteApi.Trace;
 using RemoteApi.Integration.Helpers;
-using SocketSubstitutionTests;
+using RemoteApi.Integration.Helpers.SocketsSubstitution;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -22,8 +22,8 @@ namespace RemoteApi.Integration
         [Fact]
         public async void Operator_WhenCommandSend_ShouldDisplayInMonitor2()
         {
-            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2($"127.0.0.1:22221");
-            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2($"127.0.0.1:22222");
+            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets($"127.0.0.1:22221");
+            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets($"127.0.0.1:22222");
             remote.ApiMap.RegisterCommand("command1", () =>
             {
                 ((IApplicationRecorder) remote.Recorder).RecordInfo("sme", "done");
@@ -55,8 +55,8 @@ namespace RemoteApi.Integration
         public async void Operator_WhenWrongCommandSend_ShouldCallHandler()
         {
             var wrongCommandCalled = false;
-            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2($"127.0.0.1:22225");
-            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2($"127.0.0.1:22226");
+            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets($"127.0.0.1:22225");
+            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets($"127.0.0.1:22226");
             remote.ApiMap.RegisterWrongCommandHandler(() =>
             {
                 wrongCommandCalled = true;
@@ -84,8 +84,8 @@ namespace RemoteApi.Integration
         [Fact]
         public async void Operator_WhenCommandSendAndDelayedResponse_ShouldCompleteSendingAfterTimeout()
         {
-            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2($"127.0.0.1:22227");
-            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2($"127.0.0.1:22228");
+            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets($"127.0.0.1:22227");
+            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets($"127.0.0.1:22228");
             
             await IntegrationTestsHelpers.AssertConnectComplete(apiOperator, "connect_1");
             
@@ -116,8 +116,8 @@ namespace RemoteApi.Integration
         public async void Operator_WhenCommandWithParametersSend_ShouldGetParameters2()
         {
             var actualParameter = string.Empty;
-            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2($"127.0.0.1:22223");
-            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2($"127.0.0.1:22224");
+            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets($"127.0.0.1:22223");
+            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets($"127.0.0.1:22224");
             remote.ApiMap.RegisterCommandWithParameters("withparameters", prm =>
             {
                 actualParameter = prm.FirstOrDefault();

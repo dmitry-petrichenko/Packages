@@ -1,7 +1,6 @@
 ﻿using System.Net.Sockets;
-using C8F2740A.Networking.ConnectionTCP.Network;
 
-namespace C8F2740A.Networking.ConnectionTCP
+namespace C8F2740A.Networking.ConnectionTCP.Network.Sockets
 {
     public interface ISocketFactory
     {

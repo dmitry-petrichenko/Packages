@@ -18,7 +18,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\C8F2740A.NetworkNode.RemoteApi\C8F2740A.NetworkNode.RemoteApi.csproj" />
-      <ProjectReference Include="..\SocketSubstitutionTests\SocketSubstitutionTests.csproj" />
     </ItemGroup>
 
 </Project>

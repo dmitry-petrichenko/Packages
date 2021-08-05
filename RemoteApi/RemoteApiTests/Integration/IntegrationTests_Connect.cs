@@ -1,8 +1,7 @@
 ﻿using System.Threading;
-using System.Threading.Tasks;
 using C8F2740A.Common.Records;
 using RemoteApi.Integration.Helpers;
-using SocketSubstitutionTests;
+using RemoteApi.Integration.Helpers.SocketsSubstitution;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -21,8 +20,8 @@ namespace RemoteApi.Integration
         [Fact]
         public async void Operator_WhenConnectToRemoteSocket_ShouldDisconnectLocal()
         {
-            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2("127.0.0.1:11111");
-            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2("127.0.0.1:11112");
+            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets("127.0.0.1:11111");
+            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets("127.0.0.1:11112");
             
             var connect1 = apiOperator.GetSocketByTag("connect_1");
             var res = await connect1.ArrangeWaiting(connect1.SendCalledTimes, 2);
@@ -47,8 +46,8 @@ namespace RemoteApi.Integration
         public async void Operator_WhenRemoteApiMapIsResponsingSlower_ShouldWorkCorrect()
         {
             var wrongCommandReceived = false;
-            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2("127.0.0.1:11113");
-            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2("127.0.0.1:11114");
+            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets("127.0.0.1:11113");
+            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets("127.0.0.1:11114");
             remote.ApiMap.RegisterWrongCommandHandler(() => wrongCommandReceived = true);
 
             await IntegrationTestsHelpers.AssertConnectComplete(apiOperator, "connect_1");
@@ -90,8 +89,8 @@ namespace RemoteApi.Integration
         [Fact]
         public async void Operator_WhenRemoteSocketDisconnectedAndLost_ShouldTryConnectAndShowMessage()
         {
-            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2("127.0.0.1:11115");
-            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2("127.0.0.1:11116");
+            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets("127.0.0.1:11115");
+            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets("127.0.0.1:11116");
 
             await IntegrationTestsHelpers.WaitingConnectComplete(apiOperator, "connect_1");
             

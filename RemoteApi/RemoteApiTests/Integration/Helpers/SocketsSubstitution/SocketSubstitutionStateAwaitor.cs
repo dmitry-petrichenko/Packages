@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
-using RemoteApi.Integration.Helpers;
 
-namespace SocketSubstitutionTests
+namespace RemoteApi.Integration.Helpers.SocketsSubstitution
 {
     internal class SocketSubstitutionStateAwaitor
     {

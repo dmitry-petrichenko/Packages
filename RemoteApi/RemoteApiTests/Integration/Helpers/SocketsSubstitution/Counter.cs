@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 
-namespace RemoteApi.Integration.Helpers
+namespace RemoteApi.Integration.Helpers.SocketsSubstitution
 {
     public class Counter
     {

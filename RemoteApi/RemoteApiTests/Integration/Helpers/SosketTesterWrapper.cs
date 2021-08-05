@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using C8F2740A.Networking.ConnectionTCP.Network;
+using C8F2740A.Networking.ConnectionTCP.Network.Sockets;
 
 namespace RemoteApi.Integration.Helpers
 {

@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using C8F2740A.Common.ExecutionStrategies;
 using C8F2740A.Common.Records;
-using C8F2740A.Networking.ConnectionTCP.Network;
+using C8F2740A.Networking.ConnectionTCP.Network.SegmentedSockets;
 
 namespace C8F2740A.Networking.ConnectionTCP
 {
@@ -24,10 +23,10 @@ namespace C8F2740A.Networking.ConnectionTCP
         public event Action<byte[]> Received;
         public event Action Disconnected;
         
-        private readonly ISocket _socket;
+        private readonly ISegmentedSocket _socket;
         private readonly IRecorder _recorder;
         
-        public NetworkTunnel(ISocket socket, IRecorder recorder)
+        public NetworkTunnel(ISegmentedSocket socket, IRecorder recorder)
         {
             _recorder = recorder;
             _socket = socket;
@@ -53,17 +52,15 @@ namespace C8F2740A.Networking.ConnectionTCP
         
         private void ListenInternal()
         {
-            byte[] data = new byte[1024];
-
             while (_socket.Connected)
             {
-                int bytes = _socket.Receive(data);
-                RecordReceivedInfo($"received {bytes}");
+                (int amount, byte[] data) = _socket.Receive();
+                RecordReceivedInfo($"received {amount}");
                 
-                if (bytes == 0) 
+                if (amount == 0) 
                     break;
                 
-                Received?.Invoke(data.Take(bytes).ToArray());
+                Received?.Invoke(data);
             }
 
             Disconnected?.Invoke();
@@ -85,7 +82,6 @@ namespace C8F2740A.Networking.ConnectionTCP
         private void DisposeInternal()
         {
             RecordOpenCloseInfo("closed");
-            _socket.Close();
             _socket.Dispose();
         }
 

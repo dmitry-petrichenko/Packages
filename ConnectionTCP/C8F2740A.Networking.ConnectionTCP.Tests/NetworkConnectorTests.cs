@@ -3,6 +3,8 @@ using System.Net;
 using System.Net.Sockets;
 using C8F2740A.Common.Records;
 using C8F2740A.Networking.ConnectionTCP.Network;
+using C8F2740A.Networking.ConnectionTCP.Network.SegmentedSockets;
+using C8F2740A.Networking.ConnectionTCP.Network.Sockets;
 using Telerik.JustMock;
 using Xunit;
 
@@ -11,12 +13,12 @@ namespace C8F2740A.Networking.ConnectionTCP.Tests
     public class NetworkConnectorTests
     {
         private INetworkConnector _sut;
-        private Func<AddressFamily, SocketType, ProtocolType, string, ISocket> _socketFactory;
+        private Func<AddressFamily, SocketType, ProtocolType, string, ISegmentedSocket> _socketFactory;
         private IRecorder _recorder;
         
         public NetworkConnectorTests()
         {
-            _socketFactory = (a, s, p, t) => Mock.Create<ISocket>();
+            _socketFactory = (a, s, p, t) => Mock.Create<ISegmentedSocket>();
             _recorder = Mock.Create<IRecorder>();
             _sut = new NetworkConnector(
                 socket => Mock.Create<INetworkTunnel>(), 
@@ -31,7 +33,7 @@ namespace C8F2740A.Networking.ConnectionTCP.Tests
             _socketFactory = (a, s, p, t) =>
             {
                 wasCalledTimes++;
-                return Mock.Create<ISocket>();
+                return Mock.Create<ISegmentedSocket>();
             };
             _sut = new NetworkConnector(
                 socket => Mock.Create<INetworkTunnel>(), 
@@ -48,7 +50,7 @@ namespace C8F2740A.Networking.ConnectionTCP.Tests
         [Fact]
         public void TryConnect_WithNetworkAddress_ShouldCallSocketConnect()
         {
-            var socket = Mock.Create<ISocket>();
+            var socket = Mock.Create<ISegmentedSocket>();
             _socketFactory = (a, s, p, t) => socket;
             _sut = new NetworkConnector(
                 socket => Mock.Create<INetworkTunnel>(), 
@@ -64,7 +66,7 @@ namespace C8F2740A.Networking.ConnectionTCP.Tests
         [Fact]
         public void TryConnect_WithNetworkAddress_ShouldReturnTrue()
         {
-            var socket = Mock.Create<ISocket>();
+            var socket = Mock.Create<ISegmentedSocket>();
             _socketFactory = (a, s, p, t) => socket;
             _sut = new NetworkConnector(
                 socket => Mock.Create<INetworkTunnel>(), 
@@ -81,7 +83,7 @@ namespace C8F2740A.Networking.ConnectionTCP.Tests
         [Fact]
         public void TryConnect_OnSocketException_ShouldReturnFalse()
         {
-            var socket = Mock.Create<ISocket>();
+            var socket = Mock.Create<ISegmentedSocket>();
             _socketFactory = (a, s, p, t) => socket;
             _sut = new NetworkConnector(
                 socket => Mock.Create<INetworkTunnel>(), 

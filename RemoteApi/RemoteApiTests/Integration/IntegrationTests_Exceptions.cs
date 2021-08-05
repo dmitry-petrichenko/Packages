@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using C8F2740A.NetworkNode.RemoteApi.Trace;
 using RemoteApi.Integration.Helpers;
-using SocketSubstitutionTests;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -21,8 +19,8 @@ namespace RemoteApi.Integration
         [Fact]
         public async void Operator_WhenCommandSend_ShouldDisplayInMonitor2()
         {
-            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets2($"127.0.0.1:22231");
-            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets2($"127.0.0.1:22232");
+            var apiOperator = IntegrationTestsHelpers.ArrangeLocalOperatorTestWrapperRealSockets($"127.0.0.1:22231");
+            var remote = IntegrationTestsHelpers.ArrangeRemoteApiMapTestWrapperWithRealSockets($"127.0.0.1:22232");
 
             await IntegrationTestsHelpers.AssertConnectComplete(apiOperator, "connect_1");
             

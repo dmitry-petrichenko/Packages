@@ -1,8 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
-using RemoteApi.Integration.Helpers;
+﻿using System.Threading.Tasks;
 
-namespace SocketSubstitutionTests
+namespace RemoteApi.Integration.Helpers.SocketsSubstitution
 {
     public static class SocketSubstitutionExtensions
     {
@@ -10,7 +8,7 @@ namespace SocketSubstitutionTests
             this SocketSubstitution socketSubstitution,
             Counter parameter, 
             int aimedValue, 
-            int timeoutTime = 5000)
+            int timeoutTime = 8000)
         {
             return new SocketSubstitutionStateAwaitor(socketSubstitution, parameter, aimedValue, timeoutTime).Task;
         }

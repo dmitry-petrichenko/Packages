@@ -2,6 +2,8 @@
 using C8F2740A.Common.Records;
 using C8F2740A.Networking.ConnectionTCP;
 using C8F2740A.Networking.ConnectionTCP.Network;
+using C8F2740A.Networking.ConnectionTCP.Network.SegmentedSockets;
+using C8F2740A.Networking.ConnectionTCP.Network.Sockets;
 using C8F2740A.NetworkNode.SessionTCP.Impl;
 
 namespace C8F2740A.NetworkNode.SessionTCP.Factories
@@ -43,9 +45,12 @@ namespace C8F2740A.NetworkNode.SessionTCP.Factories
             return instructionReceiver;
         }
         
-        protected virtual ISocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType, string tag)
+        protected virtual ISegmentedSocket SocketFactory(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType, string tag)
         {
-            return new SocketAbstraction(addressFamily, socketType, protocolType, tag);
+            var socketAbstraction = new SocketAbstraction(addressFamily, socketType, protocolType, tag);
+            var segmentedSocket = new SegmentedSocket(socketAbstraction, new DataSplitterFactory()); // TODO extract factory
+
+            return segmentedSocket;
         }
         
         protected virtual ISession SessionFactory(INetworkTunnel networkTunnel)
@@ -53,7 +58,7 @@ namespace C8F2740A.NetworkNode.SessionTCP.Factories
             return new Session(networkTunnel, _recorder);
         }
 
-        protected virtual INetworkTunnel NetworkTunnelFactory(ISocket socket)
+        protected virtual INetworkTunnel NetworkTunnelFactory(ISegmentedSocket socket)
         {
             return new NetworkTunnel(socket, _recorder);
         }
