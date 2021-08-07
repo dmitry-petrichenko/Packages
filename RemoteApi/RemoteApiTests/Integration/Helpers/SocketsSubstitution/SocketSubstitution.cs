@@ -2,11 +2,11 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using C8F2740A.Networking.ConnectionTCP.Network.Sockets;
+using C8F2740A.Networking.ConnectionTCP.Network.SegmentedSockets;
 
 namespace RemoteApi.Integration.Helpers.SocketsSubstitution
 {
-    public class SocketSubstitution : ISocket
+    public class SocketSubstitution : ISegmentedSocket
     {
         public string Tag { get; }
         
@@ -26,14 +26,14 @@ namespace RemoteApi.Integration.Helpers.SocketsSubstitution
         public event Action<SocketSubstitution, ExceptionLine, string> UpdatedAfter;
         public event Action<SocketSubstitution, ExceptionLine, string> UpdatedBefore;
 
-        private ISocket _socket;
-        private Func<AddressFamily, SocketType, ProtocolType, string, ISocket> _factory;
-        private Func<ISocket, string, ISocket> _acceptFactory;
+        private ISegmentedSocket _socket;
+        private Func<AddressFamily, SocketType, ProtocolType, string, ISegmentedSocket> _factory;
+        private Func<ISegmentedSocket, string, ISegmentedSocket> _acceptFactory;
         
 
         public SocketSubstitution(
-            Func<AddressFamily, SocketType, ProtocolType, string, ISocket> factory,
-            Func<ISocket, string, ISocket> acceptFactory,
+            Func<AddressFamily, SocketType, ProtocolType, string, ISegmentedSocket> factory,
+            Func<ISegmentedSocket, string, ISegmentedSocket> acceptFactory,
             AddressFamily addressFamily, 
             SocketType socketType, 
             ProtocolType protocolType, 
@@ -46,7 +46,7 @@ namespace RemoteApi.Integration.Helpers.SocketsSubstitution
             Initialize();
         }
 
-        public SocketSubstitution(ISocket socket, string tag)
+        public SocketSubstitution(ISegmentedSocket socket, string tag)
         {
             Tag = tag;
             _socket = socket;
@@ -105,16 +105,16 @@ namespace RemoteApi.Integration.Helpers.SocketsSubstitution
             UpdateAfterInternal("Send");
         }
 
-        public int Receive(byte[] bytes)
+        public (int, byte[]) Receive()
         {
-            int receivedValue = _socket.Receive(bytes);
+            (int a, byte[] received) = _socket.Receive();
             ReceiveCalledTimes.Tick();
             UpdateAfterInternal("Receive");
             
-            return receivedValue;
+            return (a, received);
         }
 
-        public async Task<ISocket> AcceptAsync()
+        public async Task<ISegmentedSocket> AcceptAsync()
         {
             var socket = await _socket.AcceptAsync();
             AcceptAsyncCalledTimes.Tick();

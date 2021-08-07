@@ -141,13 +141,15 @@ namespace RemoteApi.Integration.Helpers
 
             public Func<AddressFamily, SocketType, ProtocolType, string, ISegmentedSocket> Create()
             {
-                ISocket SocketRegularFactory(AddressFamily family, SocketType type, ProtocolType protocolType, string tag)
+                ISegmentedSocket SocketRegularFactory(AddressFamily family, SocketType type, ProtocolType protocolType, string tag)
                 {
                     var socket = new SocketAbstraction(family, type, protocolType, tag);
-                    return socket;
+                    var segmentedSocket = new SegmentedSocket(socket, new DataSplitterFactory()); //TODO вынести фабрику
+                    
+                    return segmentedSocket;
                 }
 
-                ISocket SocketAcceptFactory(ISocket socket, string tag)
+                ISegmentedSocket SocketAcceptFactory(ISegmentedSocket socket, string tag)
                 {
                     var socketSubstitution = new SocketSubstitution(socket, tag);
                     _sockets.AddSocket(socketSubstitution);
@@ -182,7 +184,7 @@ namespace RemoteApi.Integration.Helpers
         //-----------------------------------------------------------
         
         internal static IApiOperator CreateLocalOperator(
-            Func<AddressFamily, SocketType, ProtocolType, string, ISocket> socketFactory,
+            Func<AddressFamily, SocketType, ProtocolType, string, ISegmentedSocket> socketFactory,
             ApplicationCacheRecorder recorder,
             IRemoteTraceMonitorСonsistent remoteTraceMonitor = default,
             string address = "127.0.0.0:11111")
