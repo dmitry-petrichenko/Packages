@@ -1,3 +1,4 @@
 -- починить тесты
 -- вынести сетевые проекты в отдельную папку от EventDispatcher
 -- вынести создание segmentedSocket в factory
+-- переименовать тестовые проекты как 56445.network.SomeProjTests

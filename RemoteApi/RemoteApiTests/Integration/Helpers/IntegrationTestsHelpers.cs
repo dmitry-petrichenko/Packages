@@ -35,10 +35,10 @@ namespace RemoteApi.Integration.Helpers
             Assert.True(result);
         }
 
-        internal static async Task AssertCloseComplete(RemoteOperatorTestWrapperRealSockets2 apiOperator, string tag)
+        internal static async Task AssertDisposeComplete(RemoteOperatorTestWrapperRealSockets2 apiOperator, string tag)
         {
             var connect1 = apiOperator.GetSocketByTag(tag);
-            var result = await connect1.ArrangeWaiting(connect1.CloseCalledTimes, 1);
+            var result = await connect1.ArrangeWaiting(connect1.DisposeCalledTimes, 1);
             
             Assert.True(result);
         }
@@ -85,7 +85,7 @@ namespace RemoteApi.Integration.Helpers
         
         internal class BaseWrapperRealSockets
         {
-            public IReadOnlyList<SocketsSubstitution.SocketSubstitution> Sockets => _sockets;
+            public IReadOnlyCollection<SocketSubstitution> Sockets => _sockets;
             public ApplicationCacheRecorder Recorder { get; }
 
             private SocketSubtitutionCollection _sockets;
@@ -96,7 +96,7 @@ namespace RemoteApi.Integration.Helpers
                 Recorder = recorder;
             }
             
-            public SocketsSubstitution.SocketSubstitution GetSocketByTag(string tag)
+            public SocketSubstitution GetSocketByTag(string tag)
             {
                 var tagName = string.Empty;
                 foreach (var socket in Sockets)

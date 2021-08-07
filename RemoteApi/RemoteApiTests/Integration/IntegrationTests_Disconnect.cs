@@ -34,7 +34,7 @@ namespace RemoteApi.Integration
             // Act
             await apiOperator.RaiseCommandReceived("disconnect");
 
-            await IntegrationTestsHelpers.AssertCloseComplete(apiOperator, "accept_1");
+            await IntegrationTestsHelpers.AssertDisposeComplete(apiOperator, "accept_1");
             
             // Log
             IntegrationTestsHelpers.LogCacheRecorderTestInfo(_output, apiOperator.Recorder);
@@ -105,7 +105,7 @@ namespace RemoteApi.Integration
             
             // Act
             await apiOperator.RaiseCommandReceived("disconnect");
-            await IntegrationTestsHelpers.AssertCloseComplete(apiOperator, "connect_2");
+            await IntegrationTestsHelpers.AssertDisposeComplete(apiOperator, "connect_2");
             
             displayedTest = apiOperator.Recorder.ArrangeWaitingMessage("cmd:executed", 18000);
             await apiOperator.RaiseCommandReceived("connect 127.0.0.1:11120");

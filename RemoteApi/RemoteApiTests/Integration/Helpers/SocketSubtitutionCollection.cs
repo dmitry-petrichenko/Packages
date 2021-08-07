@@ -1,13 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
+using RemoteApi.Integration.Helpers.SocketsSubstitution;
 
 namespace RemoteApi.Integration.Helpers
 {
-    public class SocketSubtitutionCollection : List<SocketsSubstitution.SocketSubstitution>
+    public class SocketSubtitutionCollection : ConcurrentBag<SocketSubstitution>
     {
-        public event Action<SocketsSubstitution.SocketSubstitution> SocketAdded;
+        public event Action<SocketSubstitution> SocketAdded;
         
-        public void AddSocket(SocketsSubstitution.SocketSubstitution socket)
+        public void AddSocket(SocketSubstitution socket)
         {
             Add(socket);
             SocketAdded?.Invoke(socket);

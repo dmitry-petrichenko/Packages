@@ -21,7 +21,8 @@ namespace C8F2740A.Networking.ConnectionTCP.Network.Sockets
 
         public void Dispose()
         {
-            _socket.Close();
+            if (_socket.Connected)
+                _socket.Disconnect(false);
             _socket.Dispose();
         }
 

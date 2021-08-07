@@ -103,19 +103,16 @@ namespace RemoteApi.Integration
             var remoteListen1 = remote.GetSocketByTag("listen_1");
             var remoteAccept1 = remote.GetSocketByTag("accept_1");
             
-            apiOperator.Recorder.ClearCache();
-            remote.Recorder.ClearCache();
-            
-            remoteListen1.Close();
-            remoteAccept1.Close();
+            remoteListen1.Dispose();
+            remoteAccept1.Dispose();
 
             // wait close
             var r1 = 
                 await remoteListen1
-                    .ArrangeWaiting(remoteListen1.CloseCalledTimes, 1, 4000);
+                    .ArrangeWaiting(remoteListen1.DisposeCalledTimes, 1, 4000);
             var r2 = 
                 await remoteAccept1
-                    .ArrangeWaiting(remoteAccept1.CloseCalledTimes, 1, 4000);
+                    .ArrangeWaiting(remoteAccept1.DisposeCalledTimes, 1, 4000);
             Assert.True(r1);
             Assert.True(r2);
             

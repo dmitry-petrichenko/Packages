@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace C8F2740A.Networking.ConnectionTCP.Network.Sockets
 {
-    public interface ISocket : IDisposable
+    public interface ISocket
     {
         IPEndPoint LocalEndPoint { get; }
         IPEndPoint RemoteEndPoint { get; }
@@ -16,6 +16,7 @@ namespace C8F2740A.Networking.ConnectionTCP.Network.Sockets
         void Listen(int backlog);
         void Send(byte[] data);
         int Receive(byte[] bytes);
+        void Dispose();
         Task<ISocket> AcceptAsync();
     }
 }
