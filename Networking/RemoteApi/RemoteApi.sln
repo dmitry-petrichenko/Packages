@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.RemoteApi", "C8F2740A.NetworkNode.RemoteApi\C8F2740A.NetworkNode.RemoteApi.csproj", "{EB824790-4576-4B63-B0FA-E930469E1FA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteApiTests", "RemoteApiTests\RemoteApiTests.csproj", "{381FC182-AF77-4379-B300-6D9A4A940ACD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.RemoteApiTests", "C8F2740A.NetworkNode.RemoteApiTests\C8F2740A.NetworkNode.RemoteApiTests.csproj", "{381FC182-AF77-4379-B300-6D9A4A940ACD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{E356AF65-3D92-40D9-AC87-8AABEBD25D0D}"
 EndProject
@@ -11,10 +11,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.Common.Records", "..\Records\C8F2740A.Common.Records\C8F2740A.Common.Records.csproj", "{D5D4FCCB-38A3-446F-985C-A29BBFAA6268}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.Common.ExecutionStrategies", "..\ExecutionStrategies\C8F2740A.Common.ExecutionStrategies\C8F2740A.Common.ExecutionStrategies.csproj", "{CF5EC974-FCE7-4D41-8B7D-C76D3465BFED}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteOperator", "RemoteOperator\RemoteOperator.csproj", "{F8E67D21-A298-4215-A013-FE1368042EB0}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteOperatorWithFactories", "RemoteOperatorWithFactories\RemoteOperatorWithFactories.csproj", "{00B7CA2D-D42E-45BA-AA9F-0E0BA18C863E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.RemoteApi.Nuget", "C8F2740A.NetworkNode.RemoteApi\C8F2740A.NetworkNode.RemoteApi.Nuget.csproj", "{3089E3EF-2FCA-4407-83DF-969A8D2D08CC}"
 EndProject
@@ -48,14 +44,6 @@ Global
 		{CF5EC974-FCE7-4D41-8B7D-C76D3465BFED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF5EC974-FCE7-4D41-8B7D-C76D3465BFED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF5EC974-FCE7-4D41-8B7D-C76D3465BFED}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F8E67D21-A298-4215-A013-FE1368042EB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F8E67D21-A298-4215-A013-FE1368042EB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F8E67D21-A298-4215-A013-FE1368042EB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F8E67D21-A298-4215-A013-FE1368042EB0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{00B7CA2D-D42E-45BA-AA9F-0E0BA18C863E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{00B7CA2D-D42E-45BA-AA9F-0E0BA18C863E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{00B7CA2D-D42E-45BA-AA9F-0E0BA18C863E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{00B7CA2D-D42E-45BA-AA9F-0E0BA18C863E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3089E3EF-2FCA-4407-83DF-969A8D2D08CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3089E3EF-2FCA-4407-83DF-969A8D2D08CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3089E3EF-2FCA-4407-83DF-969A8D2D08CC}.Release|Any CPU.ActiveCfg = Release|Any CPU

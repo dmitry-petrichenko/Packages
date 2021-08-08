@@ -15,7 +15,7 @@ namespace C8F2740A.Networking.ConnectionTCP.Tests.Integration
         [Theory]
         [InlineData("127.0.0.1:8888", 1, 2, 3, 4, 100, 300)]
         [InlineData("127.0.0.1:8889", 6, 8, 255, 11, 50, 500)]
-        public async void NetworkTunnel_WhenReceive_ShouldShoudREceiveSegmented(string address, int i1, int i2, int i3, int i4,
+        public async void NetworkTunnel_WhenReceive_ShouldShouldREceiveSegmented(string address, int i1, int i2, int i3, int i4,
             int sendDelay, int handleReceiveDelay)
         {
             var bytesToSend = IntToArrayByte(i1, i2, i3, i4);
