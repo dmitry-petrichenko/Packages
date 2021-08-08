@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using C8F2740A.Common.Records;
 using C8F2740A.Networking.ConnectionTCP.Network;
@@ -42,70 +43,56 @@ namespace C8F2740A.Networking.ConnectionTCP.Tests
         }
         
         [Fact]
-        public void Send_Throws_ShouldBeCaught()
+        public void Send_ThrowsSocketException_ShouldDisconnect()
         {
+            bool calledDisconnected = false;
             var paramToSent = new byte[] { 0b01010101 };
             Mock.Arrange(() => _socket.Send(null)).IgnoreArguments().Throws(new SocketException());
             _sut = new NetworkTunnel(_socket, _recorder);
-            
+            _sut.Disconnected += () => calledDisconnected = true;
+
+            _sut.Send(paramToSent);
+
+            Assert.True(calledDisconnected);
+            //Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Once());
+        }
+        
+        [Fact]
+        public void Send_ThrowsNoSocketException_ShouldBeCaught()
+        {
+            var paramToSent = new byte[] { 0b01010101 };
+            Mock.Arrange(() => _socket.Send(null)).IgnoreArguments().Throws(new Exception());
+            _sut = new NetworkTunnel(_socket, _recorder);
+
             _sut.Send(paramToSent);
 
             Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Once());
         }
-        
-        [Fact]
-        public void Send_ThrowsInterruptConnection_ShouldBeCaught()
-        {
-            var paramToSent = new byte[] { 0b01010101 };
-            Mock.Arrange(() => _socket.Send(null)).IgnoreArguments().Throws(new SocketException(10054));
-            _sut = new NetworkTunnel(_socket, _recorder);
-            
-            _sut.Send(paramToSent);
 
-            Mock.Assert(() => _socket.Dispose(), Occurs.Exactly(1));
-            Mock.Assert(() => _recorder.RecordInfo(Arg.AnyString, Arg.AnyString), Occurs.Exactly(3));
-            Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Never());
-        }
-        
         [Fact]
-        public void Dispose_CalledTwice_ShouldCallSocketDisposeOnce()
+        public void Dispose_WhenCalled_ShouldCallSocketDispose()
         {
             var socket = Mock.Create<ISegmentedSocket>();
-            Mock.Arrange(() => socket.Connected).Returns(true);
             _sut = new NetworkTunnel(socket, _recorder);
-            
+
             _sut.Dispose();
-            _sut.Dispose();
-            
+
             Mock.Assert(() => socket.Dispose(), Occurs.Once());
         }
         
         [Fact]
-        public void Dispose_CalledTwice_ShouldCallClosedEventOnce()
+        public async Task SocketReceive_ThrowsSocketExteption_ShouldRaiseDisconnected()
         {
-            var closeRaised = 0;
+            bool disconnected = false;
             var socket = Mock.Create<ISegmentedSocket>();
-            Mock.Arrange(() => socket.Connected).Returns(true);
-            _sut = new NetworkTunnel(socket, _recorder);
-            //_sut.Closed += () => closeRaised++;
-            
-            _sut.Dispose();
-            _sut.Dispose();
-            
-            Assert.Equal(1, closeRaised);
-        }
-        
-        [Fact]
-        public async Task SocketReceive_Throws_ShouldBeCaught()
-        {
-            var socket = Mock.Create<ISegmentedSocket>();
-            //Mock.Arrange(() => socket.Receive(null)).IgnoreArguments().Throws(new SocketException());
+            Mock.Arrange(() => socket.Receive()).IgnoreArguments().Throws(new SocketException());
             Mock.Arrange(() => socket.Connected).Returns(true);
 
             _sut = new NetworkTunnel(socket, _recorder);
+            _sut.Disconnected += () => disconnected = true;
             _sut.Listen();
             await Task.Delay(100);
-            Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Once());
+            Assert.True(disconnected);
         }
     }
 }
