@@ -27,7 +27,6 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
         public void Set_WhenCalled_ShouldSubscribeOnSession()
         {
             var session = Mock.Create<ISession>();
-            session.ArrangeSet(x => x.Closed += null).IgnoreArguments().Occurs(1);
             session.ArrangeSet(x => x.Received += null).IgnoreArguments().Occurs(1);
             session.ArrangeSet(x => x.Responded += null).IgnoreArguments().Occurs(1);
             
@@ -45,7 +44,7 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
 
             _sut.Set(session2);
             
-            Mock.Assert(() => session1.Close(), Occurs.Exactly(1));
+            Mock.Assert(() => session1.Dispose(), Occurs.Exactly(1));
         }
         
         [Fact]
@@ -217,12 +216,11 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
         public void Close_WhenRaised_ShouldUnsubscribeOnSession()
         {
             var session = Mock.Create<ISession>();
-            session.ArrangeSet(x => x.Closed -= null).IgnoreArguments().Occurs(1);
             session.ArrangeSet(x => x.Received -= null).IgnoreArguments().Occurs(1);
             session.ArrangeSet(x => x.Responded -= null).IgnoreArguments().Occurs(1);
             _sut.Set(session);
             
-            Mock.Raise(() => session.Closed += null); 
+            //Mock.Raise(() => session.Closed += null); 
             
             session.AssertAll();
         }
@@ -234,7 +232,7 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
             _sut.Set(session);
             var before = _sut.HasActiveSession;
             
-            Mock.Raise(() => session.Closed += null); 
+            //Mock.Raise(() => session.Closed += null); 
             
             Assert.True(before);
             Assert.False(_sut.HasActiveSession);
@@ -255,6 +253,10 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
         }
 
         public void Dispose()
+        {
+        }
+
+        public void Listen()
         {
         }
 
@@ -290,6 +292,7 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
 
         public event Action<IEnumerable<byte>> Received;
         public event Action<IEnumerable<byte>> Responded;
+        public event Action Disconnected;
         public event Action Closed;
         
         public event Action<IEnumerable<byte>> ResponseCalledWithData;

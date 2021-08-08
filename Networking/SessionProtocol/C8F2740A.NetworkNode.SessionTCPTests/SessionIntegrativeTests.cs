@@ -118,6 +118,7 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
             public NetworkTunnelMock RemoteTunnel { get; set; }
 
             public event Action<byte[]> Received;
+            public event Action Disconnected;
             public event Action Closed;
         }
     }

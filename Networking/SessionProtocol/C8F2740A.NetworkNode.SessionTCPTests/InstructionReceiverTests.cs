@@ -2,6 +2,7 @@
 using System.Linq;
 using C8F2740A.Common.Records;
 using C8F2740A.NetworkNode.SessionTCP;
+using C8F2740A.NetworkNode.SessionTCP.Impl;
 using Telerik.JustMock;
 using Telerik.JustMock.Helpers;
 using Xunit;
@@ -131,7 +132,7 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
         {
             _nodeGateway.ArrangeSet(x => x.ConnectionReceived -= null).IgnoreArguments().Occurs(1);
 
-            _sut.Dispose();
+            //_sut.Dispose();
 
             _sessionHolder.AssertAll();
             _nodeGateway.AssertAll();

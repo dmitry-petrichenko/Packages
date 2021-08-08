@@ -34,7 +34,7 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
         [Fact]
         public void Constructor_WhenCalled_ShouldSubscribeOnClose()
         {
-            _networkTunnel.ArrangeSet(x => x.Closed += null).IgnoreArguments().Occurs(1);
+            //_networkTunnel.ArrangeSet(x => x.Closed += null).IgnoreArguments().Occurs(1);
             _sut = new Session(_networkTunnel, _recorder);
             
             _networkTunnel.AssertAll();
@@ -54,7 +54,7 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
         public void Dispose_WhenCalled_ShouldSubscribeFromSubscriptions()
         {
             _networkTunnel.ArrangeSet(x => x.Received -= null).IgnoreArguments().Occurs(1);
-            _networkTunnel.ArrangeSet(x => x.Closed -= null).IgnoreArguments().Occurs(1);
+            //_networkTunnel.ArrangeSet(x => x.Closed -= null).IgnoreArguments().Occurs(1);
             _sut = new Session(_networkTunnel, _recorder);
             
             _sut.Dispose();;
@@ -222,9 +222,9 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
         {
             var calledClose = false;
             _sut = new Session(_networkTunnel, _recorder);
-            _sut.Closed += ()=> calledClose = true;
+            //_sut.Closed += ()=> calledClose = true;
 
-            Mock.Raise(() => _networkTunnel.Closed += null); 
+            //Mock.Raise(() => _networkTunnel.Closed += null); 
 
             Assert.True(calledClose);
         }
