@@ -213,29 +213,17 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
         
         #region Close
         [Fact]
-        public void Close_WhenRaised_ShouldUnsubscribeOnSession()
+        public void Disconnected_WhenRaised_ShouldRaiseDisconnected()
         {
+            bool disconnectedCalled = false;
             var session = Mock.Create<ISession>();
-            session.ArrangeSet(x => x.Received -= null).IgnoreArguments().Occurs(1);
-            session.ArrangeSet(x => x.Responded -= null).IgnoreArguments().Occurs(1);
+
+            _sut.Disconnected += () => disconnectedCalled = true;
             _sut.Set(session);
             
-            //Mock.Raise(() => session.Closed += null); 
+            Mock.Raise(() => session.Disconnected += null); 
             
-            session.AssertAll();
-        }
-        
-        [Fact]
-        public void SessionClosed_WhenRaised_ShouldReset()
-        {
-            var session = Mock.Create<ISession>();
-            _sut.Set(session);
-            var before = _sut.HasActiveSession;
-            
-            //Mock.Raise(() => session.Closed += null); 
-            
-            Assert.True(before);
-            Assert.False(_sut.HasActiveSession);
+            Assert.True(disconnectedCalled);
         }
         #endregion
     }

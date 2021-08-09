@@ -126,17 +126,22 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
         }
         #endregion
         
-        #region Dispose
+        #region Disconnect
         [Fact]
-        public void Dispose_WhenCalled_ShouldClearAndUnsubscribe()
+        public void Disconnect_WhenRaised_ShouldClearSession()
         {
-            _nodeGateway.ArrangeSet(x => x.ConnectionReceived -= null).IgnoreArguments().Occurs(1);
+            Mock.Arrange(() => _sessionHolder.HasActiveSession).Returns(true);
+            
+            Mock.Raise(() => _sessionHolder.Disconnected += null); 
 
-            //_sut.Dispose();
-
-            _sessionHolder.AssertAll();
-            _nodeGateway.AssertAll();
             Mock.Assert(() => _sessionHolder.Clear(), Occurs.Exactly(1));
+        }
+        
+        public void Disconnect_WhenRaisedHasActiveSessionFalse_ShouldNotClearSession()
+        {
+            Mock.Raise(() => _sessionHolder.Disconnected += null); 
+
+            Mock.Assert(() => _sessionHolder.Clear(), Occurs.Exactly(0));
         }
         #endregion
     }

@@ -57,16 +57,13 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
         [Theory]
         [InlineData( new byte[] { 0b1101_1111, 0b0101_1101} )]
         [InlineData( new byte[] { 0b1111_1111, 0b1101_0101} )]
-        public void TrySendInstruction_WhenCalledWithNoActiveSession_ShouldConnect(IEnumerable<byte> data)
+        public void TrySendInstruction_WhenCalledWithNoActiveSession_ShouldRecordError(IEnumerable<byte> data)
         {
-            var session = Mock.Create<ISession>();
             Mock.Arrange(() => _sessionHolder.HasActiveSession).Returns(false);
-            Mock.Arrange(() => _nodeVisitor.TryConnect(Arg.IsAny<INetworkAddress>())).Returns((true, session));
-            
+
             _sut.TrySendInstruction(data);
             
-            Mock.Assert(() => _sessionHolder.SendInstruction(data), Occurs.Exactly(1));
-            Mock.Assert(() => _sessionHolder.Set(session), Occurs.Exactly(1));
+            Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Exactly(1));
         }
         
         [Theory]
@@ -76,11 +73,9 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
         {
             var session = Mock.Create<ISession>();
             Mock.Arrange(() => _sessionHolder.HasActiveSession).Returns(false);
-            Mock.Arrange(() => _nodeVisitor.TryConnect(Arg.IsAny<INetworkAddress>())).Returns((false, session));
-            
+
             _sut.TrySendInstruction(data);
             
-            Mock.Assert(() => _nodeVisitor.TryConnect(Arg.IsAny<INetworkAddress>()), Occurs.Exactly(1));
             Mock.Assert(() => _sessionHolder.SendInstruction(data), Occurs.Exactly(0));
             Mock.Assert(() => _sessionHolder.Set(session), Occurs.Exactly(0));
         }

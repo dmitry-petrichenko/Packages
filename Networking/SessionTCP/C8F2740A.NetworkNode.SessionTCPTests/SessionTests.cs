@@ -24,11 +24,11 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
         
         #region Constructor
         [Fact]
-        public void Constructor_WhenCalled_ShouldStartListen()
+        public void Constructor_WhenCalled_ShouldNotStartListen()
         {
             _sut = new Session(_networkTunnel, _recorder);
             
-            Mock.Assert(() => _networkTunnel.Listen(), Occurs.Exactly(1));
+            Mock.Assert(() => _networkTunnel.Listen(), Occurs.Exactly(0));
         }
         
         [Fact]
@@ -218,15 +218,15 @@ namespace C8F2740A.NetworkNode.SessionTCPTests
         #endregion  
         
         [Fact]
-        public void Close_WhenRaised_ShouldRaiseClose()
+        public void Disconnected_WhenRaised_ShouldRaiseDisconnected()
         {
-            var calledClose = false;
+            var calledDisconnected = false;
             _sut = new Session(_networkTunnel, _recorder);
-            //_sut.Closed += ()=> calledClose = true;
+            _sut.Disconnected += ()=> calledDisconnected = true;
 
-            //Mock.Raise(() => _networkTunnel.Closed += null); 
+            Mock.Raise(() => _networkTunnel.Disconnected += null); 
 
-            Assert.True(calledClose);
+            Assert.True(calledDisconnected);
         }
         
         private byte[] GenerateDataWithPrefix(byte prefix, byte[] data, bool responseBehaviour = false, int startIndex = int.MinValue)

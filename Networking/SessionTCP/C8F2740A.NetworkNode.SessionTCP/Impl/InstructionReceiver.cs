@@ -61,6 +61,7 @@ namespace C8F2740A.NetworkNode.SessionTCP.Impl
             }
             
             _recorder.RecordError(GetType().Name, "Trying to sent instruction without session");
+            
             return Task.FromResult((false, Enumerable.Empty<byte>()));
         }
     }

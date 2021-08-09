@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.Common.ExecutionSt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.Networking.ConnectionTCP.Tests", "ConnectionTCP\C8F2740A.Networking.ConnectionTCP.Tests\C8F2740A.Networking.ConnectionTCP.Tests.csproj", "{D1025576-4BD8-4BE9-BC25-CE542E766508}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.SessionTCPTests", "SessionTCP\C8F2740A.NetworkNode.SessionTCPTests\C8F2740A.NetworkNode.SessionTCPTests.csproj", "{EFA35A70-FFDA-49A8-B022-90DD23E0E7E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{D1025576-4BD8-4BE9-BC25-CE542E766508}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1025576-4BD8-4BE9-BC25-CE542E766508}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1025576-4BD8-4BE9-BC25-CE542E766508}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFA35A70-FFDA-49A8-B022-90DD23E0E7E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFA35A70-FFDA-49A8-B022-90DD23E0E7E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFA35A70-FFDA-49A8-B022-90DD23E0E7E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFA35A70-FFDA-49A8-B022-90DD23E0E7E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
