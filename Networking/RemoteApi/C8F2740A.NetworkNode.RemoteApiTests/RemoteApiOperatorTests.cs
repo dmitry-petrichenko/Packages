@@ -90,24 +90,26 @@ namespace RemoteApi
         {
             var instructionSender = Mock.Create<IInstructionSender>();
             Mock.Arrange(() => _instructionSenderFactory.Create(Arg.IsAny<string>())).Returns(instructionSender);
-
+            Mock.Arrange(() => instructionSender.TryConnect()).Returns(true);
+            
             _sut.Connect("127.0.0.1:10101");
             
             Mock.Assert(() => _instructionSenderHolder.Set(Arg.IsAny<IInstructionSender>()), Occurs.Once());
         }
         
         [Fact]
-        public void TrySendInstruction_WhenReturnsTrue_ShouldSetHolder()
+        public void TryConnect_WhenReturnsFalse_ShouldRecordInfo()
         {
             var instructionSender = Mock.Create<IInstructionSender>();
+            Mock.Arrange(() => instructionSender.TryConnect()).Returns(false);
             Mock.Arrange(() => _instructionSenderHolder.TrySendInstruction(Arg.IsAny<IEnumerable<byte>>()))
                 .Returns(Task.FromResult((true, Enumerable.Empty<byte>())));
             Mock.Arrange(() => _instructionSenderFactory.Create(Arg.IsAny<string>())).Returns(instructionSender);
 
             _sut.Connect("127.0.0.1:10101");
             
-            Mock.Assert(() => _instructionSenderHolder.Set(Arg.IsAny<IInstructionSender>()), Occurs.Once());
-            Mock.Assert(() => _recorder.RecordError(Arg.AnyString, Arg.AnyString), Occurs.Never());
+            Mock.Assert(() => _instructionSenderHolder.Set(Arg.IsAny<IInstructionSender>()), Occurs.Never());
+            Mock.Assert(() => _applicationRecorder.RecordInfo(Arg.AnyString, Arg.AnyString), Occurs.Once());
         }
 
         [Fact]
