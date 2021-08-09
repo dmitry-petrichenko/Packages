@@ -8,6 +8,7 @@ using Xunit;
 
 namespace RemoteApi
 {
+    [Collection("Serial")]
     public class TraceableRemoteApiMapTests
     {
         private ITraceableRemoteApiMap _sut;

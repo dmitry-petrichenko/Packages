@@ -7,6 +7,7 @@ using Xunit;
 
 namespace RemoteApi
 {
+    [Collection("Serial")]
     public class RemoteRecordsSenderTests
     {
         private IRemoteRecordsSender _sut;

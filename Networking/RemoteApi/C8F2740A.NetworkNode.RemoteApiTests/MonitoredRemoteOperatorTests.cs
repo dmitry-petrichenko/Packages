@@ -8,6 +8,7 @@ using Xunit;
 
 namespace RemoteApi
 {
+    [Collection("Serial")]
     public class MonitoredRemoteOperatorTests
     {
         private IMonitoredRemoteOperator _sut;

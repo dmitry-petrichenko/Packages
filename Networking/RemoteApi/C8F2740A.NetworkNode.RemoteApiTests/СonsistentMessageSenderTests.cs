@@ -45,23 +45,43 @@ namespace RemoteApi
         [Fact]
         public async void SendRemote_AfterCallSeveralTimes_ShouldSendMessagesConsistently()
         {
+            int trySendTextCalledTimes = 0;
             var taskCompletion = default(TaskCompletionSource<bool>);
-            _sut = new СonsistentMessageSender(_textToRemoteSender, _recorder);
-
-            Mock.Arrange(() => _textToRemoteSender.TrySendText(Arg.IsAny<string>())).Returns(CreateCompletion().Task);
-
+            var testToRemoteSender = new TextToRemoteSenderMock();
+            
+            _sut = new СonsistentMessageSender(testToRemoteSender, _recorder);
+            testToRemoteSender.TrySendTextCalled += () => trySendTextCalledTimes++;
+            
             _sut.SendRemote("message1");
             _sut.SendRemote("message2");
             _sut.SendRemote("message3");
-            await Task.Delay(200);
+            
+            await testToRemoteSender.TrySendTextCalledTask;
+            await Task.Delay(500);
 
-            Mock.Assert(() => _textToRemoteSender.TrySendText(Arg.IsAny<string>()), Occurs.Once());
+            Assert.Equal(1, trySendTextCalledTimes);
         }
 
-        private TaskCompletionSource<bool> CreateCompletion()
+        private class TextToRemoteSenderMock : ITextToRemoteSender
         {
-            var task = new TaskCompletionSource<bool>();
-            return task;
+            public event Action TrySendTextCalled;
+            
+            private TaskCompletionSource<bool> _trySendTextCalledCompletion;
+
+            public Task TrySendTextCalledTask => _trySendTextCalledCompletion.Task;
+
+            public TextToRemoteSenderMock()
+            {
+                _trySendTextCalledCompletion = new TaskCompletionSource<bool>();
+            }
+
+            public Task<bool> TrySendText(string instruction)
+            {
+                TrySendTextCalled?.Invoke();
+                _trySendTextCalledCompletion.SetResult(true);
+                
+                return new TaskCompletionSource<bool>().Task;
+            }
         }
     }
 }

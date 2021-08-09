@@ -8,6 +8,7 @@ using Xunit;
 
 namespace RemoteApi
 {
+    [Collection("Serial")]
     public class ConnectParserTests
     {
         private IConnectParser _sut;

@@ -6,6 +6,7 @@ using Xunit;
 
 namespace RemoteApi
 {
+    [Collection("Serial")]
     public class AutoLocalConnectorTests
     {
         private IAutoLocalConnector _sut;

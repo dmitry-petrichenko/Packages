@@ -13,6 +13,7 @@ using Xunit;
 
 namespace RemoteApi
 {
+    [Collection("Serial")]
     public class RemoteApiOperatorTests
     {
         private IRemoteApiOperator _sut;
