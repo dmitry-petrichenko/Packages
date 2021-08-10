@@ -3,13 +3,12 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <RootNamespace>SampleService</RootNamespace>
     </PropertyGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\C8F2740A.NetworkNode.RAServicePlugin\C8F2740A.NetworkNode.RAServicePlugin.csproj" />
-      <ProjectReference Include="..\Operator\Operator.csproj" />
+	
+	<ItemGroup>
+      <ProjectReference Include="..\..\RemoteApiPlugin\C8F2740A.Networking.RemoteApiPlugin\C8F2740A.Networking.RemoteApiPlugin.csproj" />
     </ItemGroup>
+	
 	<ItemGroup>
 		<Content Include="appsettings.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

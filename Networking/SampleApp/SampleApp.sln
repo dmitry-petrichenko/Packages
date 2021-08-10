@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteService", "RemoteService\RemoteService.csproj", "{88E5CDE7-BF63-40E1-8ED1-DB6148E85449}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalOperator", "LocalOperator\LocalOperator.csproj", "{4716FC70-BD85-46D1-9ADA-9EB82305D798}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{88E5CDE7-BF63-40E1-8ED1-DB6148E85449}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88E5CDE7-BF63-40E1-8ED1-DB6148E85449}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88E5CDE7-BF63-40E1-8ED1-DB6148E85449}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88E5CDE7-BF63-40E1-8ED1-DB6148E85449}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4716FC70-BD85-46D1-9ADA-9EB82305D798}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4716FC70-BD85-46D1-9ADA-9EB82305D798}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4716FC70-BD85-46D1-9ADA-9EB82305D798}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4716FC70-BD85-46D1-9ADA-9EB82305D798}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
