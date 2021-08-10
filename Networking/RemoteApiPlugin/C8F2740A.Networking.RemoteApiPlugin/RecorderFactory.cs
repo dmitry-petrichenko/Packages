@@ -3,7 +3,7 @@ using C8F2740A.NetworkNode.RemoteApi;
 using C8F2740A.NetworkNode.RemoteApi.Trace;
 using Microsoft.Extensions.Configuration;
 
-namespace C8F2740A.NetworkNode.RAServicePlugin
+namespace C8F2740A.Networking.RemoteApiPlugin
 {
     public class RecorderFactory
     {

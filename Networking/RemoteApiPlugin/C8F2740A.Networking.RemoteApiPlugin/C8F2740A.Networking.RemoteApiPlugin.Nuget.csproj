@@ -1,6 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
+	<PropertyGroup>
+		<PackageId>C8F2740A.Networking.RemoteApiPlugin</PackageId>
+		<Authors>Dmitry Petrichenko</Authors>
+		<Version>1.0.0</Version>
+        <RootNamespace>C8F2740A.Networking.RemoteApiPlugin</RootNamespace>
+		<Company>C8F2740A</Company>
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
 

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
-using C8F2740A.NetworkNode.RAServicePlugin;
 using C8F2740A.NetworkNode.RemoteApi.Factories;
 using C8F2740A.NetworkNode.RemoteApi.Monitor;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
 using Microsoft.Extensions.Configuration;
 
-namespace Operator
+namespace C8F2740A.Networking.RemoteApiPlugin
 {
     public interface IOperatorBuildable
     {
@@ -64,7 +63,6 @@ namespace Operator
 
         private void SystemInterruptedHandler(string message)
         {
-            //.Dispose();
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(message);

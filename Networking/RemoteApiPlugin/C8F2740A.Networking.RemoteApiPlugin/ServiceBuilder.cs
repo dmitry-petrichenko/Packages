@@ -5,7 +5,7 @@ using C8F2740A.NetworkNode.RemoteApi.Trace;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
 using Microsoft.Extensions.Configuration;
 
-namespace C8F2740A.NetworkNode.RAServicePlugin
+namespace C8F2740A.Networking.RemoteApiPlugin
 {
     public class ServiceBuilder : IServiceBuilder, IServiceRunner
     {

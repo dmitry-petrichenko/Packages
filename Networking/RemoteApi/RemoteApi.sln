@@ -8,10 +8,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.Networking.ConnectionTCP", "..\ConnectionTCP\C8F2740A.Networking.ConnectionTCP\C8F2740A.Networking.ConnectionTCP.csproj", "{6678655B-E8D1-4CCC-A3B1-4149ECE4FBBD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.Common.Records", "..\Records\C8F2740A.Common.Records\C8F2740A.Common.Records.csproj", "{D5D4FCCB-38A3-446F-985C-A29BBFAA6268}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.Common.ExecutionStrategies", "..\ExecutionStrategies\C8F2740A.Common.ExecutionStrategies\C8F2740A.Common.ExecutionStrategies.csproj", "{CF5EC974-FCE7-4D41-8B7D-C76D3465BFED}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C8F2740A.NetworkNode.RemoteApi.Nuget", "C8F2740A.NetworkNode.RemoteApi\C8F2740A.NetworkNode.RemoteApi.Nuget.csproj", "{3089E3EF-2FCA-4407-83DF-969A8D2D08CC}"
 EndProject
 Global
@@ -32,14 +28,6 @@ Global
 		{6678655B-E8D1-4CCC-A3B1-4149ECE4FBBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6678655B-E8D1-4CCC-A3B1-4149ECE4FBBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6678655B-E8D1-4CCC-A3B1-4149ECE4FBBD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D5D4FCCB-38A3-446F-985C-A29BBFAA6268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D5D4FCCB-38A3-446F-985C-A29BBFAA6268}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D5D4FCCB-38A3-446F-985C-A29BBFAA6268}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D5D4FCCB-38A3-446F-985C-A29BBFAA6268}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CF5EC974-FCE7-4D41-8B7D-C76D3465BFED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CF5EC974-FCE7-4D41-8B7D-C76D3465BFED}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CF5EC974-FCE7-4D41-8B7D-C76D3465BFED}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CF5EC974-FCE7-4D41-8B7D-C76D3465BFED}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3089E3EF-2FCA-4407-83DF-969A8D2D08CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3089E3EF-2FCA-4407-83DF-969A8D2D08CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3089E3EF-2FCA-4407-83DF-969A8D2D08CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -47,7 +35,5 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6678655B-E8D1-4CCC-A3B1-4149ECE4FBBD} = {E356AF65-3D92-40D9-AC87-8AABEBD25D0D}
-		{D5D4FCCB-38A3-446F-985C-A29BBFAA6268} = {E356AF65-3D92-40D9-AC87-8AABEBD25D0D}
-		{CF5EC974-FCE7-4D41-8B7D-C76D3465BFED} = {E356AF65-3D92-40D9-AC87-8AABEBD25D0D}
 	EndGlobalSection
 EndGlobal
