@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using C8F2740A.NetworkNode.RAServicePlugin;
+using C8F2740A.Networking.RemoteApiPlugin;
 using C8F2740A.NetworkNode.RemoteApi.Trace;
 
 namespace SampleService
