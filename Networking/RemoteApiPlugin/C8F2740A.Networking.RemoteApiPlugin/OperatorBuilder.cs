@@ -9,7 +9,7 @@ namespace C8F2740A.Networking.RemoteApiPlugin
 {
     public interface IOperatorBuildable
     {
-        IOperatorRunnable Build();
+        IOperatorRunnable Build(string settingsPath);
     }
     
     public interface IOperatorRunnable
@@ -20,22 +20,23 @@ namespace C8F2740A.Networking.RemoteApiPlugin
     public class OperatorBuilder : IOperatorBuildable, IOperatorRunnable
     {
         private TaskCompletionSource<bool> _mainApplicationTask;
+        private IConfigurationRoot _configuration;
 
-        public IOperatorRunnable Build()
+        public IOperatorRunnable Build(string settingsPath)
         {
+            _configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build();
+            
             return this;
         }
 
         public Task Run()
         {
             _mainApplicationTask = new TaskCompletionSource<bool>();
-            
-            var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .Build();
-            
+
             // Recorder factory
-            var recorderFactory = new RecorderFactory(configuration, SystemInterruptedHandler);
+            var recorderFactory = new RecorderFactory(_configuration, SystemInterruptedHandler);
             
             // System recorder
             var systemRecorder = recorderFactory.CreateSystemRecorder();
@@ -45,8 +46,8 @@ namespace C8F2740A.Networking.RemoteApiPlugin
             
             // Remote trace monitor
             var remoteTraceMonitor = new RemoteTraceMonitor(new ConsoleAbstraction()
-                ,Int32.Parse(configuration["MONITOR_LINES"]),
-                bool.Parse(configuration["SHOW_DEBUG_MESSAGES"]),
+                ,Int32.Parse(_configuration["MONITOR_LINES"]),
+                bool.Parse(_configuration["SHOW_DEBUG_MESSAGES"]),
                 systemRecorder, 
                 systemRecorder);
             remoteTraceMonitor.Start();
@@ -56,7 +57,7 @@ namespace C8F2740A.Networking.RemoteApiPlugin
             var traceableRemoteApiMapFactory = new BaseTraceableRemoteApiMapFactory(new BaseInstructionReceiverFactory(applicationRecorder), applicationRecorder);
 
             var apiOperatorFactory = new ApiOperatorFactory(remoteOperatorFactory, traceableRemoteApiMapFactory, applicationRecorder);
-            apiOperatorFactory.Create(configuration["IP_ADDRESS"]);
+            apiOperatorFactory.Create(_configuration["IP_ADDRESS"]);
             
             return _mainApplicationTask.Task;
         }

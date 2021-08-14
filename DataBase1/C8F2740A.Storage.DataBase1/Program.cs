@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using LiteDB;
 using Microsoft.Extensions.Configuration;
 
 namespace C8F2740A.Storage.DataBase1
@@ -20,8 +18,8 @@ namespace C8F2740A.Storage.DataBase1
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .Build();
-            
-            var storage = new Storage(configuration);
+            var factory = new StorageFactory();
+            var storage = factory.Create("appsettings.json");
             var q = storage.GetQueue("q");
             q.Enqueue("a1");
             q.Enqueue("a2");
@@ -34,11 +32,8 @@ namespace C8F2740A.Storage.DataBase1
 
         private static void ReadData()
         {
-            var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .Build();
-            
-            var storage = new Storage(configuration);
+            var factory = new StorageFactory();
+            var storage = factory.Create("appsettings.json");
             var q = storage.GetQueue("q");
             Console.WriteLine(q.Dequeue().Item2);
             Console.WriteLine(q.Dequeue().Item2);

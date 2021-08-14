@@ -10,7 +10,7 @@ namespace SampleService
     {
         static async Task Main(string[] args)
         {
-            await CreateApplicationBuilder().Build(SetupCoreHandler).Run();
+            await CreateApplicationBuilder().Build(SetupCoreHandler, "appsettings.json").Run();
             
             Console.ReadLine();
         }

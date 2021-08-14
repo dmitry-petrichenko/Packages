@@ -7,7 +7,7 @@ namespace Operator
     {
         static async Task Main(string[] args)
         {
-            await CreateOperatorBuilder().Build().Run();
+            await CreateOperatorBuilder().Build("appsettings.json").Run();
         }
 
         public static IOperatorBuildable CreateOperatorBuilder()

@@ -17,10 +17,13 @@ namespace C8F2740A.Networking.RemoteApiPlugin
             _mainApplicationTask = new TaskCompletionSource<bool>();
         }
 
-        public IServiceRunner Build(Func<ITraceableRemoteApiMap, IApplicationRecorder, IRunnable> setupCore)
+        public IServiceRunner Build(
+            Func<ITraceableRemoteApiMap, IApplicationRecorder,
+            IRunnable> setupCore,
+            string settingsPath)
         {
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile(settingsPath)
                 .Build();
             
             // Recorder factory
