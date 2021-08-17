@@ -19,7 +19,7 @@ namespace C8F2740A.Networking.RemoteApiPlugin
     
     public class OperatorBuilder : IOperatorBuildable, IOperatorRunnable
     {
-        private TaskCompletionSource<bool> _mainApplicationTask;
+        private TaskCompletionSource<OperatorExecutionResult> _mainApplicationTask;
         private IConfigurationRoot _configuration;
 
         public IOperatorRunnable Build(string settingsPath)
@@ -33,7 +33,7 @@ namespace C8F2740A.Networking.RemoteApiPlugin
 
         public Task Run()
         {
-            _mainApplicationTask = new TaskCompletionSource<bool>();
+            _mainApplicationTask = new TaskCompletionSource<OperatorExecutionResult>();
 
             // Recorder factory
             var recorderFactory = new RecorderFactory(_configuration, SystemInterruptedHandler);
@@ -57,9 +57,15 @@ namespace C8F2740A.Networking.RemoteApiPlugin
             var traceableRemoteApiMapFactory = new BaseTraceableRemoteApiMapFactory(new BaseInstructionReceiverFactory(applicationRecorder), applicationRecorder);
 
             var apiOperatorFactory = new ApiOperatorFactory(remoteOperatorFactory, traceableRemoteApiMapFactory, applicationRecorder);
-            apiOperatorFactory.Create(_configuration["IP_ADDRESS"]);
+            var apiOperator = apiOperatorFactory.Create(_configuration["IP_ADDRESS"]);
+            apiOperator.Finished += FinishedHandler;
             
             return _mainApplicationTask.Task;
+        }
+        
+        private void FinishedHandler()
+        {
+            _mainApplicationTask.SetResult(OperatorExecutionResult.Exit);
         }
 
         private void SystemInterruptedHandler(string message)
@@ -70,7 +76,7 @@ namespace C8F2740A.Networking.RemoteApiPlugin
             Console.ResetColor();
 
             Console.ReadKey();
-            _mainApplicationTask.SetResult(false);
+            _mainApplicationTask.SetResult(OperatorExecutionResult.Error);
         }
     }
 }

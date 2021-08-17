@@ -6,9 +6,10 @@ using C8F2740A.NetworkNode.RemoteApi.Monitor;
 
 namespace C8F2740A.NetworkNode.RemoteApi.Trace
 {
-    public interface IMonitoredRemoteOperator : IDisposable
+    public interface IMonitoredRemoteOperator
     {
         void Start();
+        event Action Finished;
     }
     
     public class MonitoredRemoteOperator : IMonitoredRemoteOperator
@@ -16,6 +17,8 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
         private readonly IAutoLocalConnector _autoLocalConnector;
         private readonly IRemoteTraceMonitorСonsistent _remoteTraceMonitorСonsistent;
         private readonly IRecorder _recorder;
+        
+        public event Action Finished;
 
         public MonitoredRemoteOperator(
             IAutoLocalConnector autoLocalConnector,
@@ -28,6 +31,7 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
 
             _autoLocalConnector.TextReceived += TextReceivedHandler;
             _autoLocalConnector.Connected += ConnectedHandler;
+            _autoLocalConnector.Finished += () => { Finished?.Invoke(); };
             _remoteTraceMonitorСonsistent.CommandReceived += TextEnteredHandler;
         }
 
@@ -57,14 +61,6 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
         {
             SafeExecution.TryCatch(() => _autoLocalConnector.Start(),
                 exception => _recorder.DefaultException(this, exception));
-        }
-
-        public void Dispose()
-        {
-            _autoLocalConnector.TextReceived -= TextReceivedHandler;
-            _autoLocalConnector.Connected -= ConnectedHandler;
-            _remoteTraceMonitorСonsistent.CommandReceived -= TextEnteredHandler;
-            _remoteTraceMonitorСonsistent.Stop();
         }
     }
 }

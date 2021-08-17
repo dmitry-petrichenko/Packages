@@ -12,6 +12,7 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
         
         event Action<string> TextReceived;
         event Action<string> Connected;
+        event Action Finished;
     }
     
     public class AutoLocalConnector : IAutoLocalConnector
@@ -22,6 +23,8 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
             add  => _connectParser.Connected += value; 
             remove  => _connectParser.Connected -= value; 
         }
+
+        public event Action Finished;
 
         private readonly IConnectParser _connectParser;
         private readonly IRecorder _recorder;
@@ -38,13 +41,9 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
             
             _connectParser.InstructionReceived += InstructionReceivedHandler;
             _connectParser.Disconnected += DisconnectedHandler;
+            _connectParser.Finished += FinishedHandler;
         }
-
-        private void DisconnectedHandler()
-        {
-            ConnectToSelf();
-        }
-
+        
         public void Start()
         {
             ConnectToSelf();
@@ -53,6 +52,16 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
         public Task<bool> ExecuteCommand(string command)
         { 
             return _connectParser.ExecuteCommand(command);
+        }
+        
+        private void FinishedHandler()
+        {
+            Finished?.Invoke();
+        }
+
+        private void DisconnectedHandler()
+        {
+            ConnectToSelf();
         }
 
         private void InstructionReceivedHandler(string value)

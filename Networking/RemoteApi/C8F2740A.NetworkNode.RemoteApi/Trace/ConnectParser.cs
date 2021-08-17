@@ -14,6 +14,7 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
         event Action<string> InstructionReceived;
         event Action<string> Connected;
         event Action Disconnected;
+        event Action Finished;
     }
     
     public class ConnectParser : IConnectParser
@@ -25,6 +26,7 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
         }
 
         public event Action Disconnected;
+        public event Action Finished;
         public event Action<string> Connected;
         
         private readonly IRemoteApiOperator _remoteApiOperator;
@@ -58,6 +60,7 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
             {
                 "connect" => Connect(commandData.Parameters.FirstOrDefault()),
                 "disconnect" => Disconnect(),
+                "exit" => Exit(),
                 _ => _remoteApiOperator.ExecuteCommand(command)
             };
         }
@@ -90,6 +93,13 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
         {
             _remoteApiOperator.Disconnect();
             Disconnected?.Invoke();
+            
+            return Task.FromResult(true);
+        }
+        
+        private Task<bool> Exit()
+        {
+            Finished?.Invoke();
             
             return Task.FromResult(true);
         }
