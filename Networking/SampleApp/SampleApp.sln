@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteService", "RemoteServ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalOperator", "LocalOperator\LocalOperator.csproj", "{4716FC70-BD85-46D1-9ADA-9EB82305D798}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalOperator.Nuget", "LocalOperator\LocalOperator.Nuget.csproj", "{38B3AD0F-FF25-469C-BAA7-EB76E4A190ED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteService.Nuget", "RemoteService\RemoteService.Nuget.csproj", "{7E76EAA0-A5BA-4287-A3D8-9C808F4032A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{4716FC70-BD85-46D1-9ADA-9EB82305D798}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4716FC70-BD85-46D1-9ADA-9EB82305D798}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4716FC70-BD85-46D1-9ADA-9EB82305D798}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38B3AD0F-FF25-469C-BAA7-EB76E4A190ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38B3AD0F-FF25-469C-BAA7-EB76E4A190ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38B3AD0F-FF25-469C-BAA7-EB76E4A190ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38B3AD0F-FF25-469C-BAA7-EB76E4A190ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E76EAA0-A5BA-4287-A3D8-9C808F4032A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E76EAA0-A5BA-4287-A3D8-9C808F4032A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E76EAA0-A5BA-4287-A3D8-9C808F4032A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E76EAA0-A5BA-4287-A3D8-9C808F4032A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
