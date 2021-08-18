@@ -30,13 +30,16 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
         public event Action<string> Connected;
         
         private readonly IRemoteApiOperator _remoteApiOperator;
+        private readonly IApplicationRecorder _applicationRecorder;
         private readonly IRecorder _recorder;
         
         public ConnectParser(
             IRemoteApiOperator remoteApiOperator,
+            IApplicationRecorder applicationRecorder,
             IRecorder recorder)
         {
             _remoteApiOperator = remoteApiOperator;
+            _applicationRecorder = applicationRecorder;
             _recorder = recorder;
 
             _remoteApiOperator.Disconnected += DisconnectedHandler;
@@ -75,7 +78,7 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
         {
             if (address == default)
             {
-                _recorder.DefaultException(this, new Exception("Address cannot be null"));
+                _applicationRecorder.RecordInfo(GetType().Name, "address cannot be empty");
                 return false;
             }
             

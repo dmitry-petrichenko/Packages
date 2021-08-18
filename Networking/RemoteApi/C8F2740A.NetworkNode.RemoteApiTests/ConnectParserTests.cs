@@ -14,13 +14,15 @@ namespace RemoteApi
         private IConnectParser _sut;
         private IRemoteApiOperator _remoteApiOperator;
         private IRecorder _recorder;
+        private IApplicationRecorder _applicationRecorder;
         
         public ConnectParserTests()
         {
             _remoteApiOperator = Mock.Create<IRemoteApiOperator>();
             _recorder = Mock.Create<IRecorder>();
+            _applicationRecorder = Mock.Create<IApplicationRecorder>();
             
-            _sut = new ConnectParser(_remoteApiOperator, _recorder);
+            _sut = new ConnectParser(_remoteApiOperator, _applicationRecorder, _recorder);
         }
         
         [Fact]
@@ -57,11 +59,11 @@ namespace RemoteApi
         }
         
         [Fact]
-        public void ExecuteCommand_WhenCalledForConnectWithWrongParameters_ShouldRecordError()
+        public void ExecuteCommand_WhenCalledForConnectWithWrongParameters_ShouldRecordAppInfo()
         {
             _sut.ExecuteCommand("connect");
 
-            Mock.Assert(() => _recorder.DefaultException(Arg.IsAny<object>(), Arg.IsAny<Exception>()), Occurs.Once());
+            Mock.Assert(() => _applicationRecorder.RecordInfo(Arg.IsAny<string>(), Arg.IsAny<string>()), Occurs.Once());
         }
         
         [Fact]

@@ -12,7 +12,7 @@
     </ItemGroup>
 	
 	<ItemGroup>
-	  <PackageReference Include="C8F2740A.Networking.RemoteApiPlugin" Version="1.1.0" />
-	</ItemGroup>
+      <ProjectReference Include="..\..\RemoteApiPlugin\C8F2740A.Networking.RemoteApiPlugin\C8F2740A.Networking.RemoteApiPlugin.csproj" />
+    </ItemGroup>
 
 </Project>

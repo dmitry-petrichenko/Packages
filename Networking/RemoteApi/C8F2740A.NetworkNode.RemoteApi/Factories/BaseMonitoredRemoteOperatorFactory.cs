@@ -37,7 +37,7 @@ namespace C8F2740A.NetworkNode.RemoteApi.Factories
                 _instructionSenderFactory,
                 _applicationRecorder,
                 _recorder);
-            var connectParser = new ConnectParser(remoteApiOperator, _recorder);
+            var connectParser = new ConnectParser(remoteApiOperator, _applicationRecorder, _recorder);
             var autoLocalConnector = new AutoLocalConnector(connectParser, _recorder, address);
             var monitoredRemoteOperator = new MonitoredRemoteOperator(autoLocalConnector, _remoteTraceMonitor, _recorder);
 
