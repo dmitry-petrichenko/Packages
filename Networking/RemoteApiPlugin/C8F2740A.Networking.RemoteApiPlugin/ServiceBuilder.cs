@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using C8F2740A.NetworkNode.RemoteApi.Factories;
 using C8F2740A.NetworkNode.RemoteApi.Trace;
 using C8F2740A.NetworkNode.SessionTCP.Factories;
+using C8F2740A.Storage.QueuesStorage;
 using Microsoft.Extensions.Configuration;
 
 namespace C8F2740A.Networking.RemoteApiPlugin
@@ -18,7 +19,7 @@ namespace C8F2740A.Networking.RemoteApiPlugin
         }
 
         public IServiceRunner Build(
-            Func<ITraceableRemoteApiMap, IApplicationRecorder,
+            Func<ITraceableRemoteApiMap, IApplicationRecorder, IStorage,
             IRunnable> setupCore,
             string settingsPath)
         {
@@ -34,8 +35,9 @@ namespace C8F2740A.Networking.RemoteApiPlugin
             
             var traceableRemoteApiMapFactory = new BaseTraceableRemoteApiMapFactory(new BaseInstructionReceiverFactory(applicationRecorder), applicationRecorder);
             var map = traceableRemoteApiMapFactory.Create(configuration["IP_ADDRESS"]);
+            var storage = new StorageFactory().Create("appsettings.json");
 
-            _core = setupCore?.Invoke(map, applicationRecorder);
+            _core = setupCore?.Invoke(map, applicationRecorder, storage);
             
             return this;
         }

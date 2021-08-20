@@ -1,6 +1,6 @@
 ﻿using LiteDB;
 
-namespace C8F2740A.Storage.DataBase1
+namespace C8F2740A.Storage.QueuesStorage
 {
     internal static class BsonDocumentExtensions
     {

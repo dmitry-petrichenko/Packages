@@ -1,12 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace C8F2740A.Storage.DataBase1
+namespace C8F2740A.Storage.QueuesStorage
 {
-    public interface IStorageFactory
-    {
-        IStorage Create(string settingsPath);
-    }
-    
     public class StorageFactory : IStorageFactory
     {
         public IStorage Create(string settingsPath)
