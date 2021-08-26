@@ -11,12 +11,13 @@ namespace SampleService
     {
         static async Task Main(string[] args)
         {
-            await CreateApplicationBuilder().Build(SetupCoreHandler, "appsettings.json").Run();
+            var application = await CreateApplicationBuilder().Build(SetupCoreHandler, "appsettings.json");
+            application.Run();
             
             Console.ReadLine();
         }
 
-        private static IRunnable SetupCoreHandler(ITraceableRemoteApiMap map, IApplicationRecorder recorder, IStorage storage)
+        private static async Task<IRunnable> SetupCoreHandler(ITraceableRemoteApiMap map, IApplicationRecorder recorder, IStorage storage)
         {
             foreach (var message in recorder.GetCache())
             {

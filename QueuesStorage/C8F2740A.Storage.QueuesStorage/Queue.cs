@@ -1,4 +1,5 @@
-﻿using LiteDB;
+﻿using System.Linq;
+using LiteDB;
 
 namespace C8F2740A.Storage.QueuesStorage
 {
@@ -7,6 +8,7 @@ namespace C8F2740A.Storage.QueuesStorage
         (bool, string) GetCurrent();
         (bool, string) Dequeue();
         void Enqueue(string value);
+        bool TryRemoveByValue(string key);
     }
     
     public class Queue : IQueue
@@ -18,18 +20,24 @@ namespace C8F2740A.Storage.QueuesStorage
             _liteCollection = liteCollection;
         }
 
-        private (bool, BsonDocument) GetCurrentInternal(ILiteCollection<BsonDocument> liteCollectio)
+        public bool TryRemoveByValue(string key)
         {
-            var element = liteCollectio.FindOne(p => true);
-            if (element == default)
+            var elements = _liteCollection.Find(bson => bson.GetValue() == key);
+
+            var bsonValues = elements as BsonDocument[] ?? elements.ToArray();
+            if (!bsonValues.Any())
             {
-                return (false, default);
+                return false;
             }
             
-            return (true, element); 
+            foreach (var element in bsonValues)
+            {
+                _liteCollection.Delete(element);
+            }
+
+            return true;
         }
 
- 
         public (bool, string) GetCurrent()
         {
             var (result, element) = GetCurrentInternal(_liteCollection);
@@ -58,6 +66,17 @@ namespace C8F2740A.Storage.QueuesStorage
         public void Enqueue(string value)
         {
             _liteCollection.Insert(new BsonDocument().SetValue(value));
+        }
+        
+        private (bool, BsonDocument) GetCurrentInternal(ILiteCollection<BsonDocument> liteCollectio)
+        {
+            var element = liteCollectio.FindOne(p => true);
+            if (element == default)
+            {
+                return (false, default);
+            }
+            
+            return (true, element); 
         }
     }
 }

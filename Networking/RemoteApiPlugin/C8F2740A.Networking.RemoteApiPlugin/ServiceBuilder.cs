@@ -18,9 +18,9 @@ namespace C8F2740A.Networking.RemoteApiPlugin
             _mainApplicationTask = new TaskCompletionSource<bool>();
         }
 
-        public IServiceRunner Build(
+        public async Task<IServiceRunner> Build(
             Func<ITraceableRemoteApiMap, IApplicationRecorder, IStorage,
-            IRunnable> setupCore,
+            Task<IRunnable>> setupCore,
             string settingsPath)
         {
             var configuration = new ConfigurationBuilder()
@@ -37,7 +37,7 @@ namespace C8F2740A.Networking.RemoteApiPlugin
             var map = traceableRemoteApiMapFactory.Create(configuration["IP_ADDRESS"]);
             var storage = new StorageFactory().Create("appsettings.json");
 
-            _core = setupCore?.Invoke(map, applicationRecorder, storage);
+            _core = await setupCore?.Invoke(map, applicationRecorder, storage);
             
             return this;
         }
