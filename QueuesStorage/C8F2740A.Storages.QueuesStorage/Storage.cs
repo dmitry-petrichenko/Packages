@@ -1,7 +1,7 @@
 ﻿using LiteDB;
 using Microsoft.Extensions.Configuration;
 
-namespace C8F2740A.Storage.QueuesStorage
+namespace C8F2740A.Storages.QueuesStorage
 {
     public interface IStorage
     {
@@ -21,7 +21,7 @@ namespace C8F2740A.Storage.QueuesStorage
         public IQueue GetQueue(string name)
         {
             var collection = _liteDatabase.GetCollection<BsonDocument>(name);
-            var queue = new Queue(collection);
+            var queue = new Queue(collection, _liteDatabase);
 
             return queue;
         }

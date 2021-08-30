@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace C8F2740A.Storage.QueuesStorage
+namespace C8F2740A.Storages.QueuesStorage
 {
     public class StorageFactory : IStorageFactory
     {

@@ -1,4 +1,4 @@
-﻿namespace C8F2740A.Storage.QueuesStorage
+﻿namespace C8F2740A.Storages.QueuesStorage
 {
     public interface IStorageFactory
     {

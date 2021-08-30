@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using LiteDB;
 
-namespace C8F2740A.Storage.QueuesStorage
+namespace C8F2740A.Storages.QueuesStorage
 {
     public interface IQueue
     {
@@ -14,10 +14,12 @@ namespace C8F2740A.Storage.QueuesStorage
     public class Queue : IQueue
     {
         private readonly ILiteCollection<BsonDocument> _liteCollection;
+        private readonly ILiteDatabase _liteDatabase;
         
-        public Queue(ILiteCollection<BsonDocument> liteCollection)
+        public Queue(ILiteCollection<BsonDocument> liteCollection, ILiteDatabase liteDatabase)
         {
             _liteCollection = liteCollection;
+            _liteDatabase = liteDatabase;
         }
 
         public bool TryRemoveByValue(string key)
@@ -34,6 +36,8 @@ namespace C8F2740A.Storage.QueuesStorage
             {
                 _liteCollection.Delete(element);
             }
+            
+            _liteDatabase.Commit();
 
             return true;
         }
@@ -59,6 +63,7 @@ namespace C8F2740A.Storage.QueuesStorage
 
             var s = element.GetValue();
             _liteCollection.Delete(element.GetId());
+            _liteDatabase.Commit();
 
             return (true, s);
         }
@@ -66,6 +71,7 @@ namespace C8F2740A.Storage.QueuesStorage
         public void Enqueue(string value)
         {
             _liteCollection.Insert(new BsonDocument().SetValue(value));
+            _liteDatabase.Commit();
         }
         
         private (bool, BsonDocument) GetCurrentInternal(ILiteCollection<BsonDocument> liteCollectio)

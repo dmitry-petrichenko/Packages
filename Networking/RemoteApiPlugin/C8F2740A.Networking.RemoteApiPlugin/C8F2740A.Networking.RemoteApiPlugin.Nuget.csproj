@@ -11,7 +11,7 @@
 
     <ItemGroup>
       <PackageReference Include="C8F2740A.NetworkNode.RemoteApi" Version="1.1.0" />
-      <PackageReference Include="C8F2740A.Storage.QueuesStorage" Version="1.0.0" />
+      <PackageReference Include="C8F2740A.Storages.QueuesStorage" Version="1.2.0" />
       <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
     </ItemGroup>

@@ -10,7 +10,7 @@
     </ItemGroup>
 	
 	<ItemGroup>
-      <ProjectReference Include="..\..\..\QueuesStorage\C8F2740A.Storage.QueuesStorage\C8F2740A.Storage.QueuesStorage.csproj" />
+      <ProjectReference Include="..\..\..\QueuesStorage\C8F2740A.Storages.QueuesStorage\C8F2740A.Storages.QueuesStorage.csproj" />
       <ProjectReference Include="..\..\RemoteApi\C8F2740A.NetworkNode.RemoteApi\C8F2740A.NetworkNode.RemoteApi.csproj" />
     </ItemGroup>
 
