@@ -1,4 +1,4 @@
-﻿using C8F2740A.Storage.QueuesStorage;
+﻿using C8F2740A.Storages.QueuesStorage;
 
 namespace SampleService
 {

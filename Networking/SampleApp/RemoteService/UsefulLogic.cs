@@ -4,7 +4,7 @@ using C8F2740A.NetworkNode.RemoteApi.Trace;
 
 namespace SampleService
 {
-    public class UsefulLogic : IRunnable
+    public class UsefulLogic : IUpable
     {
         private readonly IApplicationRecorder _recorder;
         private ulong _currentValue;
@@ -30,7 +30,7 @@ namespace SampleService
             }
         }
 
-        public void Run()
+        public void Up()
         {
             StartProcess();
         }

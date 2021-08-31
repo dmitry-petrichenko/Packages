@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<PackageId>C8F2740A.Networking.RemoteApiPlugin</PackageId>
 		<Authors>Dmitry Petrichenko</Authors>
-		<Version>1.4.0</Version>
+		<Version>1.7.0</Version>
         <RootNamespace>C8F2740A.Networking.RemoteApiPlugin</RootNamespace>
 		<Company>C8F2740A</Company>
         <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -11,7 +11,7 @@
 
     <ItemGroup>
       <PackageReference Include="C8F2740A.NetworkNode.RemoteApi" Version="1.1.0" />
-      <PackageReference Include="C8F2740A.Storages.QueuesStorage" Version="1.2.0" />
+      <PackageReference Include="C8F2740A.Storages.QueuesStorage" Version="*" />
       <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
     </ItemGroup>

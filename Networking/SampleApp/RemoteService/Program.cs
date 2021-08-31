@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using C8F2740A.Networking.RemoteApiPlugin;
 using C8F2740A.NetworkNode.RemoteApi.Trace;
-using C8F2740A.Storage.QueuesStorage;
+using C8F2740A.Storages.QueuesStorage;
 
 namespace SampleService
 {
@@ -11,13 +11,15 @@ namespace SampleService
     {
         static async Task Main(string[] args)
         {
-            var application = await CreateApplicationBuilder().Build(SetupCoreHandler, "appsettings.json");
-            application.Run();
-            
-            Console.ReadLine();
+            var application = CreateApplicationBuilder().Build(SetupCoreHandler, "appsettings.json");
+            await application.Run();
+            // no readline after this line
         }
 
-        private static async Task<IRunnable> SetupCoreHandler(ITraceableRemoteApiMap map, IApplicationRecorder recorder, IStorage storage)
+        private static IUpable SetupCoreHandler(
+            ITraceableRemoteApiMap map, 
+            IApplicationRecorder recorder,
+            IStorage storage)
         {
             foreach (var message in recorder.GetCache())
             {

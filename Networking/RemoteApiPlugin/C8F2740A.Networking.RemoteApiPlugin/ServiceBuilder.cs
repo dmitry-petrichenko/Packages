@@ -11,7 +11,7 @@ namespace C8F2740A.Networking.RemoteApiPlugin
     public class ServiceBuilder : IServiceBuilder, IServiceRunner
     {
         private TaskCompletionSource<bool> _mainApplicationTask;
-        private IRunnable _core;
+        private IUpable _core;
         
         public ServiceBuilder()
         {
@@ -20,7 +20,7 @@ namespace C8F2740A.Networking.RemoteApiPlugin
 
         public IServiceRunner Build(
             Func<ITraceableRemoteApiMap, IApplicationRecorder, IStorage,
-            IRunnable> setupCore,
+            IUpable> setupCore,
             string settingsPath)
         {
             var configuration = new ConfigurationBuilder()
@@ -36,7 +36,9 @@ namespace C8F2740A.Networking.RemoteApiPlugin
             var traceableRemoteApiMapFactory = new BaseTraceableRemoteApiMapFactory(new BaseInstructionReceiverFactory(applicationRecorder), applicationRecorder);
             var map = traceableRemoteApiMapFactory.Create(configuration["IP_ADDRESS"]);
             var storage = new StorageFactory().Create("appsettings.json");
-
+            
+            RegisterBaseCommands(map);
+            
             _core = setupCore?.Invoke(map, applicationRecorder, storage);
             
             return this;
@@ -44,9 +46,17 @@ namespace C8F2740A.Networking.RemoteApiPlugin
 
         public Task Run()
         {
-            _core.Run();
+            _core.Up();
             
             return _mainApplicationTask.Task;
+        }
+
+        private void RegisterBaseCommands(ITraceableRemoteApiMap traceableRemoteApiMap)
+        {
+            traceableRemoteApiMap.RegisterCommand("complete", () =>
+            {
+                _mainApplicationTask.TrySetResult(true);
+            });
         }
         
         private void SystemInterruptedHandler(string message)

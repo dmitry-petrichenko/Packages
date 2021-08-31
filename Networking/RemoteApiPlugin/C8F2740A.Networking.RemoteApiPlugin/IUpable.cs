@@ -1,7 +1,7 @@
 ﻿namespace C8F2740A.Networking.RemoteApiPlugin
 {
-    public interface IRunnable
+    public interface IUpable
     {
-        void Run();
+        void Up();
     }
 }
