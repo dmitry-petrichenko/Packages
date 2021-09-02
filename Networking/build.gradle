@@ -1,0 +1,11 @@
+import xyz.ronella.gradle.plugin.simple.dotnet.core.task.*
+
+plugins {
+  id "xyz.ronella.dotnet.core"
+}
+
+tasks.register('runTests', DotNetTask) {
+	group = 'manage'
+	command = 'test'
+	args = ['-v=normal']
+}

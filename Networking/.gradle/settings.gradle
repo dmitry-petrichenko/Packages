@@ -1,0 +1,9 @@
+rootProject.name = 'C8F2740A.networking'
+include ':Records'
+project(':Records').projectDir = new File('../Records/C8F2740A.Common.Records')
+include ':ConnectionTCP'
+project(':ConnectionTCP').projectDir = new File('../ConnectionTCP/C8F2740A.Networking.ConnectionTCP')
+include ':ExecutionStrategies'
+project(':ExecutionStrategies').projectDir = new File('../ExecutionStrategies/C8F2740A.Common.ExecutionStrategies')
+include ':Root'
+project(':Root').projectDir = new File('../')

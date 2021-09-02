@@ -1,0 +1,5 @@
+tasks.register('clear', Delete) {
+  group = 'manage'
+  delete 'bin', 'obj' , '../.idea', '.idea'
+  followSymlinks = true
+}

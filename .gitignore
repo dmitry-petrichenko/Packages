@@ -10,7 +10,6 @@
 .project
 .settings
 
-
 package*.json
 
 **/gradleScripts/
@@ -18,17 +17,13 @@ package*.json
 
 *.log
 
-
 # Unity3D generated meta files
 *.pidb.meta
 /Docs/*
 
-
-
 #Build-outputs (target)
 **/target/
 build
-
 
 !Assets/CoreTech/Resources/CoreTechSettings.asset
 JetBrains.meta
