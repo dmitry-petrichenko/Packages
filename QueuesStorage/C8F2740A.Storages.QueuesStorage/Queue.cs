@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using LiteDB;
 
 namespace C8F2740A.Storages.QueuesStorage
@@ -9,6 +10,7 @@ namespace C8F2740A.Storages.QueuesStorage
         (bool, string) Dequeue();
         void Enqueue(string value);
         bool TryRemoveByValue(string key);
+        (bool, IEnumerable<string>) GetAll();
     }
     
     public class Queue : IQueue
@@ -40,6 +42,20 @@ namespace C8F2740A.Storages.QueuesStorage
             _liteDatabase.Commit();
 
             return true;
+        }
+
+        public (bool, IEnumerable<string>) GetAll()
+        {
+            string f(string v)
+            {
+                return v;
+            }
+            var all = _liteCollection
+                .FindAll()
+                .Select(e => f(e.GetValue()))
+                .ToArray();
+
+            return (true, all);
         }
 
         public (bool, string) GetCurrent()

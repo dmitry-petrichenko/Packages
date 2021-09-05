@@ -1,13 +1,15 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using C8F2740A.Storages.QueuesStorage;
 using Xunit;
 
 namespace C8F2740A.Storages.QueuesStorageTests
 {
-    public class QueueTests
+    public class QueueTests : IDisposable
     {
         private readonly string _path;
+        private IStorage _storage;
         
         public QueueTests()
         {
@@ -21,8 +23,8 @@ namespace C8F2740A.Storages.QueuesStorageTests
             var expectedValue = "value1";
             var configuration = new ConfigurationMock();
             configuration.AddKey("DATABASE_PATH", _path);
-            var storage = new Storage(configuration);
-            var queue = storage.GetQueue("test1");
+            _storage = new Storage(configuration);
+            var queue = _storage.GetQueue("test1");
             queue.Enqueue(expectedValue);
             
             // Asset
@@ -30,8 +32,6 @@ namespace C8F2740A.Storages.QueuesStorageTests
             
             // Assert
             Assert.Equal(expectedValue, current);
-
-            ClearTest(storage);
         }
         
         [Fact]
@@ -41,8 +41,8 @@ namespace C8F2740A.Storages.QueuesStorageTests
             var expectedValue = "test1";
             var configuration = new ConfigurationMock();
             configuration.AddKey("DATABASE_PATH", _path);
-            var storage = new Storage(configuration);
-            var queue = storage.GetQueue(expectedValue);
+            _storage = new Storage(configuration);
+            var queue = _storage.GetQueue(expectedValue);
 
             // Asset
             var (result, value) = queue.GetCurrent();
@@ -50,8 +50,6 @@ namespace C8F2740A.Storages.QueuesStorageTests
             // Assert
             Assert.False(result);
             Assert.Equal(String.Empty, value);
-
-            ClearTest(storage);
         }
         
         [Fact]
@@ -61,8 +59,8 @@ namespace C8F2740A.Storages.QueuesStorageTests
             var expectedValue = "test1";
             var configuration = new ConfigurationMock();
             configuration.AddKey("DATABASE_PATH", _path);
-            var storage = new Storage(configuration);
-            var queue = storage.GetQueue(expectedValue);
+            _storage = new Storage(configuration);
+            var queue = _storage.GetQueue(expectedValue);
 
             // Asset
             var (result, value) = queue.Dequeue();
@@ -70,8 +68,6 @@ namespace C8F2740A.Storages.QueuesStorageTests
             // Assert
             Assert.False(result);
             Assert.Equal(String.Empty, value);
-
-            ClearTest(storage);
         }
         
         [Fact]
@@ -81,8 +77,8 @@ namespace C8F2740A.Storages.QueuesStorageTests
             var expectedValue = "testValue";
             var configuration = new ConfigurationMock();
             configuration.AddKey("DATABASE_PATH", _path);
-            var storage = new Storage(configuration);
-            var queue = storage.GetQueue(expectedValue);
+            _storage = new Storage(configuration);
+            var queue = _storage.GetQueue(expectedValue);
             queue.Enqueue(expectedValue);
 
             // Asset
@@ -91,8 +87,6 @@ namespace C8F2740A.Storages.QueuesStorageTests
             // Assert
             Assert.True(result);
             Assert.Equal(expectedValue, value);
-
-            ClearTest(storage);
         }
         
         [Fact]
@@ -102,8 +96,8 @@ namespace C8F2740A.Storages.QueuesStorageTests
             var expectedValue = "test1";
             var configuration = new ConfigurationMock();
             configuration.AddKey("DATABASE_PATH", _path);
-            var storage = new Storage(configuration);
-            var queue = storage.GetQueue("someQueue");
+            _storage = new Storage(configuration);
+            var queue = _storage.GetQueue("someQueue");
 
             // Asset
             queue.Enqueue(expectedValue);
@@ -112,14 +106,39 @@ namespace C8F2740A.Storages.QueuesStorageTests
             var (result, actual) = queue.GetCurrent();
             Assert.True(result);
             Assert.Equal(expectedValue, actual);
-
-            ClearTest(storage);
         }
         
-        private void ClearTest(Storage storage)
+        [Fact]
+        public void GetAll_WhenCalled_ShouldReturnAll()
+        {
+            // Arrange
+            var expectedArr = new[] {"1", "12", "18", "20" };
+            var configuration = new ConfigurationMock();
+            configuration.AddKey("DATABASE_PATH", _path);
+            _storage = new Storage(configuration);
+            var queue = _storage.GetQueue("someQueue");
+
+            // Asset
+            queue.Enqueue("1");
+            queue.Enqueue("12");
+            queue.Enqueue("18");
+            queue.Enqueue("20");
+
+            // Assert
+            var (result, actual) = queue.GetAll();
+            var actualArr = actual.ToArray();
+            Assert.Equal(expectedArr, actualArr);
+        }
+        
+        private void ClearTest(IStorage storage)
         {
             storage.Dispose();
             File.Delete(_path);
+        }
+
+        public void Dispose()
+        {
+            ClearTest(_storage);
         }
     }
 }
