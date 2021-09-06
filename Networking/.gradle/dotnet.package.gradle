@@ -1,0 +1,35 @@
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "gradle.plugin.xyz.ronella.gradle.plugin:simple-dotnet-core:2.0.1"
+  }
+}
+
+import xyz.ronella.gradle.plugin.simple.dotnet.core.task.*
+apply plugin: "xyz.ronella.dotnet.core"
+
+ext { 
+  projectName = ''  // must be initialized
+} 
+
+tasks.register('clear', Delete) {
+  group = 'manage'
+  description ''
+  if (project.hasProperty("hard")) {
+      delete 'bin', 'obj' , '../.idea', '.idea'
+  }
+  else {
+      delete 'bin', 'obj'
+  }
+}
+
+tasks.register('pureBuild', DotNetTask) {
+  group = 'manage'
+  description ''
+  command = 'build'
+  args = [projectName, '--nologo']
+}

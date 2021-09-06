@@ -5,5 +5,9 @@ include ':ConnectionTCP'
 project(':ConnectionTCP').projectDir = new File('../ConnectionTCP/C8F2740A.Networking.ConnectionTCP')
 include ':ExecutionStrategies'
 project(':ExecutionStrategies').projectDir = new File('../ExecutionStrategies/C8F2740A.Common.ExecutionStrategies')
+include ':RemoteApi'
+project(':RemoteApi').projectDir = new File('../RemoteApi/C8F2740A.NetworkNode.RemoteApi')
+include ':SessionTCP'
+project(':SessionTCP').projectDir = new File('../SessionTCP/C8F2740A.NetworkNode.SessionTCP')
 include ':Root'
 project(':Root').projectDir = new File('../')

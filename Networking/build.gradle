@@ -6,6 +6,7 @@ plugins {
 
 tasks.register('runTests', DotNetTask) {
 	group = 'manage'
+	description ''
 	command = 'test'
 	args = ['-v=normal']
 }

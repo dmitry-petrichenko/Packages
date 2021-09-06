@@ -22,9 +22,9 @@ namespace SampleService
 
         private async Task StartProcess()
         {
-            while (_currentValue < ulong.MaxValue)
+            while (_currentValue < 10)
             {
-                await Task.Delay(2800);
+                await Task.Delay(1000);
                 _currentValue++;
                 _recorder.RecordInfo("App", $"value: {_currentValue}");
             }

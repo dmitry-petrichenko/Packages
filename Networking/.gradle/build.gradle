@@ -1,23 +1,13 @@
+import xyz.ronella.gradle.plugin.simple.dotnet.core.task.*
 plugins {
   id "xyz.ronella.dotnet.core" version "2.0.1"
 }
 
-tasks.register('clear') {
+tasks.register('clearGlobal') {
 	group = 'manage'
 	dependsOn(
 		'Records:clear',
 		'ConnectionTCP:clear',
 		'ExecutionStrategies:clear'
 	)
-    doLast {
-        println 'Hello world!'
-     }
 }
-
-tasks.register('test') {
-	group = 'manage'
-    doLast {
-        println 'Hello world!'
-     }
-}
-

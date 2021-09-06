@@ -1,1 +1,1 @@
-apply from: '../../.gradle/base.packages.gradle'
+apply from: '../../.gradle/dotnet.package.gradle'
