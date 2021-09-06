@@ -26,8 +26,7 @@ namespace C8F2740A.Storages.QueuesStorage
 
         public bool TryRemoveByValue(string key)
         {
-            var elements = _liteCollection.Find(bson => bson.GetValue() == key);
-
+            var elements = _liteCollection.Find(Query.Contains("value", key));
             var bsonValues = elements as BsonDocument[] ?? elements.ToArray();
             if (!bsonValues.Any())
             {
@@ -36,7 +35,11 @@ namespace C8F2740A.Storages.QueuesStorage
             
             foreach (var element in bsonValues)
             {
-                _liteCollection.Delete(element);
+                var deleteresult = _liteCollection.Delete(element.GetId());
+                if (!deleteresult)
+                {
+                    return false;
+                }
             }
             
             _liteDatabase.Commit();

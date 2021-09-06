@@ -130,6 +130,29 @@ namespace C8F2740A.Storages.QueuesStorageTests
             Assert.Equal(expectedArr, actualArr);
         }
         
+        [Fact]
+        public void TryRemoveByValue_WhenCalled_ShouldRemoveByValue()
+        {
+            // Arrange
+            var expectedArr = new[] { "1", "3" };
+            var configuration = new ConfigurationMock();
+            configuration.AddKey("DATABASE_PATH", _path);
+            _storage = new Storage(configuration);
+            var queue = _storage.GetQueue("fredy");
+            queue.Enqueue("1");
+            queue.Enqueue("2");
+            queue.Enqueue("3");
+            
+            // Asset
+            var result = queue.TryRemoveByValue("2");
+            var (succesed, all) = queue.GetAll();
+            
+            // Assert
+            Assert.True(result);
+            Assert.True(succesed);
+            Assert.Equal(expectedArr, all);
+        }
+        
         private void ClearTest(IStorage storage)
         {
             storage.Dispose();
