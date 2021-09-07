@@ -8,9 +8,9 @@ tasks.register('clearAll') {
 	dependsOn(
 		'Records:clear',
 		'ConnectionTCP:clear',
-		'ExecutionStrategies:clear'
-		'RemoteApi:clear'
-		'SessionTCP:clear'
+		'ExecutionStrategies:clear',
+		'RemoteApi:clear',
+		'SessionTCP:clear',
 		'RemoteApiPlugin:clear'
 	)
 }
