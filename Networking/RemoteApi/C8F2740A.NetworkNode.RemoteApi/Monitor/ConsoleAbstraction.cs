@@ -12,6 +12,7 @@ namespace C8F2740A.NetworkNode.RemoteApi.Monitor
         void WriteOnPosition(string value, int left = 0, int top = 0, ConsoleColor color = ConsoleColor.White);
         void Clear();
         void WriteLine(string value);
+        int GetScreenWidth();
     }
     
     public class ConsoleAbstraction : IConsoleAbstraction
@@ -58,6 +59,11 @@ namespace C8F2740A.NetworkNode.RemoteApi.Monitor
         public void WriteLine(string value)
         {
             Console.WriteLine(value);
+        }
+
+        public int GetScreenWidth()
+        {
+            return Console.WindowWidth;
         }
     }
 }

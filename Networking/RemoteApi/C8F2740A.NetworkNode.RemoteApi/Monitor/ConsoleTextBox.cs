@@ -20,7 +20,7 @@ namespace C8F2740A.NetworkNode.RemoteApi.Monitor
         public ConsoleTextBox(IConsoleAbstraction consoleAbstraction, int top, int height)
         {
             _consoleAbstraction = consoleAbstraction;
-            _textBuffer = new TextBuffer(height + 5);
+            _textBuffer = new TextBuffer(height + 5, _consoleAbstraction.GetScreenWidth() - 1);
             _height = height;
             _top = top;
         }
@@ -62,22 +62,37 @@ namespace C8F2740A.NetworkNode.RemoteApi.Monitor
         
         private class TextBuffer
         {
+            private readonly ILinesLengthFitter _linesLengthFitter;
+            
             public IEnumerable<string> Strings => _allStrings;
 
             private Queue<string> _allStrings;
             private int _size;
             
-            public TextBuffer(int size)
+            public TextBuffer(int size, int screenWidth)
             {
                 _size = size;
                 _allStrings = new Queue<string>();
+                _linesLengthFitter = new LinesLengthFitter(screenWidth);
             }
             
             public void Add(string value)
             {
                 var splitByNewLine = value.Split(Environment.NewLine);
                 var valuableStrings = splitByNewLine.Where(s => !s.Equals(string.Empty)).ToArray();
-                
+
+                var fittedStrings = _linesLengthFitter.ProceedLines(valuableStrings);
+
+                EnqueueAndShiftQueue(fittedStrings);
+            }
+
+            public void Clear()
+            {
+                _allStrings.Clear();
+            }
+            
+            private void EnqueueAndShiftQueue(IEnumerable<string> valuableStrings)
+            {
                 foreach (var line in valuableStrings)
                 {
                     _allStrings.Enqueue(line);
@@ -87,11 +102,6 @@ namespace C8F2740A.NetworkNode.RemoteApi.Monitor
                 {
                     _allStrings.Dequeue();
                 }
-            }
-
-            public void Clear()
-            {
-                _allStrings.Clear();
             }
         }
     }
