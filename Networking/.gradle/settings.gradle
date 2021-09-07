@@ -9,5 +9,7 @@ include ':RemoteApi'
 project(':RemoteApi').projectDir = new File('../RemoteApi/C8F2740A.NetworkNode.RemoteApi')
 include ':SessionTCP'
 project(':SessionTCP').projectDir = new File('../SessionTCP/C8F2740A.NetworkNode.SessionTCP')
+include ':RemoteApiPlugin'
+project(':RemoteApiPlugin').projectDir = new File('../RemoteApiPlugin/C8F2740A.Networking.RemoteApiPlugin')
 include ':Root'
 project(':Root').projectDir = new File('../')

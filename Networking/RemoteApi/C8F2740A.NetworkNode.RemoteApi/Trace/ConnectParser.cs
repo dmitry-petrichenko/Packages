@@ -81,6 +81,8 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
                 _applicationRecorder.RecordInfo(GetType().Name, "address cannot be empty");
                 return false;
             }
+
+            address = SubstituteAbbreviation(address);
             
             var connected = await _remoteApiOperator.Connect(address);
             if (connected)
@@ -90,6 +92,11 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
             }
 
             return false;
+        }
+
+        private string SubstituteAbbreviation(string address)
+        {
+            return address.Replace("l:", "127.0.0.1:");
         }
         
         private Task<bool> Disconnect()

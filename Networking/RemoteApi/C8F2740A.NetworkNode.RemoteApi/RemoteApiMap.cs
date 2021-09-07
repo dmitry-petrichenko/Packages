@@ -17,6 +17,7 @@ namespace C8F2740A.NetworkNode.RemoteApi
     
     public interface IRemoteApiMap
     {
+        IEnumerable<string> GetCommands();
         void RegisterWrongCommandHandler(Action action);
         void RegisterCommand(string name, Action handler, string description = "");
         void RegisterCommandWithParameters(string name, Action<IEnumerable<string>> handler, string description = "");
@@ -45,6 +46,12 @@ namespace C8F2740A.NetworkNode.RemoteApi
             _recorder = recorder;
             
             _instructionsReceiver.InstructionReceived += CommandHandler;
+        }
+
+        public IEnumerable<string> GetCommands()
+        {
+            var commands = _commandWithParametersMap.Keys.ToArray();
+            return commands;
         }
 
         public void RegisterWrongCommandHandler(Action action)

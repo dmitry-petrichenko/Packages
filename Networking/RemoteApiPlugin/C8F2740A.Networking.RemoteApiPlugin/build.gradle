@@ -1,0 +1,5 @@
+apply from: '../../.gradle/dotnet.package.gradle'
+
+ext { 
+  projectName = 'C8F2740A.Networking.RemoteApiPlugin.csproj'  
+} 

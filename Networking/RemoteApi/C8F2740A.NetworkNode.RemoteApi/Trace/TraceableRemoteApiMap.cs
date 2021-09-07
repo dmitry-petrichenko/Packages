@@ -7,6 +7,7 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
 {
     public interface ITraceableRemoteApiMap
     {
+        IEnumerable<string> GetCommands();
         void RegisterWrongCommandHandler(Action action);
         void RegisterCommand(string name, Action handler, string description = "");
         void RegisterCommandWithParameters(string name, Action<IEnumerable<string>> handler, string description = "");
@@ -37,6 +38,11 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
             _remoteRecordsSender.ActivateAndSendCache();
             
             TraceStarted?.Invoke();
+        }
+
+        public IEnumerable<string> GetCommands()
+        {
+            return _remoteApiMap.GetCommands();
         }
 
         public void RegisterWrongCommandHandler(Action action)

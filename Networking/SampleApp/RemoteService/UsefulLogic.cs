@@ -22,7 +22,7 @@ namespace SampleService
 
         private async Task StartProcess()
         {
-            while (_currentValue < 10)
+            while (_currentValue < 1000)
             {
                 await Task.Delay(1000);
                 _currentValue++;
