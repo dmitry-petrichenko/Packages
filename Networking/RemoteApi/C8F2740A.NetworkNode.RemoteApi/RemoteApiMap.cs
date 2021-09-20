@@ -118,7 +118,7 @@ namespace C8F2740A.NetworkNode.RemoteApi
 
             if (!result.Item1)
             {
-                _recorder?.RecordError(GetType().Name, "Fail to send text");
+                _recorder?.RecordError(GetType().Name, "fail to send text");
             }
 
             return result.Item1;

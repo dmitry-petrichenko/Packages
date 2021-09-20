@@ -27,7 +27,7 @@ namespace C8F2740A.NetworkNode.RemoteApi.Factories
             var remoteApiMap = new RemoteApiMap(instructionReceiver, _recorder);
             var consistentMessageSender = new СonsistentMessageSender(remoteApiMap, _recorder);
             var remoteRecorderSender = new RemoteRecordsSender(consistentMessageSender, _recorder, _recorder);
-            var traceableRemoteApiMap = new TraceableRemoteApiMap(remoteApiMap, remoteRecorderSender, _recorder);
+            var traceableRemoteApiMap = new TraceableRemoteApiMap(remoteApiMap, remoteRecorderSender, _recorder, _recorder);
 
             return traceableRemoteApiMap;
         }

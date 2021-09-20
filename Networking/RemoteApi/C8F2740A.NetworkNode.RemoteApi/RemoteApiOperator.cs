@@ -54,7 +54,7 @@ namespace C8F2740A.NetworkNode.RemoteApi
                 _instructionSenderHolder.Clear();
             }
             
-            _applicationRecorder.RecordInfo(GetType().Name, "Remote point disconnected");
+            _applicationRecorder.RecordInfo(GetType().Name, "remote point disconnected");
             Disconnected?.Invoke();
         }
 
@@ -71,7 +71,7 @@ namespace C8F2740A.NetworkNode.RemoteApi
                 return await TrySendInstructionInternal(command);
             }
             
-            _recorder.RecordError(GetType().Name, "Trying to send instruction without sender");
+            _recorder.RecordError(GetType().Name, "trying send instruction without sender");
 
             return false;
         }
@@ -82,7 +82,7 @@ namespace C8F2740A.NetworkNode.RemoteApi
 
             if (!result.Item1)
             {
-                _applicationRecorder.RecordError(GetType().Name, "Fail to execute command");
+                _applicationRecorder.RecordError(GetType().Name, "fail execute command");
             }
 
             return result.Item1;
@@ -92,14 +92,14 @@ namespace C8F2740A.NetworkNode.RemoteApi
         {
             if (!address.IsCorrectIPv4Address())
             {
-                _applicationRecorder.RecordInfo(GetType().Name, "Wrong ip address format");
+                _applicationRecorder.RecordInfo(GetType().Name, "wrong ip address format");
                 return false;
             }
             
             IInstructionSender instructionsSender = _instructionsSenderFactory.Create(address);
             if (!instructionsSender.TryConnect())
             {
-                _applicationRecorder.RecordInfo(GetType().Name, "Fail to connect to remote");
+                _applicationRecorder.RecordInfo(GetType().Name, "fail connect to remote");
                 return false;
             }
             
@@ -108,7 +108,7 @@ namespace C8F2740A.NetworkNode.RemoteApi
             var (result, data) =  await _instructionSenderHolder.TrySendInstruction(RemoteApiCommands.TRACE.ToEnumerableByte());
             if (!result)
             {
-                _applicationRecorder.RecordInfo(GetType().Name, "Fail to execute TRACE command");
+                _applicationRecorder.RecordInfo(GetType().Name, "fail execute TRACE command");
                 return false;
             }
             

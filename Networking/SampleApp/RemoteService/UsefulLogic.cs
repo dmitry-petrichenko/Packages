@@ -26,7 +26,7 @@ namespace SampleService
             {
                 await Task.Delay(1000);
                 _currentValue++;
-                _recorder.RecordInfo("App", $"value: {_currentValue}");
+                _recorder.RecordInfo("app", $"value: {_currentValue}");
             }
         }
 

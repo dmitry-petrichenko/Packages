@@ -7,7 +7,6 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
 {
     public interface ITraceableRemoteApiMap
     {
-        IEnumerable<string> GetCommands();
         void RegisterWrongCommandHandler(Action action);
         void RegisterCommand(string name, Action handler, string description = "");
         void RegisterCommandWithParameters(string name, Action<IEnumerable<string>> handler, string description = "");
@@ -18,19 +17,23 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
         private readonly IRemoteApiMap _remoteApiMap;
         private readonly IRemoteRecordsSender _remoteRecordsSender;
         private readonly IRecorder _recorder;
+        private readonly IApplicationRecorder _applicationRecorder;
 
         internal Action TraceStarted;
         
         public TraceableRemoteApiMap(
             IRemoteApiMap remoteApiMap,
             IRemoteRecordsSender remoteRecordsSender,
+            IApplicationRecorder applicationRecorder,
             IRecorder recorder)
         {
             _remoteApiMap = remoteApiMap;
             _remoteRecordsSender = remoteRecordsSender;
+            _applicationRecorder = applicationRecorder;
             _recorder = recorder;
             
             RegisterCommand(RemoteApiCommands.TRACE, TraceHandler);
+            RegisterCommand("commands", CommandsHandler);
         }
 
         private void TraceHandler()
@@ -39,8 +42,15 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
             
             TraceStarted?.Invoke();
         }
+        
+        private void CommandsHandler()
+        {
+            var commands = GetCommands();
+            var commandsString = string.Join(" ", commands);
+            _applicationRecorder.RecordInfo("", commandsString);
+        }
 
-        public IEnumerable<string> GetCommands()
+        private IEnumerable<string> GetCommands()
         {
             return _remoteApiMap.GetCommands();
         }

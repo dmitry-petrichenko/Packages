@@ -26,7 +26,6 @@ namespace C8F2740A.NetworkNode.RemoteApi.Operator
             _applicationRecorder = applicationRecorder;
             
             _traceableRemoteApiMap.RegisterWrongCommandHandler(WrongCommandHandler);
-            _traceableRemoteApiMap.RegisterCommand("commands", CommandsHandler);
             _monitoredRemoteOperator.Finished += FinishedHandler;
             _monitoredRemoteOperator.Start();
         }
@@ -38,14 +37,7 @@ namespace C8F2740A.NetworkNode.RemoteApi.Operator
 
         private void WrongCommandHandler()
         {
-            _applicationRecorder.RecordInfo("operator", "Wrong command");
-        }
-        
-        private void CommandsHandler()
-        {
-            var commands = _traceableRemoteApiMap.GetCommands();
-            var commandsString = string.Join(" ", commands);
-            _applicationRecorder.RecordInfo("|", commandsString);
+            _applicationRecorder.RecordInfo("operator", "wrong command");
         }
     }
 }
