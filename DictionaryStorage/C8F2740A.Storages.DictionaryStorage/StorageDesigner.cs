@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace C8F2740A.Storages.DictionaryStorage
 {
@@ -23,12 +24,17 @@ namespace C8F2740A.Storages.DictionaryStorage
 
         public (bool, string) TryGetValueByKey(string key)
         {
-            if (_content.ContainsKey(key))
+            if (!_content.ContainsKey(key))
             {
-                return (true, _content[key]);
+                return (false, default);
+            }
+
+            if (_content[key] == String.Empty)
+            {
+                return (false, default);
             }
             
-            return (false, default);
+            return (true, _content[key]);
         }
 
         public void RemoveKey(string key)
