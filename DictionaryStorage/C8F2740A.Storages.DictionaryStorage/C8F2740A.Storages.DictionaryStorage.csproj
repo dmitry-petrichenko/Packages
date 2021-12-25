@@ -1,12 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
+		<PackageId>C8F2740A.Storages.DictionaryStorage</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>Dmitry Petrichenko</Authors>
+		<Company>C8F2740A</Company>
+        <RootNamespace>C8F2740A.Storages.DictionaryStorage</RootNamespace>
         <TargetFramework>net5.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="JetBrains.ReSharper.TestRunner.Abstractions, Version=2.2.1.0, Culture=neutral, PublicKeyToken=5c492ec4f3eccde3">
+        <HintPath>C:\Program Files\JetBrains\JetBrains Rider 2021.2\lib\ReSharperHost\TestRunner\netcoreapp2.0\JetBrains.ReSharper.TestRunner.Abstractions.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

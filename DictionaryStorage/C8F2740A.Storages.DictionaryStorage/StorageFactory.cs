@@ -1,4 +1,6 @@
-﻿namespace C8F2740A.Storages.DictionaryStorage
+﻿using C8F2740A.Automation.InstagramAutomation.Stores;
+
+namespace C8F2740A.Storages.DictionaryStorage
 {
     public interface IStorageFactory
     {
@@ -9,7 +11,8 @@
     {
         public IStorage Create(string path)
         {
-            var storage = new Storage(path);
+            var fileSystem = new FileSystem(path);
+            var storage = new Storage(fileSystem);
             
             return storage;
         }

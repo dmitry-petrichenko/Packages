@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.IO;
+using C8F2740A.Automation.InstagramAutomation.Stores;
 using Newtonsoft.Json;
 
 namespace C8F2740A.Storages.DictionaryStorage
@@ -8,24 +8,25 @@ namespace C8F2740A.Storages.DictionaryStorage
     {
         void Commit();
     }
-    
+
     public class Storage : IStorage
     {
         private readonly string _path;
+        private readonly IFileSystem _fileSystem;
         
         private IStorageDesigner _dictionaryStorageDesigner;
         
-        public Storage(string path)
+        public Storage(IFileSystem fileSystem)
         {
-            _path = path;
+            _fileSystem = fileSystem;
 
-            if (!File.Exists(_path))
+            if (!_fileSystem.Exists())
             {
                 InitializeEmptyDictionaryStorage();
                 return;
             }
             
-            var rawText = File.ReadAllText(_path);
+            var rawText = _fileSystem.ReadAllText();
             var rawDictionary = JsonConvert.DeserializeObject<IDictionary<string, string>>(rawText);
 
             if (rawDictionary == null)
@@ -47,7 +48,7 @@ namespace C8F2740A.Storages.DictionaryStorage
         private void WriteDictionaryToFile(IDictionary<string, string> dictionary)
         {
             string rawText = JsonConvert.SerializeObject(dictionary);
-            File.WriteAllText(_path, rawText);
+            _fileSystem.WriteAllText(rawText);
         }
 
         public void AddKeyValue(string key, string value)
@@ -69,7 +70,7 @@ namespace C8F2740A.Storages.DictionaryStorage
         {
             var rawDictionary = _dictionaryStorageDesigner.GetContent();
             string rawText = JsonConvert.SerializeObject(rawDictionary);
-            File.WriteAllText(_path, rawText);
+            _fileSystem.WriteAllText(rawText);
         }
     }
 }
