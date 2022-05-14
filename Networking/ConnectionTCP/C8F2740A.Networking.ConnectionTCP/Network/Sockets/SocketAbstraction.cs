@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
@@ -22,7 +23,14 @@ namespace C8F2740A.Networking.ConnectionTCP.Network.Sockets
         public void Dispose()
         {
             if (_socket.Connected)
-                _socket.Disconnect(false);
+            {
+                try
+                {
+                    _socket.Disconnect(false);
+                }
+                catch (Exception e) { }
+            }
+
             _socket.Dispose();
         }
 

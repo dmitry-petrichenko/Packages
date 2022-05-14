@@ -14,19 +14,21 @@ namespace RemoteApi
         private ITraceableRemoteApiMap _sut;
         private IRemoteApiMap _remoteApiMap;
         private IRemoteRecordsSender _remoteRecordsSender;
+        private IApplicationRecorder _applicationRecorder;
         private IRecorder _recorder;
 
         public TraceableRemoteApiMapTests()
         {
             _remoteApiMap = Mock.Create<IRemoteApiMap>();
             _remoteRecordsSender = Mock.Create<IRemoteRecordsSender>();
+            _applicationRecorder = Mock.Create<IApplicationRecorder>();
             _recorder = Mock.Create<IRecorder>();
         }
         
         [Fact]
         public void Constructor_WhenCalled_ShouldRegisterTraceCommand()
         {
-            _sut = new TraceableRemoteApiMap(_remoteApiMap, _remoteRecordsSender, _recorder);
+            _sut = new TraceableRemoteApiMap(_remoteApiMap, _remoteRecordsSender, _applicationRecorder, _recorder);
             
             Mock.Assert(() => _remoteApiMap.RegisterCommand(RemoteApiCommands.TRACE, Arg.IsAny<Action>(), Arg.AnyString), 
                 Occurs.Exactly(1));
@@ -35,7 +37,7 @@ namespace RemoteApi
         [Fact]
         public void RegisterWrongCommand_WhenCalled_ShouldRegisterWrongCommand()
         {
-            _sut = new TraceableRemoteApiMap(_remoteApiMap, _remoteRecordsSender, _recorder);
+            _sut = new TraceableRemoteApiMap(_remoteApiMap, _remoteRecordsSender, _applicationRecorder, _recorder);
 
             Action a = () => { };
             _sut.RegisterWrongCommandHandler(a);
@@ -47,7 +49,7 @@ namespace RemoteApi
         [Fact]
         public void RegisterCommand_WhenCalled_ShouldRegisterCommand()
         {
-            _sut = new TraceableRemoteApiMap(_remoteApiMap, _remoteRecordsSender, _recorder);
+            _sut = new TraceableRemoteApiMap(_remoteApiMap, _remoteRecordsSender, _applicationRecorder, _recorder);
 
             Action a = () => { };
             _sut.RegisterCommand("action", a, string.Empty);
@@ -59,7 +61,7 @@ namespace RemoteApi
         [Fact]
         public void RegisterCommandWithParameters_WhenCalled_ShouldRegisterCommandWithParameters()
         {
-            _sut = new TraceableRemoteApiMap(_remoteApiMap, _remoteRecordsSender, _recorder);
+            _sut = new TraceableRemoteApiMap(_remoteApiMap, _remoteRecordsSender, _applicationRecorder, _recorder);
 
             Action<IEnumerable<string>> a = arr => { };
             _sut.RegisterCommandWithParameters("action", a, string.Empty);
@@ -72,7 +74,7 @@ namespace RemoteApi
         public void TraceCommand_WhenCalled_ShouldActivateAndSendCache()
         {
             var remoteApiMap = new RemoteApiMapMock();
-            _sut = new TraceableRemoteApiMap(remoteApiMap, _remoteRecordsSender, _recorder);
+            _sut = new TraceableRemoteApiMap(remoteApiMap, _remoteRecordsSender, _applicationRecorder, _recorder);
 
             remoteApiMap.TriggerTraceCommand();
             
@@ -84,7 +86,7 @@ namespace RemoteApi
         public void RegisterWrongCommandHandler_WhenThrows_ShouldCatch()
         {
             Mock.Arrange(() => _remoteApiMap.RegisterWrongCommandHandler(Arg.IsAny<Action>())).Throws<Exception>();
-            _sut = new TraceableRemoteApiMap(_remoteApiMap, _remoteRecordsSender, _recorder);
+            _sut = new TraceableRemoteApiMap(_remoteApiMap, _remoteRecordsSender, _applicationRecorder, _recorder);
 
             Action a = () => { };
             _sut.RegisterWrongCommandHandler(a);
@@ -96,7 +98,7 @@ namespace RemoteApi
         public void RegisterCommand_WhenThrows_ShouldCatch()
         {
             Mock.Arrange(() => _remoteApiMap.RegisterCommand("action", Arg.IsAny<Action>(), string.Empty)).Throws<Exception>();
-            _sut = new TraceableRemoteApiMap(_remoteApiMap, _remoteRecordsSender, _recorder);
+            _sut = new TraceableRemoteApiMap(_remoteApiMap, _remoteRecordsSender, _applicationRecorder, _recorder);
             Action a = () => { };
             
             _sut.RegisterCommand("action", a, string.Empty);
@@ -108,7 +110,7 @@ namespace RemoteApi
         public void RegisterCommandWithParameters_WhenThrows_ShouldCatch()
         {
             Mock.Arrange(() => _remoteApiMap.RegisterCommandWithParameters("action", Arg.IsAny<Action<IEnumerable<string>>>(), string.Empty)).Throws<Exception>();
-            _sut = new TraceableRemoteApiMap(_remoteApiMap, _remoteRecordsSender, _recorder);
+            _sut = new TraceableRemoteApiMap(_remoteApiMap, _remoteRecordsSender, _applicationRecorder, _recorder);
             Action<IEnumerable<string>> a = arr => { };
             
             _sut.RegisterCommandWithParameters("action", a, string.Empty);
@@ -119,7 +121,12 @@ namespace RemoteApi
         private class RemoteApiMapMock : IRemoteApiMap
         {
             private Action _handler;
-            
+
+            public IEnumerable<string> GetCommands()
+            {
+                return null;
+            }
+
             public void RegisterWrongCommandHandler(Action action)
             {
                 throw new NotImplementedException();
@@ -128,7 +135,7 @@ namespace RemoteApi
             public void TriggerTraceCommand()
             {
                 _handler?.Invoke();
-            }
+            } 
 
             public void RegisterCommand(string name, Action handler, string description = "")
             {

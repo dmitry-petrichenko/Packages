@@ -84,10 +84,19 @@ namespace C8F2740A.NetworkNode.RemoteApi.Trace
 
             address = SubstituteAbbreviation(address);
             
-            var connected = await _remoteApiOperator.Connect(address);
+            var connected = _remoteApiOperator.Connect(address);
             if (connected)
             {
                 Connected?.Invoke(address);
+                
+                var result = await _remoteApiOperator.ExecuteCommand(RemoteApiCommands.TRACE);
+                
+                if (!result)
+                {
+                    _applicationRecorder.RecordInfo(GetType().Name, "fail execute TRACE command");
+                    return false;
+                }
+                
                 return true;
             }
 

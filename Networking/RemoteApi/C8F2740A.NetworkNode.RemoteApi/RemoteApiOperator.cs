@@ -14,7 +14,7 @@ namespace C8F2740A.NetworkNode.RemoteApi
     public interface IRemoteApiOperator
     {
         Task<bool> ExecuteCommand(string command);
-        Task<bool> Connect(string address);
+        bool Connect(string address);
         void Disconnect();
         
         event Action<string> InstructionReceived;
@@ -88,7 +88,7 @@ namespace C8F2740A.NetworkNode.RemoteApi
             return result.Item1;
         }
 
-        public async Task<bool> Connect(string address)
+        public bool Connect(string address)
         {
             if (!address.IsCorrectIPv4Address())
             {
@@ -104,13 +104,6 @@ namespace C8F2740A.NetworkNode.RemoteApi
             }
             
             _instructionSenderHolder.Set(instructionsSender);
-            
-            var (result, data) =  await _instructionSenderHolder.TrySendInstruction(RemoteApiCommands.TRACE.ToEnumerableByte());
-            if (!result)
-            {
-                _applicationRecorder.RecordInfo(GetType().Name, "fail execute TRACE command");
-                return false;
-            }
             
             return true;
         }

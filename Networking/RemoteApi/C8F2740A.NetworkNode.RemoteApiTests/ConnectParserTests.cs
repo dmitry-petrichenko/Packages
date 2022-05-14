@@ -29,7 +29,7 @@ namespace RemoteApi
         public void ExecuteConnect_WhenConnectSuccess_ShouldRaiseConnect()
         {
             var connectedParam = default(string);
-            Mock.Arrange(() => _remoteApiOperator.Connect(Arg.AnyString)).Returns(Task.FromResult(true));
+            Mock.Arrange(() => _remoteApiOperator.Connect(Arg.AnyString)).Returns(true);
             _sut.Connected += s => connectedParam = s;
             
             _sut.ExecuteCommand("connect 127.0.0.1:11101");
@@ -41,7 +41,7 @@ namespace RemoteApi
         public async void ExecuteConnect_WhenConnectFail_ShouldNotRaiseConnect()
         {
             var connectedParam = string.Empty;
-            Mock.Arrange(() => _remoteApiOperator.Connect(Arg.AnyString)).Returns(Task.FromResult(false));
+            Mock.Arrange(() => _remoteApiOperator.Connect(Arg.AnyString)).Returns(false);
             _sut.Connected += s => connectedParam = s;
             
             var result = await _sut.ExecuteCommand("connect 127.0.0.1:11101");
